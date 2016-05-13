@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<h:head>
+        <title>Quartis Pro Gestion des Contrôles</title>
+        <link rel="stylesheet" media="screen" href="../css/treeView.css" />
+        <script type="text/javascript" src="../js/treeView.js"></script>
+
+    </h:head>
+	
+	<h:body>
+		<h1>Gestion des gammes de contrôles</h1>
+        <h:form id="form">
+        	<p:outputLabel value="#{bundle['labelSite']}" for="site" />
+			<p:autoComplete id="site" value="#{searchController.site}" completeMethod="#{searchController.completeSite}" />
+ 			<br/>
+ 			<p:outputLabel value="#{bundle['labelDesi']}" for="desi" />
+			<p:inputText id="desi" value="#{searchController.desi}" />
+ 			<br/>
+ 			<p:commandButton 	value="#{bundle['labelSearch']}" 
+ 								id="searchButton" 
+ 								actionListener="#{searchController.searchAction}" 
+ 								ajax="false" />
+ 								
+ 			<br/>
+ 			<br/>
+ 			
+ 			<p:dataTable var="mach" value="#{searchController.listeMachine}" rendered="#{not empty searchController.listeMachine}">
+			    <p:column headerText="#{bundle['headerCode']}">
+			        <h:outputText value="#{mach.pk.codeMach}" />
+			    </p:column>
+			 
+			    <p:column headerText="#{bundle['headerSite']}">
+			        <h:outputText value="#{mach.pk.codeSite}" />
+			    </p:column>
+			 
+			    <p:column headerText="#{bundle['headerDesi']}">
+			        <h:outputText value="#{mach.desiMach}" />
+			    </p:column>
+			    
+			    <p:column headerText="">
+			        <p:button outcome="edit" value="#{bundle['labelEdit']}">
+					    <f:param name="code" value="#{mach.pk.codeMach}" />
+					    <f:param name="site" value="#{mach.pk.codeSite}" />
+					</p:button>
+					 
+			    </p:column>
+			</p:dataTable>
+    	</h:form>
+   	</h:body>
+</html>
