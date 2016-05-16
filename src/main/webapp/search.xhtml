@@ -8,14 +8,14 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
-        <title>Quartis Pro Gestion des Contrôles</title>
+        <title>Heroku Test</title>
         <link rel="stylesheet" media="screen" href="../css/treeView.css" />
         <script type="text/javascript" src="../js/treeView.js"></script>
 
     </h:head>
 	
 	<h:body>
-		<h1>Gestion des gammes de contrôles</h1>
+		<h1>Blo</h1>
         <h:form id="form">
         	<p:outputLabel value="#{bundle['labelSite']}" for="site" />
 			<p:autoComplete id="site" value="#{searchController.site}" completeMethod="#{searchController.completeSite}" />
@@ -33,21 +33,21 @@
  			
  			<p:dataTable var="mach" value="#{searchController.listeMachine}" rendered="#{not empty searchController.listeMachine}">
 			    <p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{mach.pk.codeMach}" />
+			        <h:outputText value="#{mach.code}" />
 			    </p:column>
 			 
 			    <p:column headerText="#{bundle['headerSite']}">
-			        <h:outputText value="#{mach.pk.codeSite}" />
+			        <h:outputText value="#{mach.codeSite}" />
 			    </p:column>
 			 
 			    <p:column headerText="#{bundle['headerDesi']}">
-			        <h:outputText value="#{mach.desiMach}" />
+			        <h:outputText value="#{mach.desi}" />
 			    </p:column>
 			    
 			    <p:column headerText="">
 			        <p:button outcome="edit" value="#{bundle['labelEdit']}">
-					    <f:param name="code" value="#{mach.pk.codeMach}" />
-					    <f:param name="site" value="#{mach.pk.codeSite}" />
+					    <f:param name="code" value="#{mach.code}" />
+					    <f:param name="site" value="#{mach.codeSite}" />
 					</p:button>
 					 
 			    </p:column>

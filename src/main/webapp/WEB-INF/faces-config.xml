@@ -11,7 +11,7 @@
             <supported-locale>fr</supported-locale>
         </locale-config>
         <resource-bundle>
-            <base-name>com.bodetosys.gestioncontrole.resources.language</base-name>
+            <base-name>fr.pascalmahe.resources.language</base-name>
             <var>bundle</var>
         </resource-bundle>
     </application>

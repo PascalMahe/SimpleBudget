@@ -3,6 +3,8 @@ package fr.pascalmahe.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.pascalmahe.business.Machine;
 
 public class MachineDAO {
@@ -28,26 +30,72 @@ public class MachineDAO {
 	
 	public static List<Machine> searchBySiteDesi(String site, String desi) {
 		// BOUCHON !
-		
-		// S'appuiera sur la bibliothèque QuartisProMetier
-		// quand elle existera...
-		
+		// TODO: real DAO
 		List<Machine> listeMachine = new ArrayList<>();
 		
-		
+		for(Machine machCourante : listeMachineEnMemoire){
+			String siteMachCourante = machCourante.getCodeSite();
+			String desiMachCourante = machCourante.getDesi();
+			boolean isRightSite = false;
+			boolean isRightDesi = false;
+			if(StringUtils.isNotBlank(siteMachCourante)){
+				siteMachCourante = siteMachCourante.toLowerCase();
+				if(siteMachCourante.indexOf(site.toLowerCase()) > -1){
+					isRightSite = true;
+				}
+			}
+			if(StringUtils.isNotBlank(desiMachCourante)){
+				desiMachCourante = desiMachCourante.toLowerCase();
+				if(desiMachCourante.indexOf(desi.toLowerCase()) > -1){
+					isRightDesi = true;
+				}
+			}
+			
+			if(isRightSite && isRightDesi){
+				listeMachine.add(machCourante);
+			}
+		}
 		
 		return listeMachine;
 	}
 
+	public static List<Machine> searchExactlyBySiteCode(String site, String code) {
+		// BOUCHON !
+		// TODO: real DAO
+		List<Machine> listeMachine = new ArrayList<>();
+		
+		for(Machine machCourante : listeMachineEnMemoire){
+			String siteMachCourante = machCourante.getCodeSite();
+			String codeMachCourante = machCourante.getCode();
+			boolean isRightSite = false;
+			boolean isRightCode = false;
+			if(StringUtils.isNotBlank(siteMachCourante) && 
+					siteMachCourante.equalsIgnoreCase(site)){
+				isRightSite = true;
+			}
+			if(StringUtils.isNotBlank(codeMachCourante) && 
+					codeMachCourante.equalsIgnoreCase(code)){
+				isRightCode = true;
+			}
+			
+			if(isRightSite && isRightCode){
+				listeMachine.add(machCourante);
+			}
+		}
+		
+		return listeMachine;
+	}
+
+	
 	public static boolean saveOrUpdate(Machine machineASauvegarder) {
 		// BOUCHON !
 		
-		// S'appuiera sur la bibliothèque QuartisProMetier
-		// quand elle existera
-		
-		
-		
-		return false;
+		List<Machine> listeMachineExistante = 
+				searchExactlyBySiteCode(machineASauvegarder.getCodeSite(), 
+										machineASauvegarder.getCode());
+		listeMachineEnMemoire.removeAll(listeMachineExistante);
+		listeMachineEnMemoire.add(machineASauvegarder);
+		return true;
 	}
 
 }
