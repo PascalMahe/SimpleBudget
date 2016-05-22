@@ -1,1 +1,1 @@
-web: java -jar target/dependency/webapp-runner.jar target/*.war $PORT
+web: java $JAVA_OPTS -jar target/dependency/webapp-runner.jar --port $PORT target/simplebudget-0.1.war
