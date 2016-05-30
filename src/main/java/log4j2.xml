@@ -30,10 +30,10 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="org.hibernate" level="INFO">
+    <Logger name="org.hibernate" level="INFO" additivity="false">
     	<Appender-Ref ref="STDOUT"/>
     </Logger>
-    <Logger name="fr.pascalmahe" level="DEBUG">
+    <Logger name="fr.pascalmahe" level="DEBUG" additivity="false">
     	<Appender-Ref ref="STDOUT"/>
     </Logger>
     <Root level="ERROR">
