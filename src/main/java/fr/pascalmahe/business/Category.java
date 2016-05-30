@@ -32,6 +32,12 @@ public class Category implements Serializable {
 		this.name = name;
 		this.fatherCategory = fatherCategory;
 	}
+
+	public Category(String name, Category fatherCategory) {
+		super();
+		this.name = name;
+		this.fatherCategory = fatherCategory;
+	}
 	
 	public Integer getId() {
 		return id;

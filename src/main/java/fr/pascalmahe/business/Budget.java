@@ -1,14 +1,13 @@
 package fr.pascalmahe.business;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 /**
@@ -26,23 +25,23 @@ public class Budget implements Serializable {
 	
 	private String name;
 	
-	@ManyToOne(targetEntity=Category.class)
-	private List<Category> categoryMap;
+	@OneToMany
+	private Map<Integer, Category> categoryMap;
 	
 	private Float maxAmount;
 	
-	private Date startDate; // the date from which this budget counts lines
+	private LocalDate startDate; // the date from which this budget counts lines
 	
-	private Date endDate; // the date up to which this budget counts lines
+	private LocalDate endDate; // the date up to which this budget counts lines
 
 	public Budget() {}
 
 	public Budget(Integer id, 
 					String name, 
-					List<Category> categoryMap, 
+					Map<Integer, Category> categoryMap, 
 					Float maxAmount, 
-					Date startDate,
-					Date endDate) {
+					LocalDate startDate,
+					LocalDate endDate) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -51,8 +50,20 @@ public class Budget implements Serializable {
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
+
+	public Budget(String name, 
+					Map<Integer, Category> categoryMap, 
+					Float maxAmount, 
+					LocalDate startDate,
+					LocalDate endDate) {
+		super();
+		this.name = name;
+		this.categoryMap = categoryMap;
+		this.maxAmount = maxAmount;
+		this.startDate = startDate;
+		this.endDate = endDate;
+	}
     
-	
 	public Integer getId() {
 		return id;
 	}
@@ -69,11 +80,11 @@ public class Budget implements Serializable {
 		this.name = name;
 	}
 
-	public List<Category> getCategoryMap() {
+	public Map<Integer, Category> getCategoryMap() {
 		return categoryMap;
 	}
 
-	public void setCategoryMap(List<Category> categoryMap) {
+	public void setCategoryMap(Map<Integer, Category> categoryMap) {
 		this.categoryMap = categoryMap;
 	}
 
@@ -85,19 +96,19 @@ public class Budget implements Serializable {
 		this.maxAmount = maxAmount;
 	}
 
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 

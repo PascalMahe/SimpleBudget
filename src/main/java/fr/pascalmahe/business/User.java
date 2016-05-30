@@ -25,13 +25,23 @@ public class User implements Serializable {
 	
 	private String password;
 	
+	private Boolean dailyNotification;
+	
 	public User() {}
 
-	public User(Integer id, String login, String password) {
+	public User(Integer id, String login, String password, Boolean dailyNotification) {
 		super();
 		this.id = id;
 		this.login = login;
 		this.password = password;
+		this.dailyNotification = dailyNotification;
+	}
+
+	public User(String login, String password, Boolean dailyNotification) {
+		super();
+		this.login = login;
+		this.password = password;
+		this.dailyNotification = dailyNotification;
 	}
 
 	@Override
@@ -97,7 +107,10 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", password=" + password + "]";
+		return "User [id=" + id + 
+				", login=" + login + 
+				", password=" + password + 
+				", dailyNotification=" + dailyNotification + "]";
 	}
 
 	

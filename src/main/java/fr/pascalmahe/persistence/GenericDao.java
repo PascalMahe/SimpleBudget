@@ -18,7 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 
@@ -135,20 +135,22 @@ public class GenericDao {
 		logger.debug("Hibernate configured and connected");
 	}
 
-	public static boolean saveOrUpdate(Line ligneASauvegarder) {
+	public static boolean saveOrUpdate(Object objectToSave) {
 		
 		setFactoryUp();
 		
-		Session currSession = sessionFactory.getCurrentSession();
+		Session currSession = sessionFactory.openSession();
 		
-		Transaction currentTransaction = currSession.getTransaction();
-		currentTransaction.begin();
+		currSession.beginTransaction();
 		
-		logger.debug("Sauvegarde de la ligne:  " + ligneASauvegarder);
-		currSession.saveOrUpdate(ligneASauvegarder);
-		currentTransaction.commit();
+		logger.debug("Saving:  " + objectToSave);
+		currSession.saveOrUpdate(objectToSave);
 		
-		logger.debug("Ligne sauvegardée.");
+		currSession.getTransaction().commit();
+		
+		currSession.flush();
+		currSession.close();
+		logger.debug(objectToSave.getClass().getSimpleName() + " saved.");
 		
 		return true;
 	}
@@ -159,7 +161,7 @@ public class GenericDao {
 		logger.debug("searchBySiteDesi - searching on site: '" + site + "', desi: '" + desi + "'.");
 		
 		Session currSession = sessionFactory.openSession();
-		
+		currSession.beginTransaction();
 		Criteria crita = currSession.createCriteria(Line.class);
 		
 		if(!StringUtils.isBlank(site)){
@@ -171,8 +173,45 @@ public class GenericDao {
 		}
 		
 		List<Line> returnList = crita.list();
+		currSession.flush();
+		currSession.close();
+		
 		logger.debug("searchBySiteDesi - returning " + returnList.size() + " result(s).");
 		
 		return returnList;
+	}
+
+	public static int count(Class classeToCount) {
+		
+		logger.debug("Counting " + classeToCount.getSimpleName() + "s.");
+
+		setFactoryUp();
+		
+		Session currSession = sessionFactory.openSession();
+		currSession.beginTransaction();
+		Number result = (Number) currSession.createCriteria(classeToCount)
+									.setProjection(Projections.rowCount())
+									.uniqueResult();
+		currSession.flush();
+		currSession.close();
+		
+		logger.debug("Counted " + result.intValue() + " " + classeToCount.getSimpleName() + "s.");
+		return result.intValue();
+	}
+
+	public static void delete(Object objectToDelete) {
+		
+		logger.debug("Deleting " + objectToDelete + ".");
+
+		Session currSession = sessionFactory.openSession();
+		currSession.beginTransaction();
+		
+		currSession.delete(objectToDelete);
+		
+		currSession.getTransaction().commit();
+		currSession.flush();
+		currSession.close();
+		
+		logger.debug(objectToDelete + " deleted.");
 	}
 }

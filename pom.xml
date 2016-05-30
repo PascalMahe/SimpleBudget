@@ -27,6 +27,13 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1206-jdbc42</version>
 		</dependency>
+		
+		<!-- Junit -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>4.11</version>
+		</dependency>
 
 		<!-- Logger : log4J -->
 		<dependency>

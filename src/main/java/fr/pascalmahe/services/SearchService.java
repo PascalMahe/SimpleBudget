@@ -1,5 +1,6 @@
 package fr.pascalmahe.services;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +24,7 @@ public class SearchService {
 		logger.info("Searching lines - returning " + listeMachine.size() + " result(s).");
 		
 		if(listeMachine.size() == 0){
-			Line newLine = new Line(null, new Date(), "test d'insertion", "Oh ça c'est du bon test, ça, madame", 15.2654f, false, null);
+			Line newLine = new Line(null, LocalDate.now(), "test d'insertion", "Oh ça c'est du bon test, ça, madame", 15.2654f, false, null);
 			GenericDao.saveOrUpdate(newLine);
 			listeMachine = GenericDao.searchBySiteDesi(site, desi);
 			

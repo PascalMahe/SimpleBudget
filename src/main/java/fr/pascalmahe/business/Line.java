@@ -1,6 +1,7 @@
 package fr.pascalmahe.business;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -24,8 +25,7 @@ public class Line implements Serializable {
 	@GeneratedValue
 	private Integer id;
 	
-	@Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDate date;
     
     private String mainLabel;
     
@@ -37,12 +37,15 @@ public class Line implements Serializable {
     
     private Category category;
 
-
 	public Line() {}
-
     
-	public Line(Integer id, Date date, String mainLabel, String secondaryLabel, Float amount, Boolean recurring,
-			Category category) {
+	public Line(Integer id, 
+			LocalDate date, 
+				String mainLabel, 
+				String secondaryLabel, 
+				Float amount, 
+				Boolean recurring,
+				Category category) {
 		super();
 		this.id = id;
 		this.date = date;
@@ -53,6 +56,20 @@ public class Line implements Serializable {
 		this.category = category;
 	}
 
+	public Line(LocalDate date, 
+				String mainLabel, 
+				String secondaryLabel, 
+				Float amount, 
+				Boolean recurring,
+				Category category) {
+		super();
+		this.date = date;
+		this.mainLabel = mainLabel;
+		this.secondaryLabel = secondaryLabel;
+		this.amount = amount;
+		this.recurring = recurring;
+		this.category = category;
+	}
 
 	@Override
 	public String toString() {
@@ -132,11 +149,11 @@ public class Line implements Serializable {
 		this.id = id;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
