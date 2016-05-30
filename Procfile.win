@@ -1,0 +1,1 @@
+web: java -jar target/dependency/webapp-runner.jar --port %PORT% target/simplebudget-0.1.war

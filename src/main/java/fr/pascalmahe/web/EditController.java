@@ -83,7 +83,7 @@ public class EditController implements Serializable {
         
         EditService editService = new EditService();
         
-        boolean success = editService.editMachine(cleanSite, cleanDesi, cleanCode);
+        boolean success = editService.editLine(cleanSite, cleanDesi, cleanCode);
         
         if(success){
             addMessage("La Machine a été sauvegardée.", FacesMessage.SEVERITY_INFO);

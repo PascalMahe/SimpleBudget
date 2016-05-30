@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.pascalmahe.business.Machine;
+import fr.pascalmahe.business.Line;
 import fr.pascalmahe.services.SearchService;
 
 
@@ -40,7 +40,7 @@ public class SearchController implements Serializable {
 
 	private String desi;
 	
-	private List<Machine> listeMachine;
+	private List<Line> listeLigne;
 
 	
 
@@ -76,7 +76,7 @@ public class SearchController implements Serializable {
         
         SearchService service = new SearchService();
         
-        listeMachine = service.searchMachinesBySiteDesi(cleanSite, cleanDesi);
+        listeLigne = service.searchLinesBySiteDesi(cleanSite, cleanDesi);
         
     }
 	
@@ -108,12 +108,15 @@ public class SearchController implements Serializable {
 		this.desi = desi;
 	}
 
-	public List<Machine> getListeMachine() {
-		return listeMachine;
+	public List<Line> getListeLigne() {
+		return listeLigne;
 	}
 
-	public void setListeMachine(List<Machine> listeMachine) {
-		this.listeMachine = listeMachine;
+	public void setListeLigne(List<Line> listeLigne) {
+		this.listeLigne = listeLigne;
 	}
+
+	
+	
 }
 

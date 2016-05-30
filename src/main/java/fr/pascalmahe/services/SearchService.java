@@ -1,25 +1,35 @@
 package fr.pascalmahe.services;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.pascalmahe.business.Machine;
-import fr.pascalmahe.persistence.MachineDAO;
+import fr.pascalmahe.business.Line;
+import fr.pascalmahe.persistence.GenericDao;
 
 public class SearchService {
 
 	private static final Logger logger = LogManager.getLogger();
 	
-	public List<Machine> searchMachinesBySiteDesi(String site, String desi){
+	public List<Line> searchLinesBySiteDesi(String site, String desi){
 		
-		logger.info("Recherche des machines - critères : {site = " + site + ", desi = " + desi + "}");
+		logger.info("Searching lines - on : {site = '" + site + "', desi = '" + desi + "'}");
 		
-		List<Machine> listeMachine = MachineDAO.searchBySiteDesi(site, desi);
+		List<Line> listeMachine = GenericDao.searchBySiteDesi(site, desi);
 		
-		logger.info("Recherche des machines - retour de " + listeMachine.size() + " résultat(s).");
+		logger.info("Searching lines - returning " + listeMachine.size() + " result(s).");
+		
+		if(listeMachine.size() == 0){
+			Line newLine = new Line(null, new Date(), "test d'insertion", "Oh ça c'est du bon test, ça, madame", 15.2654f, false, null);
+			GenericDao.saveOrUpdate(newLine);
+			listeMachine = GenericDao.searchBySiteDesi(site, desi);
+			
+			logger.info("Searching lines - ACTUALLY, returning " + listeMachine.size() + " result(s).");
+		}
+		
 		return listeMachine;
 	}
 
