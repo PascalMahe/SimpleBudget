@@ -25,7 +25,8 @@ public class EditService {
 			Line ligneASauvegarder = new Line();
 			
 			// appel du DAO approprié
-			success = GenericDao.saveOrUpdate(ligneASauvegarder);
+			GenericDao<Line> dao = new GenericDao<>(Line.class);
+			dao.saveOrUpdate(ligneASauvegarder);
 		}
 		
 		if(success){

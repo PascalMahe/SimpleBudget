@@ -2,7 +2,6 @@ package fr.pascalmahe.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -19,19 +18,28 @@ public class SearchService {
 		
 		logger.info("Searching lines - on : {site = '" + site + "', desi = '" + desi + "'}");
 		
-		List<Line> listeMachine = GenericDao.searchBySiteDesi(site, desi);
+		GenericDao<Line> dao = new GenericDao<>(Line.class);
 		
-		logger.info("Searching lines - returning " + listeMachine.size() + " result(s).");
+		List<Line> listLines = dao.searchBySiteDesi(site, desi);
 		
-		if(listeMachine.size() == 0){
-			Line newLine = new Line(null, LocalDate.now(), "test d'insertion", "Oh ça c'est du bon test, ça, madame", 15.2654f, false, null);
-			GenericDao.saveOrUpdate(newLine);
-			listeMachine = GenericDao.searchBySiteDesi(site, desi);
+		logger.info("Searching lines - returning " + listLines.size() + " result(s).");
+		
+		if(listLines.size() == 0){
+			Line newLine = new Line(null, 
+									LocalDate.now(), 
+									"test d'insertion", 
+									"Oh ça c'est du bon test, ça, madame", 
+									15.2654f, 
+									false, 
+									null);
 			
-			logger.info("Searching lines - ACTUALLY, returning " + listeMachine.size() + " result(s).");
+			dao.saveOrUpdate(newLine);
+			listLines = dao.searchBySiteDesi(site, desi);
+			
+			logger.info("Searching lines - ACTUALLY, returning " + listLines.size() + " result(s).");
 		}
 		
-		return listeMachine;
+		return listLines;
 	}
 
 	public List<String> findSites(String site) {

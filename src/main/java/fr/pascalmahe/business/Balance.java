@@ -106,5 +106,8 @@ public class Balance implements Serializable {
 	public String toString() {
 		return "Balance [id=" + id + ", fetchDate=" + fetchDate + ", amount=" + amount + "]";
 	}
+
+	   
+    
     
 }

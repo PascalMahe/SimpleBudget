@@ -6,7 +6,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -28,11 +30,19 @@ import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.business.User;
 
-public class GenericDao {
+public class GenericDao<T> {
 
 	private static SessionFactory sessionFactory;
 	
 	private static final Logger logger = LogManager.getLogger();
+	
+	private static final String CRITERIA_STRING_NAKED_START = " following criterias: ";
+	
+	private Class<T> classToUse;
+	
+	public GenericDao(Class<T> classUse){
+		this.classToUse = classUse;
+	}
 	
 	private static void setFactoryUp(){
 		if(sessionFactory == null){
@@ -135,7 +145,7 @@ public class GenericDao {
 		logger.debug("Hibernate configured and connected");
 	}
 
-	public static boolean saveOrUpdate(Object objectToSave) {
+	public void saveOrUpdate(Object objectToSave) {
 		
 		setFactoryUp();
 		
@@ -148,14 +158,11 @@ public class GenericDao {
 		
 		currSession.getTransaction().commit();
 		
-		currSession.flush();
 		currSession.close();
 		logger.debug(objectToSave.getClass().getSimpleName() + " saved.");
-		
-		return true;
 	}
 
-	public static List<Line> searchBySiteDesi(String site, String desi) {
+	public List<Line> searchBySiteDesi(String site, String desi) {
 		
 		setFactoryUp();
 		logger.debug("searchBySiteDesi - searching on site: '" + site + "', desi: '" + desi + "'.");
@@ -173,7 +180,7 @@ public class GenericDao {
 		}
 		
 		List<Line> returnList = crita.list();
-		currSession.flush();
+		
 		currSession.close();
 		
 		logger.debug("searchBySiteDesi - returning " + returnList.size() + " result(s).");
@@ -181,25 +188,24 @@ public class GenericDao {
 		return returnList;
 	}
 
-	public static int count(Class classeToCount) {
+	public int count() {
 		
-		logger.debug("Counting " + classeToCount.getSimpleName() + "s.");
+		logger.debug("Counting " + classToUse.getSimpleName() + "s.");
 
 		setFactoryUp();
 		
 		Session currSession = sessionFactory.openSession();
 		currSession.beginTransaction();
-		Number result = (Number) currSession.createCriteria(classeToCount)
+		Number result = (Number) currSession.createCriteria(classToUse)
 									.setProjection(Projections.rowCount())
 									.uniqueResult();
-		currSession.flush();
 		currSession.close();
 		
-		logger.debug("Counted " + result.intValue() + " " + classeToCount.getSimpleName() + "s.");
+		logger.debug("Counted " + result.intValue() + " " + classToUse.getSimpleName() + "s.");
 		return result.intValue();
 	}
 
-	public static void delete(Object objectToDelete) {
+	public void delete(Object objectToDelete) {
 		
 		logger.debug("Deleting " + objectToDelete + ".");
 
@@ -209,9 +215,38 @@ public class GenericDao {
 		currSession.delete(objectToDelete);
 		
 		currSession.getTransaction().commit();
-		currSession.flush();
+		
 		currSession.close();
 		
 		logger.debug(objectToDelete + " deleted.");
+	}
+	
+	public List<T> search(Map<String, Object> searchCriteriaMap){
+		String criteriaString = " no criterias";
+		if(searchCriteriaMap.size() > 0){
+			criteriaString = CRITERIA_STRING_NAKED_START;
+		}
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		for(String property : searchCriteriaMap.keySet()){
+			Object value = searchCriteriaMap.get(property);
+			
+			// adding to the debug message
+			if(criteriaString.length() != CRITERIA_STRING_NAKED_START.length()){
+				criteriaString += ", ";
+			}
+			criteriaString += property + " = '" + value + "'";
+			
+			// adding to the criteria
+			crita.add(Restrictions.eqOrIsNull(property, value));
+		}
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s with" + criteriaString + ".");
+		
+		List<T> listToReturn = crita.list();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
 	}
 }
