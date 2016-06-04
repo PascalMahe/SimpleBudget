@@ -6,18 +6,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
@@ -145,7 +142,7 @@ public class GenericDao<T> {
 		logger.debug("Hibernate configured and connected");
 	}
 
-	public void saveOrUpdate(Object objectToSave) {
+	public void saveOrUpdate(T objectToSave) {
 		
 		setFactoryUp();
 		
@@ -153,7 +150,7 @@ public class GenericDao<T> {
 		
 		currSession.beginTransaction();
 		
-		logger.debug("Saving:  " + objectToSave);
+		logger.debug("Saving:  " + objectToSave + "...");
 		currSession.saveOrUpdate(objectToSave);
 		
 		currSession.getTransaction().commit();
@@ -162,35 +159,9 @@ public class GenericDao<T> {
 		logger.debug(objectToSave.getClass().getSimpleName() + " saved.");
 	}
 
-	public List<Line> searchBySiteDesi(String site, String desi) {
-		
-		setFactoryUp();
-		logger.debug("searchBySiteDesi - searching on site: '" + site + "', desi: '" + desi + "'.");
-		
-		Session currSession = sessionFactory.openSession();
-		currSession.beginTransaction();
-		Criteria crita = currSession.createCriteria(Line.class);
-		
-		if(!StringUtils.isBlank(site)){
-			crita.add(Restrictions.eq("mainLabel", desi));
-		}
-
-		if(!StringUtils.isBlank(site)){
-			crita.add(Restrictions.eq("category", desi));
-		}
-		
-		List<Line> returnList = crita.list();
-		
-		currSession.close();
-		
-		logger.debug("searchBySiteDesi - returning " + returnList.size() + " result(s).");
-		
-		return returnList;
-	}
-
 	public int count() {
 		
-		logger.debug("Counting " + classToUse.getSimpleName() + "s.");
+		logger.debug("Counting " + classToUse.getSimpleName() + "s...");
 
 		setFactoryUp();
 		
@@ -205,7 +176,7 @@ public class GenericDao<T> {
 		return result.intValue();
 	}
 
-	public void delete(Object objectToDelete) {
+	public void delete(T objectToDelete) {
 		
 		logger.debug("Deleting " + objectToDelete + ".");
 
@@ -219,6 +190,16 @@ public class GenericDao<T> {
 		currSession.close();
 		
 		logger.debug(objectToDelete + " deleted.");
+	}
+	
+	public T fetch(Integer id){
+		logger.debug("Fetching " + classToUse.getSimpleName() + " with #" + id +"...");
+		
+		Session currSession = sessionFactory.openSession();
+		T fetched = currSession.get(classToUse, id);
+		
+		logger.debug("Found : " + fetched);
+		return fetched;
 	}
 	
 	public List<T> search(Map<String, Object> searchCriteriaMap){

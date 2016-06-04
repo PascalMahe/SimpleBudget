@@ -2,7 +2,9 @@ package fr.pascalmahe.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,8 +21,10 @@ public class SearchService {
 		logger.info("Searching lines - on : {site = '" + site + "', desi = '" + desi + "'}");
 		
 		GenericDao<Line> dao = new GenericDao<>(Line.class);
-		
-		List<Line> listLines = dao.searchBySiteDesi(site, desi);
+		Map<String, Object> mapOfCriteria = new HashMap<>();
+		mapOfCriteria.put("mainLabel", desi);
+		mapOfCriteria.put("category", site);
+		List<Line> listLines = dao.search(mapOfCriteria);
 		
 		logger.info("Searching lines - returning " + listLines.size() + " result(s).");
 		
@@ -34,7 +38,7 @@ public class SearchService {
 									null);
 			
 			dao.saveOrUpdate(newLine);
-			listLines = dao.searchBySiteDesi(site, desi);
+			listLines = dao.search(mapOfCriteria);
 			
 			logger.info("Searching lines - ACTUALLY, returning " + listLines.size() + " result(s).");
 		}

@@ -218,15 +218,20 @@ public class TestGenericDao {
 
 		for(Object currObject : listToDelete){
 			if(currObject instanceof Balance){
-				balanceDao.delete(currObject);
+				Balance balTodelete = (Balance) currObject;
+				balanceDao.delete(balTodelete);
 			} else if(currObject instanceof Budget){
-				budgetDao.delete(currObject);
+				Budget balTodelete = (Budget) currObject;
+				budgetDao.delete(balTodelete);
 			} else if(currObject instanceof Category){
-				categoryDao.delete(currObject);
+				Category catTodelete = (Category) currObject;
+				categoryDao.delete(catTodelete);
 			} else if(currObject instanceof Line){
-				lineDao.delete(currObject);
+				Line linTodelete = (Line) currObject;
+				lineDao.delete(linTodelete);
 			} else if(currObject instanceof User){
-				userDao.delete(currObject);
+				User userTodelete = (User) currObject;
+				userDao.delete(userTodelete);
 			}
 		}
 		
@@ -247,6 +252,7 @@ public class TestGenericDao {
 
 	@Test
 	public void testSearch() {
+		logger.info("Starting testSearch...");
 		// Balance
 		// Test : 1 criteria, 1 result
 		Map<String, Object> critList = new HashMap<>();
@@ -352,7 +358,171 @@ public class TestGenericDao {
 						+ "found when searching with 1 criteria.", 
 					1, 
 					oneResultUser.size());
+		logger.info("testSearch done.");
+	}
+	
+	@Test
+	public void testInsert(){
+		logger.info("Starting testInsert...");
+		// Balance
+		// Counting before
+		GenericDao<Balance> balanceDao = new GenericDao<>(Balance.class);
+		int nbBalancesBeforeInsertion = balanceDao.count();
 		
+		// Creating value
+		Balance balanceToInsert = new Balance(LocalDate.now(), -0.05f);
+		balanceDao.saveOrUpdate(balanceToInsert);
+		
+		// Checking by counting
+		int nbBalancesAfterInsertion = balanceDao.count();
+		assertEquals("Wrong number of Balances counted after insertion test", 
+						nbBalancesBeforeInsertion + 1, 
+						nbBalancesAfterInsertion);
+		
+		// Checking by fetching
+		Balance balanceForVerification = balanceDao.fetch(balanceToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of Balance.", balanceToInsert, balanceForVerification);
+		
+		// Category (simple)
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		int nbCategorysBeforeInsertion = catDao.count();
+		
+		// Creating value
+		Category catToInsert = new Category("Category for insertion test", null);
+		catDao.saveOrUpdate(catToInsert);
+		
+		// Checking by counting
+		int nbCategorysAfterInsertion = catDao.count();
+		assertEquals("Wrong number of Categorys counted after insertion test", 
+						nbCategorysBeforeInsertion + 1, 
+						nbCategorysAfterInsertion);
+		
+		// Checking by fetching
+		Category catForVerification = catDao.fetch(balanceToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of Categorys.", 
+						balanceToInsert, 
+						balanceForVerification);
+
+		// Category (with father)
+		nbCategorysBeforeInsertion = catDao.count();
+		
+		// Creating value
+		Category catToInsertWithFather = new Category("Category for insertion test (with father)", catToInsert);
+		catDao.saveOrUpdate(catToInsertWithFather);
+		
+		// Checking by counting
+		nbCategorysAfterInsertion = catDao.count();
+		assertEquals("Wrong number of Categorys counted after insertion test (with father)", 
+						nbCategorysBeforeInsertion + 1, 
+						nbCategorysAfterInsertion);
+		
+		// Checking by fetching
+		catForVerification = catDao.fetch(balanceToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of Categorys (with father).", 
+						balanceToInsert, 
+						balanceForVerification);
+		
+		// Budget
+		// Counting before
+		GenericDao<Budget> budgetDao = new GenericDao<>(Budget.class);
+		int nbBudgetsBeforeInsertion = budgetDao.count();
+		
+		// Creating value
+		LocalDate monthStart = LocalDate.now().withDayOfMonth(1);
+		boolean isCurrentYearLeap = monthStart.isLeapYear();
+		int currentMonthLength = monthStart.getMonth().length(isCurrentYearLeap);
+		LocalDate monthEnd = LocalDate.now().withDayOfMonth(currentMonthLength);
+		Map<Integer, Category> categoryMap = new HashMap<>();
+		categoryMap.put(catToInsert.getId(), catToInsert);
+		categoryMap.put(catToInsert.getId(), catToInsertWithFather);
+		Budget budgetToInsert = new Budget("Testbudget", categoryMap, -1245.69f, monthStart, monthEnd);
+		budgetDao.saveOrUpdate(budgetToInsert);
+		
+		// Checking by counting
+		int nbBudgetsAfterInsertion = budgetDao.count();
+		assertEquals("Wrong number of Budgets counted after insertion test", 
+						nbBudgetsBeforeInsertion + 1, 
+						nbBudgetsAfterInsertion);
+		
+		// Checking by fetching
+		Budget budgetForVerification = budgetDao.fetch(budgetToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of Budget.", budgetToInsert, budgetForVerification);
+		
+		// Line (simple)
+		// Counting before
+		GenericDao<Line> linDao = new GenericDao<>(Line.class);
+		int nbLinesBeforeInsertion = linDao.count();
+		
+		// Creating value
+		Line linToInsert = new Line(LocalDate.now(), 
+									"Line for insertion test", 
+									"Line for insertion test (sec label)", 
+									0.123f, 
+									false, 
+									null);
+		linDao.saveOrUpdate(linToInsert);
+		
+		// Checking by counting
+		int nbLinesAfterInsertion = linDao.count();
+		assertEquals("Wrong number of Lines counted after insertion test", 
+						nbLinesBeforeInsertion + 1, 
+						nbLinesAfterInsertion);
+		
+		// Checking by fetching
+		Line lineForVerification = linDao.fetch(linToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of Line.", linToInsert, lineForVerification);
+		
+		// Line (with category)
+		// Counting before
+		nbLinesBeforeInsertion = linDao.count();
+		
+		// Creating value
+		Line linToInsertWithCategory = new Line(LocalDate.now(), 
+											"Line for insertion test (with category)", 
+											"Line for insertion test (sec label) (with category)", 
+											-15150.123f, 
+											false, 
+											catToInsert);
+		linDao.saveOrUpdate(linToInsertWithCategory);
+		
+		// Checking by counting
+		nbLinesAfterInsertion = linDao.count();
+		assertEquals("Wrong number of Lines counted after insertion test (with category)", 
+						nbLinesBeforeInsertion + 1, 
+						nbLinesAfterInsertion);
+		
+		// Checking by fetching
+		lineForVerification = linDao.fetch(linToInsertWithCategory.getId());
+		assertEquals("Wrong value fetched after insertion of Line (with category).", linToInsertWithCategory, lineForVerification);
+
+		// User
+		// Counting before
+		GenericDao<User> userDao = new GenericDao<>(User.class);
+		int nbUsersBeforeInsertion = userDao.count();
+		
+		// Creating value
+		User userToInsert = new User("User for insertion test", "pwd", true);
+		userDao.saveOrUpdate(userToInsert);
+		
+		// Checking by counting
+		int nbUsersAfterInsertion = userDao.count();
+		assertEquals("Wrong number of Lines counted after insertion test", 
+						nbUsersBeforeInsertion + 1, 
+						nbUsersAfterInsertion);
+		
+		// Checking by fetching
+		User userForVerification = userDao.fetch(userToInsert.getId());
+		assertEquals("Wrong value fetched after insertion of User.", userToInsert, userForVerification);
+		
+		listToDelete.add(balanceToInsert);
+		listToDelete.add(budgetToInsert);
+		listToDelete.add(catToInsert);
+		listToDelete.add(catToInsertWithFather);
+		listToDelete.add(linToInsert);
+		listToDelete.add(linToInsertWithCategory);
+		listToDelete.add(userToInsert);
+		
+		logger.info("testInsert done.");
 	}
 
 }
