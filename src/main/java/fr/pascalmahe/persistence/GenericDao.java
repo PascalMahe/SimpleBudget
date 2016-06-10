@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +21,11 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
+import org.hibernate.sql.JoinType;
 
 import fr.pascalmahe.business.Balance;
 import fr.pascalmahe.business.Budget;
+import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.business.User;
@@ -130,6 +133,7 @@ public class GenericDao<T> {
 		configuration.addAnnotatedClass(Balance.class);
 		configuration.addAnnotatedClass(Budget.class);
 		configuration.addAnnotatedClass(Category.class);
+		configuration.addAnnotatedClass(Categorisation.class);
 		configuration.addAnnotatedClass(Line.class);
 		configuration.addAnnotatedClass(User.class);
 		
@@ -151,11 +155,14 @@ public class GenericDao<T> {
 		currSession.beginTransaction();
 		
 		logger.debug("Saving:  " + objectToSave + "...");
-		currSession.saveOrUpdate(objectToSave);
+		try {
+			currSession.saveOrUpdate(objectToSave);
+			currSession.getTransaction().commit();
+		}
+		finally {
+			currSession.close();
+		}
 		
-		currSession.getTransaction().commit();
-		
-		currSession.close();
 		logger.debug(objectToSave.getClass().getSimpleName() + " saved.");
 	}
 
@@ -182,13 +189,12 @@ public class GenericDao<T> {
 
 		Session currSession = sessionFactory.openSession();
 		currSession.beginTransaction();
-		
-		currSession.delete(objectToDelete);
-		
-		currSession.getTransaction().commit();
-		
-		currSession.close();
-		
+		try {
+			currSession.delete(objectToDelete);
+			currSession.getTransaction().commit();
+		} finally {
+			currSession.close();
+		}
 		logger.debug(objectToDelete + " deleted.");
 	}
 	
@@ -198,6 +204,7 @@ public class GenericDao<T> {
 		Session currSession = sessionFactory.openSession();
 		T fetched = currSession.get(classToUse, id);
 		
+		currSession.close();
 		logger.debug("Found : " + fetched);
 		return fetched;
 	}
@@ -225,9 +232,32 @@ public class GenericDao<T> {
 		
 		logger.debug("Searching " + classToUse.getSimpleName() + "s with" + criteriaString + ".");
 		
+		// To avoid duplicates in list returned
+		// cf. http://stackoverflow.com/a/4645549
+		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		
 		List<T> listToReturn = crita.list();
 		
 		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
 		return listToReturn;
 	}
+	
+	public List<T> searchBudgetContainingCategory(Category cat){
+		
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.createAlias("categoryList", "cat", JoinType.INNER_JOIN);
+		
+//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
+		crita.add(Restrictions.eqOrIsNull("cat.id", cat.getId()));
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
+		
+		List<T> listToReturn = crita.list();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+	
 }

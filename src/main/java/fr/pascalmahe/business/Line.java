@@ -2,13 +2,15 @@ package fr.pascalmahe.business;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.OneToMany;
 
 
 /**
@@ -35,9 +37,12 @@ public class Line implements Serializable {
     
     private Boolean recurring;
     
-    private Category category;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Categorisation> categorisationList;
 
-	public Line() {}
+	public Line() {
+		categorisationList = new ArrayList<>();
+	}
     
 	public Line(Integer id, 
 			LocalDate date, 
@@ -45,7 +50,7 @@ public class Line implements Serializable {
 				String secondaryLabel, 
 				Float amount, 
 				Boolean recurring,
-				Category category) {
+				List<Categorisation> categorisationList) {
 		super();
 		this.id = id;
 		this.date = date;
@@ -53,7 +58,7 @@ public class Line implements Serializable {
 		this.secondaryLabel = secondaryLabel;
 		this.amount = amount;
 		this.recurring = recurring;
-		this.category = category;
+		this.categorisationList = categorisationList;
 	}
 
 	public Line(LocalDate date, 
@@ -61,37 +66,21 @@ public class Line implements Serializable {
 				String secondaryLabel, 
 				Float amount, 
 				Boolean recurring,
-				Category category) {
+				List<Categorisation> categorisationList) {
 		super();
 		this.date = date;
 		this.mainLabel = mainLabel;
 		this.secondaryLabel = secondaryLabel;
 		this.amount = amount;
 		this.recurring = recurring;
-		this.category = category;
+		this.categorisationList = categorisationList;
 	}
 
 	@Override
 	public String toString() {
 		return "Line [id=" + id + ", date=" + date + ", mainLabel=" + mainLabel + ", secondaryLabel=" + secondaryLabel
-				+ ", amount=" + amount + ", recurring=" + recurring + ", category=" + category + "]";
+				+ ", amount=" + amount + ", recurring=" + recurring + ", categorisationList=" + categorisationList + "]";
 	}
-
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
-		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((mainLabel == null) ? 0 : mainLabel.hashCode());
-		result = prime * result + ((recurring == null) ? 0 : recurring.hashCode());
-		result = prime * result + ((secondaryLabel == null) ? 0 : secondaryLabel.hashCode());
-		return result;
-	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -102,44 +91,13 @@ public class Line implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Line other = (Line) obj;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
-			return false;
-		if (category == null) {
-			if (other.category != null)
-				return false;
-		} else if (!category.equals(other.category))
-			return false;
-		if (date == null) {
-			if (other.date != null)
-				return false;
-		} else if (!date.equals(other.date))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (mainLabel == null) {
-			if (other.mainLabel != null)
-				return false;
-		} else if (!mainLabel.equals(other.mainLabel))
-			return false;
-		if (recurring == null) {
-			if (other.recurring != null)
-				return false;
-		} else if (!recurring.equals(other.recurring))
-			return false;
-		if (secondaryLabel == null) {
-			if (other.secondaryLabel != null)
-				return false;
-		} else if (!secondaryLabel.equals(other.secondaryLabel))
-			return false;
 		return true;
 	}
-
 
 	public Integer getId() {
 		return id;
@@ -189,14 +147,11 @@ public class Line implements Serializable {
 		this.recurring = recurring;
 	}
 
-	public Category getCategory() {
-		return category;
+	public List<Categorisation> getCategorisationList() {
+		return categorisationList;
 	}
 
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCategorisationList(List<Categorisation> categorisationList) {
+		this.categorisationList = categorisationList;
 	}
-    
-    
-    
 }

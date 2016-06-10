@@ -41,40 +41,6 @@ public class Balance implements Serializable {
 		this.amount = amount;
 	}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public LocalDate getDate() {
-		return fetchDate;
-	}
-
-	public void setDate(LocalDate fetchDate) {
-		this.fetchDate = fetchDate;
-	}
-
-	public Float getAmount() {
-		return amount;
-	}
-
-	public void setAmount(Float amount) {
-		this.amount = amount;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((amount == null) ? 0 : amount.hashCode());
-		result = prime * result + ((fetchDate == null) ? 0 : fetchDate.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -84,16 +50,6 @@ public class Balance implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Balance other = (Balance) obj;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
-			return false;
-		if (fetchDate == null) {
-			if (other.fetchDate != null)
-				return false;
-		} else if (!fetchDate.equals(other.fetchDate))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -107,7 +63,28 @@ public class Balance implements Serializable {
 		return "Balance [id=" + id + ", fetchDate=" + fetchDate + ", amount=" + amount + "]";
 	}
 
-	   
-    
-    
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public LocalDate getFetchDate() {
+		return fetchDate;
+	}
+
+	public void setFetchDate(LocalDate fetchDate) {
+		this.fetchDate = fetchDate;
+	}
+
+	public Float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Float amount) {
+		this.amount = amount;
+	}
+
 }
