@@ -47,8 +47,16 @@ public class TestGenericDao {
 	private static Integer idBalanceForUpdate;
 	private static Integer idBudgetForUpdate;
 	private static Integer idCategoryForUpdate;
+	private static Integer idCategorisationForUpdate;
 	private static Integer idLineForUpdate;
 	private static Integer idUserForUpdate;
+
+	private static Integer idBalanceForDeletion;
+	private static Integer idBudgetForDeletion;
+	private static Integer idCategoryForDeletion;
+	private static Integer idCategorisationForDeletion;
+	private static Integer idLineForDeletion;
+	private static Integer idUserForDeletion;
 	
 	@BeforeClass
 	public static void loadUpDatabase() {
@@ -83,48 +91,58 @@ public class TestGenericDao {
 		Balance bal1 = new Balance(LocalDate.of(2014, Month.MAY, 28), 456.23f);
 		Balance bal2 = new Balance(LocalDate.of(2015, Month.MARCH, 29), -456.23f);
 		Balance bal3 = new Balance(LocalDate.of(2016, Month.MAY, 30), 0.01f);
+		Balance balToDelete = new Balance(LocalDate.of(2016, Month.JUNE, 10), 6.16f);
 		
 		balanceDao.saveOrUpdate(bal1);
 		balanceDao.saveOrUpdate(bal2);
 		balanceDao.saveOrUpdate(bal3);
+		balanceDao.saveOrUpdate(balToDelete);
 
-		listToDelete.add(0, bal1); // insertion toujours en premier pour permettre 
-		listToDelete.add(0, bal2); // de supprimer dans l'ordre inverse
+		idBalanceForUpdate = bal1.getId();
+		idBalanceForDeletion = balToDelete.getId();
+		
+		listToDelete.add(0, bal1); 
+		listToDelete.add(0, bal2);
 		listToDelete.add(0, bal3);
 		
-		idBalanceForUpdate = bal1.getId();
 		
 		// inserting Categories
 		
 		Category cat1 = new Category("TestStandaloneCategory", null);
 		Category cat2 = new Category("TestFatherCategory", null);
 		Category cat3 = new Category("TestSonCategory", cat2);
+		Category catToDelete = new Category("TestCategoryToDelete", cat2);
 		
 		categoryDao.saveOrUpdate(cat1);
 		categoryDao.saveOrUpdate(cat2);
 		categoryDao.saveOrUpdate(cat3);
+		categoryDao.saveOrUpdate(catToDelete);
 
 		listToDelete.add(0, cat1);
 		listToDelete.add(0, cat2);
 		listToDelete.add(0, cat3);
 		
 		idCategoryForUpdate = cat1.getId();
+		idCategoryForDeletion = catToDelete.getId();
 		
 		// inserting Users
 		
 		User use1 = new User("TestUser 01", "Safe password", true);
 		User use2 = new User("TestUser 02", "Unsafe password", false);
 		User use3 = new User("TestUser 03", "Unsafe password", true);
+		User useToDelete = new User("TestUser to delete", "no password", true);
 		
 		userDao.saveOrUpdate(use1);
 		userDao.saveOrUpdate(use2);
 		userDao.saveOrUpdate(use3);
+		userDao.saveOrUpdate(useToDelete);
 
 		listToDelete.add(0, use1);
 		listToDelete.add(0, use2);
 		listToDelete.add(0, use3);
 
 		idUserForUpdate = use1.getId();
+		idUserForDeletion = useToDelete.getId();
 		
 		// Beans depending on Category : Line, Budget
 
@@ -158,16 +176,24 @@ public class TestGenericDao {
 								40.0f, 
 								LocalDate.of(2015, Month.JUNE, 1),
 								LocalDate.of(2015, Month.JUNE, 30));
+
+		Budget budToDelete = new Budget("TestBudget to delete", 
+								listWithTwoOtherCategories, 
+								616.0f, 
+								LocalDate.of(2016, Month.JUNE, 1),
+								LocalDate.of(2016, Month.JUNE, 30));
 		
 		budgetDao.saveOrUpdate(bud1);
 		budgetDao.saveOrUpdate(bud2);
 		budgetDao.saveOrUpdate(bud3);
+		budgetDao.saveOrUpdate(budToDelete);
 		
 		listToDelete.add(0, bud1);
 		listToDelete.add(0, bud2);
 		listToDelete.add(0, bud3);
 
 		idBudgetForUpdate = bud3.getId();
+		idBudgetForDeletion = budToDelete.getId();
 		
 		// inserting Lines
 		Categorisation catego1 = new Categorisation(23.01f, cat2);
@@ -181,15 +207,26 @@ public class TestGenericDao {
 		twoListCatego.add(catego2);
 		twoListCatego.add(catego3);
 		
-
+		List<Categorisation> twoOtherListCatego = new ArrayList<>();
+		Categorisation categoToDelete1 = new Categorisation(61.6f, cat1);
+		Categorisation categoToDelete2 = new Categorisation(6.16f, cat2);
+		Categorisation categoToDelete3 = new Categorisation(6.16f, cat3);
+		twoOtherListCatego.add(categoToDelete1);
+		twoOtherListCatego.add(categoToDelete2);
+		
 		categoDao.saveOrUpdate(catego1);
 		categoDao.saveOrUpdate(catego2);
 		categoDao.saveOrUpdate(catego3);
+		categoDao.saveOrUpdate(categoToDelete1);
+		categoDao.saveOrUpdate(categoToDelete2);
+		categoDao.saveOrUpdate(categoToDelete3);
 
 		listToDelete.add(0, catego1);
 		listToDelete.add(0, catego2);
 		listToDelete.add(0, catego3);
 
+		idCategorisationForUpdate = catego2.getId();
+		idCategorisationForDeletion = categoToDelete3.getId();
 		
 		Line lin1 = new Line(	LocalDate.of(2016, Month.MARCH, 01), 
 								"TestLine 01", 
@@ -218,11 +255,19 @@ public class TestGenericDao {
 								-24.45f, 
 								true, 
 								new ArrayList<Categorisation>());
+
+		Line linToDelete = new Line(LocalDate.of(2016, Month.JUNE, 01), 
+								"TestLine To delete", 
+								"category: 2 categorisations", 
+								-616.0f, 
+								true, 
+								twoOtherListCatego);
 		
 		lineDao.saveOrUpdate(lin1);
 		lineDao.saveOrUpdate(lin2);
 		lineDao.saveOrUpdate(lin3);
 		lineDao.saveOrUpdate(lin4);
+		lineDao.saveOrUpdate(linToDelete);
 
 		listToDelete.add(0, lin1);
 		listToDelete.add(0, lin2);
@@ -230,6 +275,7 @@ public class TestGenericDao {
 		listToDelete.add(0, lin4);
 
 		idLineForUpdate = lin1.getId();
+		idLineForDeletion = linToDelete.getId();
 
 		int nbBalancesAfterInsertions = balanceDao.count();
 		int nbBudgetsAfterInsertions = budgetDao.count();
@@ -376,40 +422,40 @@ public class TestGenericDao {
 			if(errorMessageSuffix.length() > 0){
 				errorMessageSuffix += ", ";
 			}
-			errorMessageSuffix += "Balances (found " + nbBalancesAfterDeletions + 
-									", should be " + nbBalancesBeforeTests + ")"; 
+			errorMessageSuffix += "Budget (found " + nbBudgetsAfterDeletions + 
+									", should be " + nbBudgetsBeforeTests + ")"; 
 		}
 		if(nbCategoriesAfterDeletions != nbCategoriesBeforeTests){
 			throwException = true;
 			if(errorMessageSuffix.length() > 0){
 				errorMessageSuffix += ", ";
 			}
-			errorMessageSuffix += "Balances (found " + nbBalancesAfterDeletions + 
-									", should be " + nbBalancesBeforeTests + ")"; 
+			errorMessageSuffix += "Categories (found " + nbCategoriesAfterDeletions + 
+									", should be " + nbCategoriesBeforeTests + ")"; 
 		}
 		if(nbCategorisationsAfterDeletions != nbCategoBeforeTests){
 			throwException = true;
 			if(errorMessageSuffix.length() > 0){
 				errorMessageSuffix += ", ";
 			}
-			errorMessageSuffix += "Balances (found " + nbBalancesAfterDeletions + 
-									", should be " + nbBalancesBeforeTests + ")"; 
+			errorMessageSuffix += "Categorisations (found " + nbCategorisationsAfterDeletions + 
+									", should be " + nbCategoBeforeTests + ")"; 
 		}
 		if(nbLinesAfterDeletions != nbLinesBeforeTests){
 			throwException = true;
 			if(errorMessageSuffix.length() > 0){
 				errorMessageSuffix += ", ";
 			}
-			errorMessageSuffix += "Balances (found " + nbBalancesAfterDeletions + 
-									", should be " + nbBalancesBeforeTests + ")"; 
+			errorMessageSuffix += "Lines (found " + nbLinesAfterDeletions + 
+									", should be " + nbLinesBeforeTests + ")"; 
 		}
 		if(nbUsersAfterDeletions != nbUsersBeforeTests){
 			throwException = true;
 			if(errorMessageSuffix.length() > 0){
 				errorMessageSuffix += ", ";
 			}
-			errorMessageSuffix += "Balances (found " + nbBalancesAfterDeletions + 
-									", should be " + nbBalancesBeforeTests + ")"; 
+			errorMessageSuffix += "Users(found " + nbUsersAfterDeletions + 
+									", should be " + nbUsersBeforeTests + ")"; 
 		}
 		if(throwException){
 			throw new TestException("Found values in DB after tests from the following classes : " + errorMessageSuffix);
@@ -712,9 +758,12 @@ public class TestGenericDao {
 	
 	@Test
 	public void testUpdate(){
+		logger.info("Starting testUpdate...");
+		
 		GenericDao<Balance> balanceDao = new GenericDao<>(Balance.class);
 		GenericDao<Budget> budDao = new GenericDao<>(Budget.class);
 		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		GenericDao<Categorisation> categoDao = new GenericDao<>(Categorisation.class);
 		GenericDao<Line> linDao = new GenericDao<>(Line.class);
 		GenericDao<User> userDao = new GenericDao<>(User.class);
 		
@@ -739,8 +788,9 @@ public class TestGenericDao {
 		
 		// Fetching value for verification
 		Balance balanceToCheck = balanceDao.fetch(idBalanceForUpdate);
-		assertEquals("Wrong Balance after update", balanceToUpdate, balanceToCheck);
+		Validator.validateBalance("update test", balanceToUpdate, balanceToCheck);
 
+		
 		// Budget
 		// Fetching value to update
 		Budget budToUpdate = budDao.fetch(idBudgetForUpdate);
@@ -777,7 +827,8 @@ public class TestGenericDao {
 		
 		// Fetching value for verification
 		Budget budToCheck = budDao.fetch(idBudgetForUpdate);
-		assertEquals("Wrong Budget after update", budToUpdate, budToCheck);
+		Validator.validateBudget("update test", budToUpdate, budToCheck);
+		
 		
 		// Category
 		// Fetching value to update
@@ -799,10 +850,34 @@ public class TestGenericDao {
 		
 		// Fetching value for verification
 		Category catToCheck = catDao.fetch(idCategoryForUpdate);
-		assertEquals("Wrong Category after update", catToUpdate, catToCheck);
+		Validator.validateCategory("update test", catToUpdate, catToCheck);
 		
 		// Adding father category to list to delete
 		listToDelete.add(catToUpdate.getFatherCategory());
+		
+		
+		// Categorisation
+		// fetching value to update
+		Categorisation categoToUpdate = categoDao.fetch(idCategorisationForUpdate);
+
+		// Checking we're not overwriting the same data 
+		// (which would invalidate the test)
+		Category updatingCategoryTo = catToAdd1;
+		Float updatingAmountTo = 32.6f;
+		assertNotEquals("Wrong Category on fetch for update", updatingCategoryTo, categoToUpdate.getCategory());
+		assertNotEquals("Wrong amount on fetch for update", updatingAmountTo, categoToUpdate.getAmount());
+		
+		// Changing the value
+		categoToUpdate.setCategory(updatingCategoryTo);
+		categoToUpdate.setAmount(updatingAmountTo);
+
+		// Saving
+		categoDao.saveOrUpdate(categoToUpdate);
+		
+		// Fetching value for verification
+		Categorisation categoToCheck = categoDao.fetch(idCategorisationForUpdate);
+		Validator.validateCategorisation("update test", categoToUpdate, categoToCheck);
+		
 		
 		// Line
 		// Fetching value to update
@@ -837,8 +912,9 @@ public class TestGenericDao {
 		
 		// Fetching value for verification
 		Line linToCheck = linDao.fetch(idLineForUpdate);
-		assertEquals("Wrong Line after update", linToUpdate, linToCheck);
+		Validator.validateLine("update test", linToUpdate, linToCheck);
 
+		
 		// User
 		// Fetching value to update
 		User userToUpdate = userDao.fetch(idUserForUpdate);
@@ -864,7 +940,127 @@ public class TestGenericDao {
 		
 		// Fetching value for verification
 		User userToCheck = userDao.fetch(idUserForUpdate);
-		assertEquals("Wrong User after update", userToUpdate, userToCheck);
+		Validator.validateUser("update test", userToUpdate, userToCheck);
+		
+		logger.info("testUpdate done.");
 	}
 
+	@Test
+	public void testDelete(){
+		logger.info("Starting testDelete...");
+
+		GenericDao<Balance> balanceDao = new GenericDao<>(Balance.class);
+		GenericDao<Budget> budDao = new GenericDao<>(Budget.class);
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		GenericDao<Categorisation> categoDao = new GenericDao<>(Categorisation.class);
+		GenericDao<Line> linDao = new GenericDao<>(Line.class);
+		GenericDao<User> userDao = new GenericDao<>(User.class);
+		
+		// Balance
+		int nbBalanceBeforeDeletion = balanceDao.count();
+		
+		// Fetching value to delete
+		Balance balanceToDelete = balanceDao.fetch(idBalanceForDeletion);
+		
+		balanceDao.delete(balanceToDelete);
+		
+		// Check by counting
+		int nbBalanceAfterDeletion = balanceDao.count();
+		assertEquals("Wrong number of Balances after deletion test.", nbBalanceBeforeDeletion - 1, nbBalanceAfterDeletion);
+		
+		// Check by fetching
+		Balance balanceToCheck = balanceDao.fetch(idBalanceForDeletion);
+		assertNull("Wrong Balance found after deletion test (should be null)", balanceToCheck);
+
+		
+		// Budget
+		int nbBudgetBeforeDeletion = budDao.count();
+		
+		// Fetching value to delete
+		Budget budgetToDelete = budDao.fetch(idBudgetForDeletion);
+		
+		budDao.delete(budgetToDelete);
+		
+		// Check by counting
+		int nbBudgetAfterDeletion = balanceDao.count();
+		assertEquals("Wrong number of Budgets after deletion test.", nbBudgetBeforeDeletion - 1, nbBudgetAfterDeletion);
+		
+		// Check by fetching
+		Budget budgetToCheck = budDao.fetch(idBudgetForDeletion);
+		assertNull("Wrong Budget found after deletion test (should be null)", budgetToCheck);
+		
+
+		// Category
+		int nbCategoryBeforeDeletion = catDao.count();
+		
+		// Fetching value to delete
+		Category catToDelete = catDao.fetch(idCategoryForDeletion);
+		
+		catDao.delete(catToDelete);
+		
+		// Check by counting
+		int nbCategoryAfterDeletion = catDao.count();
+		assertEquals("Wrong number of Categories after deletion test.", 
+				nbCategoryBeforeDeletion - 1, 
+				nbCategoryAfterDeletion);
+		
+		// Check by fetching
+		Category catToCheck = catDao.fetch(idCategoryForDeletion);
+		assertNull("Wrong Category found after deletion test (should be null)", catToCheck);
+
+
+		// Categorisation
+		int nbCategorisationBeforeDeletion = categoDao.count();
+		
+		// Fetching value to delete
+		Categorisation categoToDelete = categoDao.fetch(idCategorisationForDeletion);
+		
+		categoDao.delete(categoToDelete);
+		
+		// Check by counting
+		int nbCategorisationAfterDeletion = categoDao.count();
+		assertEquals("Wrong number of Categorisations after deletion test.", 
+				nbCategorisationBeforeDeletion - 1, 
+				nbCategorisationAfterDeletion);
+		
+		// Check by fetching
+		Categorisation catgegoToCheck = categoDao.fetch(idCategorisationForDeletion);
+		assertNull("Wrong Categorisation found after deletion test (should be null)", catgegoToCheck);
+		
+
+		// Line
+		int nbLineBeforeDeletion = linDao.count();
+		
+		// Fetching value to delete
+		Line linToDelete = linDao.fetch(idLineForDeletion);
+		
+		linDao.delete(linToDelete);
+		
+		// Check by counting
+		int nbLineAfterDeletion = linDao.count();
+		assertEquals("Wrong number of Lines after deletion test.", nbLineBeforeDeletion - 1, nbLineAfterDeletion);
+		
+		// Check by fetching
+		Line linToCheck = linDao.fetch(idLineForDeletion);
+		assertNull("Wrong Line found after deletion test (should be null)", linToCheck);
+
+
+		// User
+		int nbUserBeforeDeletion = userDao.count();
+		
+		// Fetching value to delete
+		User userToDelete = userDao.fetch(idUserForDeletion);
+		
+		userDao.delete(userToDelete);
+		
+		// Check by counting
+		int nbUserAfterDeletion = userDao.count();
+		assertEquals("Wrong number of Lines after deletion test.", nbUserBeforeDeletion - 1, nbUserAfterDeletion);
+		
+		// Check by fetching
+		User userToCheck = userDao.fetch(idUserForDeletion);
+		assertNull("Wrong User found after deletion test (should be null)", userToCheck);
+
+		logger.info("testDelete done.");
+	}
 }
