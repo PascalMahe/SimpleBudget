@@ -10,27 +10,27 @@
 	<h:head>
         <title>Appli Budget</title>
         <link rel="stylesheet" media="screen" href="../css/treeView.css" />
-        <script type="text/javascript" src="../js/treeView.js"></script>
+        <script type="text/javascript" src="../js/jquery-3.0.0.js"></script>
+        <script type="text/javascript" src="../js/login.js"></script>
 
     </h:head>
 	
 	<h:body>
 		<h1>Connexion</h1>
-		<h:form>
+		
+		<p:messages />
+		<h:form onsubmit="submitLoginForm()">
 			<div>
 				<p:outputLabel value="#{bundle['labelLogin']}" for="login" />
 				<p:inputText id="login" value="#{loginController.login}" />
 	 			<br/>
 				<p:outputLabel value="#{bundle['labelPassword']}" for="password" />
-				<p:inputText id="password" value="#{loginController.password}" />
+				<p:password id="password" value="#{loginController.password}" />
 				<br/>
 				
-				<p:button	value="#{bundle['labelConnecter']}" 
-							id="searchButton" 
- 							actionListener="#{loginController.loginAction}"
- 							outcome="dashboard" />
- 							
- 				<h:button></h:button>
+				<p:commandButton 	value="#{bundle['labelConnecter']}" 
+									id="searchButton" 
+ 									action="#{loginController.loginAction}" />
 			</div>
 		</h:form>
    	</h:body>

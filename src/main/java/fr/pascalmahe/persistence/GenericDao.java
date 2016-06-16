@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,89 +41,88 @@ public class GenericDao<T> {
 	
 	public GenericDao(Class<T> classUse){
 		this.classToUse = classUse;
+		setFactoryUp();
 	}
 	
 	private static void setFactoryUp(){
 		if(sessionFactory == null){
-			 try {
-			        // Create the SessionFactory from hibernate.cfg.xml
-			        Configuration configuration = new Configuration();
-			        configuration.configure("hibernate.cfg.xml");
-			        
-			        String databaseUrlEnvProperty = System.getenv("DATABASE_URL");
-			        
-			        if(databaseUrlEnvProperty != null){
-			        	logger.debug("Detection de la propriété système DATABASE_URL");
-			        	configuration.setProperty("hibernate.connection.url",
-			        			databaseUrlEnvProperty);
-			        	
-			        	URI dbUri = new URI(databaseUrlEnvProperty);
+			try {
+				// Create the SessionFactory from hibernate.cfg.xml
+				Configuration configuration = new Configuration();
+				configuration.configure("hibernate.cfg.xml");
+	        
+				String databaseUrlEnvProperty = System.getenv("DATABASE_URL");
+	        
+				if(databaseUrlEnvProperty != null){
+		        	logger.debug("Detection de la propriété système DATABASE_URL");
+		        	configuration.setProperty("hibernate.connection.url",
+		        			databaseUrlEnvProperty);
+		        	
+		        	URI dbUri = new URI(databaseUrlEnvProperty);
+	
+			        String username = dbUri.getUserInfo().split(":")[0];
+			        String password = dbUri.getUserInfo().split(":")[1];
+			        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':'
+			                + dbUri.getPort() + dbUri.getPath();
+			        configuration
+			                .setProperty("hibernate.connection.username", username);
+			        configuration
+			                .setProperty("hibernate.connection.password", password);
+			        configuration.setProperty("hibernate.connection.url", dbUrl);
+		        }
+		        
+		        logger.info("Hibernate configuration loaded");
+		        
+		        String dbUrl = configuration.getProperty("hibernate.connection.url");
+		        String password = configuration.getProperty("hibernate.connection.password");
+		        String user = configuration.getProperty("hibernate.connection.username");
+		        
+		        logger.debug("Hibernate username: " + user);
+		        logger.debug("Hibernate password: " + password);
+		        logger.debug("Hibernate dbUrl: " + dbUrl);
 
-				        String username = dbUri.getUserInfo().split(":")[0];
-				        String password = dbUri.getUserInfo().split(":")[1];
-				        String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':'
-				                + dbUri.getPort() + dbUri.getPath();
-				        configuration
-				                .setProperty("hibernate.connection.username", username);
-				        configuration
-				                .setProperty("hibernate.connection.password", password);
-				        configuration.setProperty("hibernate.connection.url", dbUrl);
-			        }
-			        
-			        logger.info("Hibernate configuration loaded");
-			        
-			        String dbUrl = configuration.getProperty("hibernate.connection.url");
-			        String password = configuration.getProperty("hibernate.connection.password");
-			        String user = configuration.getProperty("hibernate.connection.username");
-			        
-			        logger.debug("Hibernate username: " + user);
-			        logger.debug("Hibernate password: " + password);
-			        logger.debug("Hibernate dbUrl: " + dbUrl);
-
-			        
-			        try {
-			        	createSessionFactory(configuration);
-			        } catch(HibernateException he){
-			        	logger.error("An error occurred while connecting to the database: " 
-			        			+ he.getLocalizedMessage(), he);
+		        try {
+		        	createSessionFactory(configuration);
+		        } catch(HibernateException he){
+		        	logger.error("An error occurred while connecting to the database: " 
+		        			+ he.getLocalizedMessage(), he);
+		        	
+		        	// Error while connecting to the database
+		        	// Maybe it doesn't exist ? 
+		        	// -> Trying to create it...
+		        	
+		        	int lastIndexOfSlash = dbUrl.lastIndexOf("/");
+		        	String databaseName = dbUrl.substring(lastIndexOfSlash + 1);
+		        	logger.warn("Hibernate can't connect to database. Trying to create schema: " + databaseName);
+		        	
+		        	String shortDbUrl = dbUrl.substring(0, lastIndexOfSlash + 1);
+		        	try {
+		        		Connection conn = DriverManager.getConnection(shortDbUrl, user, password);
+		        		PreparedStatement stat = conn.prepareStatement(" CREATE DATABASE " + databaseName);
+		        		stat.execute();
+		        		
+		        		if(!conn.getAutoCommit()){
+		        			conn.commit();
+		        		}
+		        		conn.close();
+		        		logger.info("Schema: " + databaseName + " created.");
 			        	
-			        	// Error while connecting to the database
-			        	// Maybe it doesn't exist ? 
-			        	// -> Trying to create it...
-			        	
-			        	int lastIndexOfSlash = dbUrl.lastIndexOf("/");
-			        	String databaseName = dbUrl.substring(lastIndexOfSlash + 1);
-			        	logger.warn("Hibernate can't connect to database. Trying to create schema: " + databaseName);
-			        	
-			        	String shortDbUrl = dbUrl.substring(0, lastIndexOfSlash + 1);
-			        	try {
-			        		Connection conn = DriverManager.getConnection(shortDbUrl, user, password);
-			        		PreparedStatement stat = conn.prepareStatement(" CREATE DATABASE " + databaseName);
-			        		stat.execute();
-			        		
-			        		if(!conn.getAutoCommit()){
-			        			conn.commit();
-			        		}
-			        		conn.close();
-			        		logger.info("Schema: " + databaseName + " created.");
-				        	
-			        		
-			        		// Retry to connect via hibernate
-			        		createSessionFactory(configuration);
-			        		
-						} catch (SQLException sqle) {
-							logger.error("Error with database: " + shortDbUrl +
-									" (with user: " + user + " and password: " + password + ")", sqle);
-							throw new ExceptionInInitializerError(sqle);
-						}
-			        	
-			        }
-			     
-			    } catch (URISyntaxException ex) {
-			        // Make sure you log the exception, as it might be swallowed
-			        logger.error("Initial SessionFactory creation failed.", ex);
-			        throw new ExceptionInInitializerError(ex);
-			    }
+		        		
+		        		// Retry to connect via hibernate
+		        		createSessionFactory(configuration);
+		        		
+					} catch (SQLException sqle) {
+						logger.error("Error with database: " + shortDbUrl +
+								" (with user: " + user + " and password: " + password + ")", sqle);
+						throw new ExceptionInInitializerError(sqle);
+					}
+		        }
+		     
+		    } catch (URISyntaxException ex) {
+		        // Make sure you log the exception, as it might be swallowed
+		        logger.error("Initial SessionFactory creation failed.", ex);
+		        throw new ExceptionInInitializerError(ex);
+		    }
 		}
 	}
 
@@ -147,9 +145,6 @@ public class GenericDao<T> {
 	}
 
 	public void saveOrUpdate(T objectToSave) {
-		
-		setFactoryUp();
-		
 		Session currSession = sessionFactory.openSession();
 		
 		currSession.beginTransaction();
@@ -167,11 +162,8 @@ public class GenericDao<T> {
 	}
 
 	public int count() {
-		
 		logger.debug("Counting " + classToUse.getSimpleName() + "s...");
 
-		setFactoryUp();
-		
 		Session currSession = sessionFactory.openSession();
 		currSession.beginTransaction();
 		Number result = (Number) currSession.createCriteria(classToUse)
@@ -184,7 +176,6 @@ public class GenericDao<T> {
 	}
 
 	public void delete(T objectToDelete) {
-		
 		logger.debug("Deleting " + objectToDelete + ".");
 
 		Session currSession = sessionFactory.openSession();
@@ -200,7 +191,7 @@ public class GenericDao<T> {
 	
 	public T fetch(Integer id){
 		logger.debug("Fetching " + classToUse.getSimpleName() + " with #" + id +"...");
-		
+
 		Session currSession = sessionFactory.openSession();
 		T fetched = currSession.get(classToUse, id);
 		
@@ -210,6 +201,7 @@ public class GenericDao<T> {
 	}
 	
 	public List<T> search(Map<String, Object> searchCriteriaMap){
+
 		String criteriaString = " no criterias";
 		if(searchCriteriaMap.size() > 0){
 			criteriaString = CRITERIA_STRING_NAKED_START;
@@ -236,6 +228,7 @@ public class GenericDao<T> {
 		// cf. http://stackoverflow.com/a/4645549
 		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		
+		@SuppressWarnings("unchecked")
 		List<T> listToReturn = crita.list();
 		
 		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
@@ -243,7 +236,7 @@ public class GenericDao<T> {
 	}
 	
 	public List<T> searchBudgetContainingCategory(Category cat){
-		
+
 		Session currSession = sessionFactory.openSession();
 		
 		Criteria crita = currSession.createCriteria(classToUse);
@@ -254,6 +247,7 @@ public class GenericDao<T> {
 		
 		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
 		
+		@SuppressWarnings("unchecked")
 		List<T> listToReturn = crita.list();
 		
 		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");

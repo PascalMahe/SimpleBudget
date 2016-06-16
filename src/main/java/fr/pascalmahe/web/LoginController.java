@@ -2,11 +2,15 @@ package fr.pascalmahe.web;
 
 import java.io.Serializable;
 import java.util.Locale;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.event.ActionEvent;
+import javax.faces.context.FacesContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import fr.pascalmahe.services.UserService;
 
 
 @ManagedBean
@@ -33,25 +37,34 @@ public class LoginController implements Serializable {
 	 * Constructeurs
 	 */
 	public LoginController(){
-		logger.error("Constructeur de LoginController");
-		logger.fatal("Constructeur de LoginController");
-		logger.warn("Constructeur de LoginController");
-		logger.info("Constructeur de LoginController");
-		logger.debug("Constructeur de LoginController");
-		logger.trace("Constructeur de LoginController");
+		logger.debug("LoginController - constructor");
 	}
 	
 	/*
 	 * Méthodes
 	 */
-	public String loginAction(ActionEvent event){
+	public String loginAction(){
 		logger.debug("loginAction - start");
 		String redirect = "";
 		
+		logger.debug("loginAction - login: " + login);
+		logger.debug("loginAction - password: " + password);
+		
+		boolean isUserValid = UserService.isUserValid(login, password);
+		if(isUserValid){
+			redirect = "dashboard.xhtml?faces-redirect=true";
+		} else {
+			FacesMessage fmWrongPwd = new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+											"Mauvais login/mot de passe.", 
+											"Aucune correspondence n'a été "
+											+ "trouvée pour cette combinaison "
+											+ "de login et de mot de passe.");
+			FacesContext.getCurrentInstance().addMessage("wrong_login_pwd", fmWrongPwd);
+		}
+		
+		logger.debug("loginAction - redirecting to: " + redirect);
 		return redirect;
 	}
-
-	
 	/*
 	 * Getters et Setters
 	 */
