@@ -84,7 +84,7 @@ public class TestGenericDao {
 		logger.debug("loadUpDatabase - nbLinesBeforeTests: " + nbLinesBeforeTests);
 		logger.debug("loadUpDatabase - nbUsersBeforeTests: " + nbUsersBeforeTests);
 		
-		// Standalone beans : Balance, Category, User
+		// Standalone beans: Balance, Category, User
 		
 		// inserting Balances
 		
@@ -144,7 +144,7 @@ public class TestGenericDao {
 		idUserForUpdate = use1.getId();
 		idUserForDeletion = useToDelete.getId();
 		
-		// Beans depending on Category : Line, Budget
+		// Beans depending on Category: Line, Budget
 
 		// inserting Budgets
 		List<Category> listWithOneCategory = new ArrayList<>();
@@ -387,10 +387,10 @@ public class TestGenericDao {
 					}
 					
 				} else if(currObject instanceof User){
-					User userTodelete = (User) currObject;
-					userDao.delete(userTodelete);
+					User userToDelete = (User) currObject;
+					userDao.delete(userToDelete);
 				} else {
-					throw new IllegalArgumentException("An object had no corresponding DAO! It's a : " 
+					throw new IllegalArgumentException("An object had no corresponding DAO! It's a: " 
 							+ currObject.getClass().getSimpleName() + ".");
 				}
 			}
@@ -458,7 +458,7 @@ public class TestGenericDao {
 									", should be " + nbUsersBeforeTests + ")"; 
 		}
 		if(throwException){
-			throw new TestException("Found values in DB after tests from the following classes : " + errorMessageSuffix);
+			throw new TestException("Found values in DB after tests from the following classes: " + errorMessageSuffix);
 		}
 		
 		logger.info("cleanUpDatabase - Test data deleted.");
@@ -468,7 +468,7 @@ public class TestGenericDao {
 	public void testSearch() {
 		logger.info("Starting testSearch...");
 		// Balance
-		// Test : 1 criteria, 1 result
+		// Test: 1 criteria, 1 result
 		Map<String, Object> critList = new HashMap<>();
 		critList.put("amount", -456.23f);
 		
@@ -482,7 +482,7 @@ public class TestGenericDao {
 		
 		// Budget
 
-		// Test : 1 criteria, 2 results
+		// Test: 1 criteria, 2 results
 		critList = new HashMap<>();
 		critList.put("name", "TestBudget");
 		
@@ -494,7 +494,7 @@ public class TestGenericDao {
 					2, 
 					twoResultsBudget.size());
 		
-		// Test : 2 criteria, 1 result
+		// Test: 2 criteria, 1 result
 		critList = new HashMap<>();
 		critList.put("name", "TestBudget");
 		critList.put("maxAmount", 800.0f);
@@ -508,7 +508,7 @@ public class TestGenericDao {
 					oneResultBudget.size());
 		
 		// Category
-		// Test : 1 criteria, 1 result
+		// Test: 1 criteria, 1 result
 		critList = new HashMap<>();
 		critList.put("name", "TestSonCategory");
 		
@@ -521,7 +521,7 @@ public class TestGenericDao {
 					oneResultCategory.size());
 
 		// Line
-		// Test : 1 criteria, 2 results
+		// Test: 1 criteria, 2 results
 		critList = new HashMap<>();
 		critList.put("secondaryLabel", "category: 2 categorisations");
 		
@@ -533,7 +533,7 @@ public class TestGenericDao {
 					2, 
 					twoResultsLine.size());
 		
-		// Test : 2 criteria, 1 result
+		// Test: 2 criteria, 1 result
 		critList = new HashMap<>();
 		critList.put("secondaryLabel", "category: 2 categorisations");
 		critList.put("amount", 612024.45f);
@@ -546,7 +546,7 @@ public class TestGenericDao {
 					oneResultLine.size());
 
 		// User
-		// Test : 1 criteria, 2 results
+		// Test: 1 criteria, 2 results
 		critList = new HashMap<>();
 		critList.put("password", "Unsafe password");
 		// "TestUser 03", "Unsafe password"
@@ -559,7 +559,7 @@ public class TestGenericDao {
 					2, 
 					twoResultsUser.size());
 		
-		// Test : 2 criteria, 1 result
+		// Test: 2 criteria, 1 result
 		critList = new HashMap<>();
 		critList.put("password", "Unsafe password");
 		critList.put("dailyNotification", true);
