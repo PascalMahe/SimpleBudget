@@ -3,6 +3,7 @@ package fr.pascalmahe.services;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,11 +44,21 @@ public class TestUserService {
 		nbUsersBeforeTests = userDao.count();
 		
 		logger.debug("Inserting user with password...");
-		int idUserWithPwd = UserService.addUser(LOGIN_WITH_PWD, PWD);
+		int idUserWithPwd = 0;
+		try {
+			idUserWithPwd = UserService.addUser(LOGIN_WITH_PWD, PWD);
+		} catch (LoginAlreadyExistsException e) {
+			logger.error("Exception while inserting user for tests: " + e.getLocalizedMessage(), e);
+		}
 		logger.debug("User with password inserted.");
 		
 		logger.debug("Inserting user with empty password...");
-		int idUserWithoutPwd = UserService.addUser(LOGIN_WITHOUT_PWD, "");
+		int idUserWithoutPwd = 0;
+		try {
+			idUserWithoutPwd = UserService.addUser(LOGIN_WITHOUT_PWD, "");
+		} catch (LoginAlreadyExistsException e) {
+			logger.error("Exception while inserting user for tests: " + e.getLocalizedMessage(), e);
+		}
 		logger.debug("User with empty password inserted.");
 		
 		User userWithPwd = userDao.fetch(idUserWithPwd);
@@ -86,24 +97,24 @@ public class TestUserService {
 		logger.info("Starting testIsUserValid...");
 		
 		logger.debug("Testing with good password: ");
-		boolean resultWithGoodPwd = UserService.isUserValid(LOGIN_WITH_PWD, PWD);
-		assertTrue("Wrong result after test of isUserValid with good pwd: ", resultWithGoodPwd);
+		User validUserWithGoodPwd = UserService.getValidUser(LOGIN_WITH_PWD, PWD);
+		assertNotNull("Wrong result after test of isUserValid with good pwd: ", validUserWithGoodPwd);
 
 		logger.debug("Testing with wrong password: ");
-		boolean resultWithWrongPwd = UserService.isUserValid(LOGIN_WITH_PWD, "a");
-		assertFalse("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwd);
+		User resultWithWrongPwd = UserService.getValidUser(LOGIN_WITH_PWD, "a");
+		assertNull("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwd);
 
 		logger.debug("Testing with wrong password (empty): ");
-		boolean resultWithWrongPwdEmpty = UserService.isUserValid(LOGIN_WITH_PWD, "");
-		assertFalse("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwdEmpty);
+		User resultWithWrongPwdEmpty = UserService.getValidUser(LOGIN_WITH_PWD, "");
+		assertNull("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwdEmpty);
 
 		logger.debug("Testing with good password (empty): ");
-		boolean resultWithGoodPwdEmpty = UserService.isUserValid(LOGIN_WITHOUT_PWD, "");
-		assertTrue("Wrong result after test of isUserValid with wrong pwd: ", resultWithGoodPwdEmpty);
+		User resultWithGoodPwdEmpty = UserService.getValidUser(LOGIN_WITHOUT_PWD, "");
+		assertNotNull("Wrong result after test of isUserValid with wrong pwd: ", resultWithGoodPwdEmpty);
 
 		logger.debug("Testing with wrong password (not empty): ");
-		boolean resultWithWrongPwdNotEmpty = UserService.isUserValid(LOGIN_WITHOUT_PWD, PWD);
-		assertFalse("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwdNotEmpty);
+		User resultWithWrongPwdNotEmpty = UserService.getValidUser(LOGIN_WITHOUT_PWD, PWD);
+		assertNull("Wrong result after test of isUserValid with wrong pwd: ", resultWithWrongPwdNotEmpty);
 		
 		logger.info("testIsUserValid finished.");
 	}
@@ -117,7 +128,12 @@ public class TestUserService {
 		int nbUserBeforeInsertion = uDao.count();
 		
 		logger.debug("Testing first insertion: ");
-		Integer idUserInserted = UserService.addUser(LOGIN_INSERTION, PWD);
+		Integer idUserInserted = null;
+		try {
+			idUserInserted = UserService.addUser(LOGIN_INSERTION, PWD);
+		} catch (LoginAlreadyExistsException e) {
+			logger.error("Exception while inserting user for tests: " + e.getLocalizedMessage(), e);
+		}
 		assertNotNull("Wrong id after addUser test (should not be null)", idUserInserted);
 
 		int nbUserAfterInsertion = uDao.count();

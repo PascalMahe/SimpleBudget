@@ -9,8 +9,8 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
         <title>Appli Budget</title>
-        <link rel="stylesheet" media="screen" href="../css/treeView.css" />
-        <script type="text/javascript" src="../js/treeView.js"></script>
+        <link rel="stylesheet" media="screen" href="../../css/treeView.css" />
+        <script type="text/javascript" src="../../js/treeView.js"></script>
 
     </h:head>
 	
@@ -19,15 +19,15 @@
 
 		<div>
 			<p>Menu</p>
-			<p:link outcome="budget" value="#{bundle['labelPageBudget']}" />
+			<p:link outcome="/secured/budget" value="#{bundle['labelPageBudget']}" />
 			<br/>
-			<p:link outcome="category" value="#{bundle['labelPageCategorie']}" />
+			<p:link outcome="/secured/category" value="#{bundle['labelPageCategorie']}" />
 			<br/>
-			<p:link outcome="import" value="#{bundle['labelPageImport']}" />
+			<p:link outcome="/secured/import" value="#{bundle['labelPageImport']}" />
 			<br/>
-			<p:link outcome="line" value="#{bundle['labelPageLigne']}" />
+			<p:link outcome="/secured/line" value="#{bundle['labelPageLigne']}" />
 			<br/>
-			<p:link outcome="login" value="#{bundle['labelPageLogin']}" />
+			<p:link outcome="/login" value="#{bundle['labelPageLogin']}" />
 			<br/>
 			<p:messages style="color:red; margin:8px;"></p:messages>
 		</div>

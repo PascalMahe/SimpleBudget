@@ -16,32 +16,32 @@ public class UserService {
 
 	private static final Logger logger = LogManager.getLogger();
 	
-	public static boolean isUserValid(String login, String password) {
+	public static User getValidUser(String login, String password) {
 		
 		logger.debug("isUserValid - Fetching user with login : '" + login + "'...");
 		User userFetched = fetchUserOnLogin(login);
-		
-		boolean result = false;
+		User validUser = null;
 		if(userFetched != null){
 			logger.debug("isUserValid - User fetched.");
 			
-			logger.debug("fetched hash : '" + userFetched.getPassword() + "'");
-			
 			logger.debug("isUserValid - Checking password...");
-			result = BCrypt.checkpw(password, userFetched.getPassword());
+			boolean pwdsMatched = BCrypt.checkpw(password, userFetched.getPassword());
 			
 			String strLogResult = "differed";
-			if(result) { strLogResult = "matched"; }
+			if(pwdsMatched) { 
+				strLogResult = "matched";
+				validUser = userFetched;
+			}
 			logger.debug("isUserValid - Passwords " + strLogResult + ".");
 		} else {
 			logger.debug("isUserValid - No user found.");
 		}
 		
-		return result;
+		return validUser;
 	}
 
 
-	public static int addUser(String login, String password) {
+	public static int addUser(String login, String password) throws LoginAlreadyExistsException {
 		
 		logger.debug("addUser - Checking no other user named : '" + login + "'...");
 		User userFetched = fetchUserOnLogin(login);
@@ -56,8 +56,10 @@ public class UserService {
 			User userToInsert = new User(login, hashedPwd, false);
 			GenericDao<User> userDao = new GenericDao<>(User.class);
 			userDao.saveOrUpdate(userToInsert);
+			int idInsertedUser = userToInsert.getId();
 			
-			return userToInsert.getId();
+			logger.info("User " + login + " #" + idInsertedUser + " created.");
+			return idInsertedUser;
 		}
 	}
 

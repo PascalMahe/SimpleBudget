@@ -6,23 +6,22 @@ import java.util.Locale;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.pascalmahe.business.User;
+import fr.pascalmahe.ex.LoginAlreadyExistsException;
 import fr.pascalmahe.services.UserService;
 
 
 @ManagedBean
-public class LoginController implements Serializable {
+public class AddUserController implements Serializable {
 
 	/*
 	 * Variables statiques
 	 */
 	
-	private static final long serialVersionUID = 3973801993975443027L;
+	private static final long serialVersionUID = 397384593975443027L;
 	
 	private static final Logger logger = LogManager.getLogger();
 
@@ -38,37 +37,31 @@ public class LoginController implements Serializable {
 	/*
 	 * Constructeurs
 	 */
-	public LoginController(){
-		logger.debug("LoginController - constructor");
+	public AddUserController(){
+		logger.debug("AddUserController - constructor");
 	}
 	
 	/*
 	 * Méthodes
 	 */
-	public String loginAction(){
-		logger.debug("loginAction - start");
+	public String addUserAction(){
+		logger.debug("addUserAction - start");
 		String redirect = "";
 		
-		logger.debug("loginAction - login: " + login);
-		logger.debug("loginAction - password: " + password);
+		logger.debug("addUserAction - login: " + login);
+		logger.debug("addUserAction - password: " + password);
 		
-		User validUser = UserService.getValidUser(login, password);
-		if(validUser != null){
-			HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
-											.getExternalContext()
-											.getRequest();
-			request.getSession().setAttribute(WebConstants.USER_ATTRIBUTE, validUser);
-			redirect = "/secured/dashboard.xhtml?faces-redirect=true";
-		} else {
+		try {
+			UserService.addUser(login, password);
+		} catch(LoginAlreadyExistsException laee){
+			logger.info("Login already exists. Error message to user.");
 			FacesMessage fmWrongPwd = new FacesMessage(FacesMessage.SEVERITY_ERROR, 
-											"Mauvais login/mot de passe.", 
-											"Aucune correspondence n'a été "
-											+ "trouvée pour cette combinaison "
-											+ "de login et de mot de passe.");
-			FacesContext.getCurrentInstance().addMessage("wrong_login_pwd", fmWrongPwd);
+					"Login existe déjà.", 
+					"Ce login est déjà employé par un utilisateur en base de données, choisissez-en un autre.");
+			FacesContext.getCurrentInstance().addMessage("login_already_exists", fmWrongPwd);
 		}
 		
-		logger.debug("loginAction - redirecting to: " + redirect);
+		logger.debug("addUserAction - redirecting to: " + redirect);
 		return redirect;
 	}
 	/*
