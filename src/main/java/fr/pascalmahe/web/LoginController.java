@@ -71,6 +71,20 @@ public class LoginController implements Serializable {
 		logger.debug("loginAction - redirecting to: " + redirect);
 		return redirect;
 	}
+	
+	public String logoutAction(){
+		logger.debug("logoutAction - start");
+		String redirect = "";
+		
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+										.getExternalContext()
+										.getRequest();
+		request.getSession().setAttribute(WebConstants.USER_ATTRIBUTE, null);
+		redirect = WebConstants.LOGIN_PAGE + "?faces-redirect=true";
+		
+		logger.debug("logoutAction - redirecting to: " + redirect);
+		return redirect;
+	}
 	/*
 	 * Getters et Setters
 	 */

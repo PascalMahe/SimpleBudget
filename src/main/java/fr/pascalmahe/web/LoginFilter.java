@@ -3,8 +3,6 @@ package fr.pascalmahe.web;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -74,7 +72,7 @@ public class LoginFilter implements Serializable, Filter {
 
 				// redirect to login.xhtml
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
-				httpResponse.sendRedirect("/" + WebConstants.LOGIN_PAGE);
+				httpResponse.sendRedirect(WebConstants.LOGIN_PAGE);
 			} else {
 				logger.debug("doFilter - Going to login page...");
 				chain.doFilter(request, response);
@@ -86,11 +84,6 @@ public class LoginFilter implements Serializable, Filter {
 	public void init(FilterConfig arg0) throws ServletException {
 		// nothing to do
 	}
-	
-	/*
-	 * Méthodes
-	 */
-	
 	
 }
 
