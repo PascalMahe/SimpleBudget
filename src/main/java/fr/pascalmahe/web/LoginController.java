@@ -1,12 +1,14 @@
 package fr.pascalmahe.web;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Locale;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +41,7 @@ public class LoginController implements Serializable {
 	 * Constructeurs
 	 */
 	public LoginController(){
-		logger.debug("LoginController - constructor");
+		logger.debug("constructor");
 	}
 	
 	/*
@@ -49,14 +51,20 @@ public class LoginController implements Serializable {
 		logger.debug("loginAction - start");
 		String redirect = "";
 		
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+				.getExternalContext()
+				.getRequest();
+		HttpSession sess = request.getSession();
+		if(sess.getAttribute(WebConstants.ERROR_MESSAGE_ATTR) != null){
+			logger.debug("loginAction - Cleaning up session.");
+			sess.setAttribute(WebConstants.ERROR_MESSAGE_ATTR, null);
+		}
+		
 		logger.debug("loginAction - login: " + login);
 		logger.debug("loginAction - password: " + password);
 		
 		User validUser = UserService.getValidUser(login, password);
 		if(validUser != null){
-			HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
-											.getExternalContext()
-											.getRequest();
 			request.getSession().setAttribute(WebConstants.USER_ATTRIBUTE, validUser);
 			redirect = "/secured/dashboard.xhtml?faces-redirect=true";
 		} else {
@@ -84,6 +92,31 @@ public class LoginController implements Serializable {
 		
 		logger.debug("logoutAction - redirecting to: " + redirect);
 		return redirect;
+	}
+	
+	public void fetchErrorMessagesAction(){
+
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+				.getExternalContext()
+				.getRequest();
+		HttpSession sess = request.getSession();
+		if(sess.getAttribute(WebConstants.ERROR_MESSAGE_ATTR) != null){
+			logger.debug("fetchErrorMessagesAction - Fetching error message in session...");
+			String errorMessage = (String) sess.getAttribute(WebConstants.ERROR_MESSAGE_ATTR);
+			sess.setAttribute(WebConstants.ERROR_MESSAGE_ATTR, null);
+			FacesMessage fmLoginError = 
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+										errorMessage, 
+										errorMessage);
+			FacesContext.getCurrentInstance()
+						.addMessage("login_error_message", fmLoginError);
+			List<FacesMessage> messageList = FacesContext.getCurrentInstance().getMessageList();
+			StringBuilder strDebug = new StringBuilder("fetchErrorMessagesAction - Messages : \n");
+			for(FacesMessage currMess : messageList){
+				strDebug.append("\t" + currMess.getSeverity() + " - " + currMess.getSummary()+ "\n");
+			}
+			logger.debug(strDebug.toString());
+		}
 	}
 	/*
 	 * Getters et Setters

@@ -37,7 +37,7 @@ public class LoginFilter implements Serializable, Filter {
 	 * Constructeurs
 	 */
 	public LoginFilter(){
-		logger.debug("LoginFilter - constructor");
+		logger.debug("constructor");
 	}
 
 	@Override
@@ -64,11 +64,12 @@ public class LoginFilter implements Serializable, Filter {
 		} else {
 
 			String url = httpRequest.getRequestURL().toString();
-			if(!url.endsWith(WebConstants.LOGIN_PAGE)){
+			if(url.contains(WebConstants.PAGE_SUFFIX) && 
+					!url.endsWith(WebConstants.LOGIN_PAGE)){
 				logger.debug("doFilter - No user in session. Redirecting to login page...");
 				
-				// TODO
 				// message to the user
+				httpRequest.getSession().setAttribute(WebConstants.ERROR_MESSAGE_ATTR, "Veuillez vous connecter.");
 
 				// redirect to login.xhtml
 				HttpServletResponse httpResponse = (HttpServletResponse) response;

@@ -17,8 +17,10 @@
 	
 	<h:body>
 		<h1>Connexion</h1>
-		
-		<p:messages />
+		<f:metadata>
+			<f:viewAction action="#{loginController.fetchErrorMessagesAction}"/>
+		</f:metadata>
+		<p:messages id="messages"/>
 		<h:form onsubmit="submitLoginForm()">
 			<div>
 				<p:outputLabel value="#{bundle['labelLogin']}" for="login" />
@@ -30,7 +32,8 @@
 				
 				<p:commandButton 	value="#{bundle['labelConnecter']}" 
 									id="searchButton" 
- 									action="#{loginController.loginAction}" />
+ 									action="#{loginController.loginAction}" 
+ 									update="messages"/>
 			</div>
 		</h:form>
    	</h:body>
