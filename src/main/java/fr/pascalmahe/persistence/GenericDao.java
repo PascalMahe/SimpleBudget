@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
@@ -27,6 +29,7 @@ import fr.pascalmahe.business.Budget;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
+import fr.pascalmahe.business.Type;
 import fr.pascalmahe.business.User;
 
 public class GenericDao<T> {
@@ -134,6 +137,7 @@ public class GenericDao<T> {
 		configuration.addAnnotatedClass(Categorisation.class);
 		configuration.addAnnotatedClass(Line.class);
 		configuration.addAnnotatedClass(User.class);
+		configuration.addAnnotatedClass(Type.class);
 		
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
@@ -149,12 +153,11 @@ public class GenericDao<T> {
 		
 		currSession.beginTransaction();
 		
-		logger.debug("Saving:  " + objectToSave + "...");
+		logger.debug("Saving: " + objectToSave + "...");
 		try {
 			currSession.saveOrUpdate(objectToSave);
 			currSession.getTransaction().commit();
-		}
-		finally {
+		} finally {
 			currSession.close();
 		}
 		
@@ -196,7 +199,7 @@ public class GenericDao<T> {
 		T fetched = currSession.get(classToUse, id);
 		
 		currSession.close();
-		logger.debug("Found : " + fetched);
+		logger.debug("Found: " + fetched);
 		return fetched;
 	}
 	
@@ -216,10 +219,23 @@ public class GenericDao<T> {
 			if(criteriaString.length() != CRITERIA_STRING_NAKED_START.length()){
 				criteriaString += ", ";
 			}
-			criteriaString += property + " = '" + value + "'";
 			
-			// adding to the criteria
-			crita.add(Restrictions.eqOrIsNull(property, value));
+			if(value == null){
+				criteriaString += property + " is not null";
+				
+				crita.add(Restrictions.isNull(property));
+			} else if(value instanceof String){
+				criteriaString += property + " like '" + value + "'";
+				
+				// adding to the criteria
+				crita.add(Restrictions.like(property, value));
+			} else {
+				criteriaString += property + " = " + value + "";
+				
+				// adding to the criteria
+				crita.add(Restrictions.eqOrIsNull(property, value));
+			}
+			
 		}
 		
 		logger.debug("Searching " + classToUse.getSimpleName() + "s with" + criteriaString + ".");
@@ -230,6 +246,78 @@ public class GenericDao<T> {
 		
 		@SuppressWarnings("unchecked")
 		List<T> listToReturn = crita.list();
+		
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+	
+
+	public List<T> searchNegative(Map<String, Object> searchCriteriaMap) {
+
+		String criteriaString = " no criterias";
+		if(searchCriteriaMap.size() > 0){
+			criteriaString = CRITERIA_STRING_NAKED_START;
+		}
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		for(String property : searchCriteriaMap.keySet()){
+			Object value = searchCriteriaMap.get(property);
+			
+			// adding to the debug message
+			if(criteriaString.length() != CRITERIA_STRING_NAKED_START.length()){
+				criteriaString += ", ";
+			}
+			
+			if(value == null){
+				criteriaString += property + " is not null";
+				
+				crita.add(Restrictions.not(Restrictions.isNull(property)));
+			} else if(value instanceof String){
+				criteriaString += property + " not like '" + value + "'";
+				
+				// adding to the criteria
+				crita.add(Restrictions.not(Restrictions.like(property, value)));
+				
+			} else {
+				criteriaString += property + " != " + value + "";
+				
+				// adding to the criteria
+				crita.add(Restrictions.not(Restrictions.eq(property, value)));
+			}
+		}
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s with" + criteriaString + ".");
+		
+		// To avoid duplicates in list returned
+		// cf. http://stackoverflow.com/a/4645549
+		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+		
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+	
+	
+	public List<T> fetchReverseChronologically(){
+
+		logger.debug("Fetching all " + classToUse.getSimpleName() + "s in reverse chrono. order...");
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.addOrder(Order.desc("date"));
+		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+
+		currSession.close();
 		
 		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
 		return listToReturn;
@@ -250,8 +338,74 @@ public class GenericDao<T> {
 		@SuppressWarnings("unchecked")
 		List<T> listToReturn = crita.list();
 		
+		currSession.close();
+		
 		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
 		return listToReturn;
 	}
-	
+
+	public List<T> fetchAll() {
+
+		logger.debug("Fetching all " + classToUse.getSimpleName() + "s...");
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+
+	public List<T> fetchNameOrdered() {
+		logger.debug("Fetching all " + classToUse.getSimpleName() + "s ordered by name...");
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.addOrder(Order.asc("name"));
+		
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+
+	public T fetchByName(String name) {
+		
+		logger.debug("Fetching a " + classToUse.getSimpleName() + " with name = '" + name + "'...");
+		
+		Map<String, Object> searchCriteria = new HashMap<>();
+		searchCriteria.put("name", name);
+		
+		List<T> resultList = this.search(searchCriteria);
+		T returnedOne = null;
+		if(!resultList.isEmpty()){
+			if(resultList.size() > 1){
+				logger.warn("Detecting " + resultList.size() + " " + 
+						classToUse.getSimpleName() + "s with name '" + name + "'. Returning first one.");
+			}
+			returnedOne = resultList.get(0);
+		}
+		
+		if(logger.isDebugEnabled()){
+			String dbgMsg = "Fetched ";
+			if(returnedOne == null){
+				dbgMsg += "0 ";
+			} else {
+				dbgMsg += "1 ";
+			}
+			dbgMsg += classToUse.getSimpleName();
+			dbgMsg += " (of " + resultList.size() + ").";
+			logger.debug(dbgMsg);
+		}
+		
+		return returnedOne;
+	}
+
 }

@@ -1,0 +1,307 @@
+package fr.pascalmahe.web;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage.Severity;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.component.UIOutput;
+import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import fr.pascalmahe.business.CatChoice;
+import fr.pascalmahe.business.Categorisation;
+import fr.pascalmahe.business.Category;
+import fr.pascalmahe.business.Line;
+import fr.pascalmahe.business.Type;
+import fr.pascalmahe.services.CategoryService;
+import fr.pascalmahe.services.LineService;
+import fr.pascalmahe.services.TypeService;
+
+@SessionScoped
+@ManagedBean
+public class LineController implements Serializable {
+
+	/*
+	 * Variables statiques
+	 */
+	private static final long serialVersionUID = 2180789495593868542L;
+
+	private static final Logger logger = LogManager.getLogger();
+
+	private Line line;
+
+	private String idToFetch;
+	
+	private List<Type> typeList;
+	
+	private List<Category> firstRankCategoryList;
+	
+	private static Map<Integer, List<Category>> sonCatMap;
+	
+	private Map<Integer, CatChoice> catChoiceMap;
+	
+	public LineController(){
+		logger.debug("constructor");
+		line = new Line(); // necessary so that JSF finds the line when updating
+		typeList = TypeService.getTypeList();
+		firstRankCategoryList = CategoryService.fetchFirstRankCategoryList();
+		
+		populateSonCatMap();
+		
+		// populating catChoiceMap
+		catChoiceMap = populateCatChoiceMap(line.getCategorisationList());
+	}
+	
+	/*
+	 * Méthodes
+	 */
+	private static void populateSonCatMap() {
+		
+		if(sonCatMap == null){
+//			logger.debug("populateSonCatMap - Populating...");
+			List<Category> rawSecondRankCategoryList = CategoryService.fetchSecondRankCategoryList();
+			sonCatMap = populateSonCatMap(rawSecondRankCategoryList);
+//			logger.debug("populateSonCatMap - Populated.");
+		} else {
+//			logger.debug("populateSonCatMap - Already populated.");
+		}
+	}
+
+	protected static Map<Integer, CatChoice> populateCatChoiceMap(List<Categorisation> categorisationList) {
+		
+		logger.debug("populateCatChoiceMap - in list.size: " + categorisationList.size());
+		Map<Integer, CatChoice> returnedMap = new HashMap<>();
+		
+		for(Categorisation catego : categorisationList){
+			
+			Category cat = catego.getCategory();
+			Category sonCat = null;
+			Category fatCat = null;
+			
+			if(cat.getFatherCategory() != null){
+				sonCat = cat;
+				fatCat = cat.getFatherCategory();
+			} else {
+				fatCat = cat;
+			}
+			
+//			logger.debug("populateCatChoiceMap - fatCat: " + fatCat);
+//			logger.debug("populateCatChoiceMap - sonCat: " + sonCat);
+			List<Category> secondRankCatList = sonCatMap.get(fatCat.getId());
+			
+			CatChoice currCatChoice = new CatChoice(catego.getId(), fatCat, sonCat, catego.getAmount(), secondRankCatList);
+			returnedMap.put(catego.getId(), currCatChoice);
+//			logger.debug("populateCatChoiceMap - currCatChoice: " + currCatChoice);
+			
+		}
+		logger.debug("populateCatChoiceMap - out map.size: " + returnedMap.size());
+		return returnedMap;
+	}
+
+	
+	protected static Map<Integer, List<Category>> populateSonCatMap(List<Category> secondRankCategoryList) {
+		Map<Integer, List<Category>>  hashMapBeingBuilt = new HashMap<>();
+		for(Category cat : secondRankCategoryList){
+			
+			int key = cat.getFatherCategory().getId();
+			List<Category> brotherCategories = hashMapBeingBuilt.get(key);
+			// noting wether to push back the list of just fill it
+			boolean entryWasNull = false;
+			if(brotherCategories == null){
+				entryWasNull = true;
+				brotherCategories = new ArrayList<>();
+//				logger.debug("populateSonCatMap - Adding list for "+ 
+//						"fatherCategory " + cat.getFatherCategory().getName() + 
+//						" (#" + key + ").");
+			}
+			
+			brotherCategories.add(cat);
+//			logger.debug("populateSonCatMap - Adding category " + cat.getName() +  
+//						" (#" + cat.getId() + ") to " + 
+//						"fatherCategory " + cat.getFatherCategory().getName() + ".");
+			
+			if(entryWasNull){
+				hashMapBeingBuilt.put(key, brotherCategories);
+			}
+			
+		}
+		return hashMapBeingBuilt;
+	}
+
+	public void fetch(){
+		
+		logger.debug("fetch - idToFetch : " + idToFetch);
+		
+		populateSonCatMap();
+		
+		line = LineService.fetchLine(idToFetch);
+		if(line == null){
+			FacesMessage fmWrongPwd = new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+					"Pas de ligne trouvée pour l'id : " + idToFetch, "");
+			FacesContext.getCurrentInstance().addMessage("wrong_login_pwd", fmWrongPwd);
+		} else {
+			catChoiceMap = populateCatChoiceMap(line.getCategorisationList());
+		}
+		
+		if(typeList == null || typeList.size() == 0){
+			typeList = TypeService.getTypeList();
+		}
+		
+		if(firstRankCategoryList == null || firstRankCategoryList.size() == 0){
+			firstRankCategoryList = CategoryService.fetchFirstRankCategoryList();
+		}
+		logger.debug("fetch - end.");
+	}
+	
+	private String catChoiceMapToString(String header){
+
+		StringBuilder dbgMsg = new StringBuilder(header + " - catChoiceMap : [");
+		for(Integer key : catChoiceMap.keySet()){
+			CatChoice catCh = catChoiceMap.get(key);
+			if(dbgMsg.length() > 31){
+				dbgMsg.append(", ");
+			}
+			Category fatCat = catCh.getFatherCategory();
+			if(fatCat != null){
+				dbgMsg.append(fatCat.getName());
+			} else {
+				dbgMsg.append("(NOCAT)");
+			}
+			
+			Category sonCat = catCh.getSonCategory();
+			if(sonCat != null){
+				dbgMsg.append(":" + sonCat.getName());
+			}
+		}
+		dbgMsg.append("]");
+		
+		return dbgMsg.toString();
+	}
+	
+	public void addCatChoice(){
+		logger.debug("addCatChoice - start...");
+		
+		logger.debug(catChoiceMapToString("addCatChoice"));
+		
+		this.line.addCategorisation(0, null);
+		LineService.updateLine(line);
+		this.catChoiceMap = populateCatChoiceMap(this.line.getCategorisationList());
+		
+		logger.debug(catChoiceMapToString("addCatChoice"));
+		
+		logger.debug("addCatChoice - end.");
+	}
+	
+	public void saveAction(){
+		logger.debug("saveAction - start...");
+		
+		Severity msgSeverity = FacesMessage.SEVERITY_INFO;
+		
+		// replace Categories in Categorizations
+		for(Integer categoID : catChoiceMap.keySet()){
+			CatChoice catChoice = catChoiceMap.get(categoID);
+			Categorisation catego = line.getCategorisationById(categoID);
+			Category finalCat;
+			if(catChoice.getSonCategory() == null){
+				finalCat = catChoice.getFatherCategory();
+			} else {
+				finalCat = catChoice.getSonCategory();
+				finalCat.setFatherCategory(catChoice.getFatherCategory());
+			}
+			catego.setCategory(finalCat);
+			
+			Float newAmount = catChoice.getAmount();
+			if(newAmount != null && newAmount != catego.getAmount()){
+				catego.setAmount(newAmount);
+			}
+			logger.debug("saveAction - " + 
+					"catego #" + categoID + 
+					" -> cat : " + finalCat);
+		}
+		
+		LineService.updateLine(line);
+
+		FacesMessage fmInfoBulkImport = new FacesMessage(msgSeverity, 
+														"Ligne sauvegardée.", 
+														"");
+		FacesContext.getCurrentInstance().addMessage("saved_a_line", fmInfoBulkImport);
+		
+		logger.debug("saveAction - end.");
+	}
+	
+	public void onFatherCategoryChange(AjaxBehaviorEvent abe){
+		
+		UIOutput source = (UIOutput) abe.getSource();
+		String rawCategoIDAsStr = source.getClientId();
+		rawCategoIDAsStr = rawCategoIDAsStr.replace("lineForm:fatherCategory", "");
+		Integer categoID = Integer.parseInt(rawCategoIDAsStr);
+		
+		Category value = (Category) source.getValue();
+		Integer newFatCatID = value.getId();
+		
+		logger.debug("onFatherCategoryChange - categoId: #" + categoID + ", newFatherCategoryId: #" + newFatCatID);
+		
+		CatChoice catChoiceToUpdate = catChoiceMap.get(categoID);
+		Category fatCat = CategoryService.fetchById(newFatCatID);
+		
+		catChoiceToUpdate.setFatherCategory(fatCat);
+		populateSonCatMap();
+		catChoiceToUpdate.setSecondRankCategoryList(sonCatMap.get(newFatCatID));
+		catChoiceToUpdate.setSonCategory(null);
+	}
+
+	/*
+	 * Getters et Setters
+	 */
+	
+	public List<CatChoice> getCatChoiceMapAsList(){
+		Collection<CatChoice> collCatChoice = catChoiceMap.values();
+		List<CatChoice> catChoiceList = new ArrayList<>();
+		catChoiceList.addAll(collCatChoice);
+		return catChoiceList;
+	}
+	
+	public Line getLine() {
+		return line;
+	}
+
+	public void setLine(Line line) {
+		this.line = line;
+	}
+
+	public String getIdToFetch() {
+		return idToFetch;
+	}
+
+	public void setIdToFetch(String idToFetch) {
+		this.idToFetch = idToFetch;
+	}
+
+	public List<Type> getTypeList() {
+		return typeList;
+	}
+
+	public void setTypeList(List<Type> typeList) {
+		this.typeList = typeList;
+	}
+
+	public List<Category> getFirstRankCategoryList() {
+		return firstRankCategoryList;
+	}
+
+	public void setFirstRankCategoryList(List<Category> firstRankCategoryList) {
+		this.firstRankCategoryList = firstRankCategoryList;
+	}
+
+}
+

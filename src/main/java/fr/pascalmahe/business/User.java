@@ -25,11 +25,13 @@ public class User implements Serializable {
 	
 	private String password;
 	
+	private String uuid;
+	
 	private Boolean dailyNotification;
 	
 	public User() {}
 
-	public User(Integer id, String login, String password, Boolean dailyNotification) {
+	public User(Integer id, String login, String password, String uuid, Boolean dailyNotification) {
 		super();
 		this.id = id;
 		this.login = login;
@@ -48,7 +50,8 @@ public class User implements Serializable {
 	public String toString() {
 		return "User [id=" + id + 
 				", login=" + login + 
-				", password=" + password + 
+				", password=" + password +
+				", uuid=" + uuid + 
 				", dailyNotification=" + dailyNotification + "]";
 	}
 
@@ -100,5 +103,13 @@ public class User implements Serializable {
 	public void setDailyNotification(Boolean dailyNotification) {
 		this.dailyNotification = dailyNotification;
 	}
-	
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
 }

@@ -1,9 +1,14 @@
 package fr.pascalmahe.business;
 
 import java.io.Serializable;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
 
 
 /**
@@ -11,7 +16,7 @@ import javax.persistence.Id;
  * @author Pascal
  */
 @Entity
-public class Category implements Serializable {
+public class Category implements Serializable, Comparable<Category> {
 
 
 	private static final long serialVersionUID = 3208053020237026635L;
@@ -22,23 +27,26 @@ public class Category implements Serializable {
 	
 	private String name;
 	
+	@ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.PERSIST)
 	private Category fatherCategory;
 
 	public Category() {}
 
 	public Category(Integer id, String name, Category fatherCategory) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.fatherCategory = fatherCategory;
 	}
 
 	public Category(String name, Category fatherCategory) {
-		super();
 		this.name = name;
 		this.fatherCategory = fatherCategory;
 	}
 	
+	public Category(String categoryName) {
+		this.name = categoryName;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -83,6 +91,17 @@ public class Category implements Serializable {
 	@Override
 	public String toString() {
 		return "Category [id=" + id + ", name=" + name + ", fatherCategory=" + fatherCategory + "]";
+	}
+
+	@Override
+	public int compareTo(Category o) {
+		int result = 0;
+		if(this.name != null){
+			result = this.name.compareTo(o.name);
+		} else {
+			result = -1;
+		}
+		return result;
 	}
     
 }

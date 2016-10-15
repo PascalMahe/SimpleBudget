@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<h:head>
+        <title>Appli Budget</title>
+        <link rel="stylesheet" media="screen" href="../simpleBudget.css" />
+        <script type="text/javascript" src="../js/treeView.js"></script>
+
+    </h:head>
+	
+	<h:body>
+		<h1>Liste exhaustive des lignes de compte</h1>
+		<ui:include page="menu.xhtml" />
+		
+		<h:form id="lineForm">
+		
+		    <p:dataScroller value="#{listLineController.lineList}" var="line" chunkSize="50">
+		        <f:facet name="header">
+		            <h:outputText value="#{bundle['defilerPourAfficher']}" />
+		        </f:facet>
+		       	
+		       	<p:link outcome="line">
+		       		<f:param name="id" value="#{line.id}" />
+		       		
+					<h:graphicImage id="editImg" 
+									library="images" 
+									name="Edit.png" 
+									alt="#{bundle['modifierLigne']}" 
+									title="#{bundle['modifierLigne']}"
+									styleClass="lineComponent allButtons editImage" 
+									onmouseover="this.src='/simplebudget/javax.faces.resource/Edit-hover.png.xhtml?ln=images';"
+									onmouseout="this.src='/simplebudget/javax.faces.resource/Edit.png.xhtml?ln=images';"/>
+		       	</p:link>
+		       	
+	       		<span class="lineComponent dateLi">#{line.formattedDate}</span>
+				
+				<h:graphicImage id="typeImage" 
+									library="images" 
+									name="#{line.formattedTypeName}.png" 
+									alt="#{line.type.name}" 
+									title="#{line.type.name}"
+									styleClass="lineComponent imageLi" />
+				 
+				<h:outputText id="shortLabel" value ="#{line.shortLabel}" styleClass="lineComponent labelLi" /> 
+				<p:tooltip id="tooltip" for="shortLabel" value="#{line.detailedLabel}" /> 
+				
+				<span class="lineComponent amount #{line.formattedClass} amountLi">#{line.formattedAmount}</span> 
+				
+				<span class="lineComponent textLineComponent categoLi">
+					<ui:repeat value="#{line.categorisationList}" var="catego">
+						<span class="lineComponent categoryZone"> 
+							<h:outputText id="fatherCatName" 
+										value ="#{catego.category.fatherCategory.name} -" 
+										rendered="#{catego.category.fatherCategory != null}"/> 
+							#{catego.category.name}
+							<h:outputText id="catName" 
+										value =" : " 
+										rendered="#{line.amount != catego.amount}"/>
+							<h:outputText id="catAmount" 
+										value ="#{catego.formattedAmount}" 
+										rendered="#{line.amount != catego.amount}"/>  
+						</span>
+						
+					</ui:repeat>
+				</span>
+	       	
+		    </p:dataScroller>
+		</h:form>
+		
+   	</h:body>
+</html>

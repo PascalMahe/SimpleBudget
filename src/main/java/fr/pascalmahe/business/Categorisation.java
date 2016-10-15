@@ -1,10 +1,11 @@
 package fr.pascalmahe.business;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
 
 /**
  * Class representing the category for part (up to 100%) of a Line.
@@ -21,6 +22,7 @@ public class Categorisation implements Serializable {
 	
 	private Float amount;
 	
+	@Column(nullable = false)
 	private Category category;
 
 	public Categorisation() {}
@@ -47,6 +49,10 @@ public class Categorisation implements Serializable {
 		return true;
 	}
 
+	public String getFormattedAmount(){
+		return String.format("%.2f", amount);
+	}
+	
 	public Categorisation(Float amount, Category cat) {
 		this.amount = amount;
 		this.category = cat;

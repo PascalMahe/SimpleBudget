@@ -4,22 +4,75 @@
 				xmlns:f="http://java.sun.com/jsf/core"
 				xmlns:p="http://primefaces.org/ui"
 				xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<script type="text/javascript">
+		function hoverOverCommandButton(formId){
+			var formElmt = document.getElementById(formId);
+			formElmt.style.backgroundColor='#F0F5F3';
+			formElmt.style.borderColor='#F0F5F3';
+		}
+		
+		function outOfCommandButton(formId){
+			var formElmt = document.getElementById(formId);
+			formElmt.style.backgroundColor='#B8CFE5';
+			formElmt.style.borderColor='#B8CFE5';
+		}
+		
+		function hoverOverCommandButtonWithImage(formId, classOnHover, classOnOut){
+			var formElmt = document.getElementById(formId);
+			var spanElmt = spanElmt = formElmt.childNodes[0];
+			spanElmt.className = spanElmt.className.replace(classOnOut, classOnHover);
+		}
+		
+		function outOfCommandButtonWithImage(formId, classOnHover, classOnOut){
+			var formElmt = document.getElementById(formId);
+			var spanElmt = spanElmt = formElmt.childNodes[0];
+			spanElmt.className = spanElmt.className.replace(classOnHover, classOnOut);
+		}
+	</script>
+				
 	<div>
-		<p>Menu</p>
-		<p:link outcome="/secured/budget" value="#{bundle['labelPageBudget']}" />
-		<br/>
-		<p:link outcome="/secured/category" value="#{bundle['labelPageCategorie']}" />
-		<br/>
-		<p:link outcome="/secured/import" value="#{bundle['labelPageImport']}" />
-		<br/>
-		<p:link outcome="/secured/line" value="#{bundle['labelPageLigne']}" />
-		<br/>
-		<h:form>
-			<p:commandButton 	value="#{bundle['labelDeconnecter']}" 
-								id="searchButton" 
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="dashboardPageLink" outcome="/secured/dashboard" value="#{bundle['labelPageDashboard']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="budgetPageLink" outcome="/secured/budget" value="#{bundle['labelPageBudget']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="categoryPageLink" outcome="/secured/category" value="#{bundle['labelPageCategorie']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="linePageLink" outcome="/secured/lineList" value="#{bundle['labelPageLigne']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="importPageLink" outcome="/secured/import" value="#{bundle['labelPageImport']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons">
+			<span class="ui-button-text ui-c">
+				<p:link id="adminUserPageLink" outcome="/secured/adminUser" value="#{bundle['labelPageAdminUser']}" />	
+			</span>
+		</span>
+		<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only menuButton allButtons"
+				onmouseover="hoverOverCommandButton('disconnectForm:disconnectButton');"
+				onmouseout="outOfCommandButton('disconnectForm:disconnectButton');">
+			<h:form id="disconnectForm">
+				<p:commandButton 	value="#{user.login} : #{bundle['labelDeconnecter']}" 
+									id="disconnectButton"
+									styleClass=""
 									action="#{loginController.logoutAction}" />
-		</h:form>
+			</h:form>
+		</span>
 		<br/>
 		<p:messages style="color:red; margin:8px;"></p:messages>
 	</div>
+	<hr/>
 </ui:composition>

@@ -33,6 +33,9 @@
     <Logger name="org.hibernate" level="INFO" additivity="false">
     	<Appender-Ref ref="STDOUT"/>
     </Logger>
+    <Logger name="fr.pascalmahe.persistence" level="WARN" additivity="false">
+    	<Appender-Ref ref="STDOUT"/>
+    </Logger>
     <Logger name="fr.pascalmahe" level="DEBUG" additivity="false">
     	<Appender-Ref ref="STDOUT"/>
     </Logger>

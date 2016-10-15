@@ -1,14 +1,12 @@
 package fr.pascalmahe.services;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
@@ -17,10 +15,11 @@ import org.junit.Test;
 import fr.pascalmahe.business.User;
 import fr.pascalmahe.ex.LoginAlreadyExistsException;
 import fr.pascalmahe.persistence.GenericDao;
-import fr.pascalmahe.persistence.TestException;
 import fr.pascalmahe.services.UserService;
+import fr.pascalmahe.testUtil.AbstractTest;
+import fr.pascalmahe.testUtil.Validator;
 
-public class TestUserService {
+public class TestUserService extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
 
@@ -31,17 +30,33 @@ public class TestUserService {
 	private static final String LOGIN_WITHOUT_PWD = "az";
 
 	private static final String LOGIN_INSERTION = "gfpsdksqdpsqkldp147";
-
-	private static List<Object> listToDelete = new ArrayList<>();
 	
-	private static int nbUsersBeforeTests;
+	private static final String PWD_WITH_UUID = "gqbssqddnl";
+
+	private static final String LOGIN_WITHOUT_UUID = "54651";
+
+	private static final String PWD_WITHOUT_UUID = "178";
+
+	private static final String LOGIN_WITH_UUID_1 = "nqmldkl";
+
+	private static final String LOGIN_WITH_UUID_2 = "1654584sdz";
+	
+	private static String uuidForSearchingUUID;
+	
+	private static int idUserWithoutUUID;
+	
+	private static int idUserWithUUIDForSearching;
+	
+	private static int idUserWithUUIDForDeleting;
 	
 	@BeforeClass
 	public static void beforeClass(){
 		logger.info("Starting beforeClass...");
 		
+		preTestDatabaseCheckup();
+		
 		GenericDao<User> userDao = new GenericDao<>(User.class);
-		nbUsersBeforeTests = userDao.count();
+		
 		
 		logger.debug("Inserting user with password...");
 		int idUserWithPwd = 0;
@@ -67,27 +82,47 @@ public class TestUserService {
 		User userWithoutPwd = userDao.fetch(idUserWithoutPwd);
 		listToDelete.add(userWithoutPwd);
 		
+		logger.debug("Inserting users with UUID...");
+		User userWithUUIDForSearching = new User();
+		userWithUUIDForSearching.setLogin(LOGIN_WITH_UUID_1);
+		userWithUUIDForSearching.setPassword(PWD_WITH_UUID);
+		uuidForSearchingUUID = UUID.randomUUID().toString();
+		userWithUUIDForSearching.setUuid(uuidForSearchingUUID);
+		
+		User userWithUUIDForDeleting = new User();
+		userWithUUIDForDeleting.setLogin(LOGIN_WITH_UUID_2);
+		userWithUUIDForDeleting.setPassword(PWD_WITH_UUID);
+		userWithUUIDForDeleting.setUuid(UUID.randomUUID().toString());
+		
+		userDao.saveOrUpdate(userWithUUIDForSearching);
+		userDao.saveOrUpdate(userWithUUIDForDeleting);
+		idUserWithUUIDForDeleting = userWithUUIDForDeleting.getId();
+		idUserWithUUIDForSearching = userWithUUIDForSearching.getId();
+		
+		listToDelete.add(userWithUUIDForSearching);
+		listToDelete.add(userWithUUIDForDeleting);
+		
+		logger.debug("Users with UUID inserted.");
+		
+
+		logger.debug("Inserting user without UUID...");
+		try {
+			idUserWithoutUUID = UserService.addUser(LOGIN_WITHOUT_UUID, PWD_WITHOUT_UUID);
+			User userWithoutUUID = userDao.fetch(idUserWithoutUUID);
+			listToDelete.add(userWithoutUUID);
+		} catch (LoginAlreadyExistsException e) {
+			logger.error("Exception while inserting user for tests: " + e.getLocalizedMessage(), e);
+		}
+		
+		logger.debug("User with UUID inserted.");
+		
 		logger.info("beforeClass finished.");
 	}
 
 	@AfterClass
 	public static void afterClass() {
 		logger.info("Starting afterClass...");
-		
-		GenericDao<User> userDao = new GenericDao<>(User.class);
-		for(Object currObj : listToDelete){
-			User userToDelete = (User) currObj;
-			userDao.delete(userToDelete);
-		}
-		
-		int nbUsersAfterDeletions = userDao.count();
-		if(nbUsersAfterDeletions != nbUsersBeforeTests){
-			String errorMessageSuffix = "Users(found " + nbUsersAfterDeletions + 
-									", should be " + nbUsersBeforeTests + ")";
-			throw new TestException("Found values in DB after tests from "
-									+ "the following classes: " 
-									+ errorMessageSuffix);
-		}
+		cleanUpDatabase();
 		
 		logger.info("afterClass finished.");
 	}
@@ -133,6 +168,7 @@ public class TestUserService {
 			idUserInserted = UserService.addUser(LOGIN_INSERTION, PWD);
 		} catch (LoginAlreadyExistsException e) {
 			logger.error("Exception while inserting user for tests: " + e.getLocalizedMessage(), e);
+			fail("Exception while inserting user for tests: " + e.getLocalizedMessage());
 		}
 		assertNotNull("Wrong id after addUser test (should not be null)", idUserInserted);
 
@@ -155,7 +191,66 @@ public class TestUserService {
 				nbUserAfterFailedInsertion);
 		
 		listToDelete.add(uDao.fetch(idUserInserted));
-		
+				
 		logger.info("testAddUser finished.");
+	}
+	
+
+	@Test
+	public void testDeleteUUID() {
+		logger.info("Starting testDeleteUUID...");
+		
+		GenericDao<User> uDao = new GenericDao<User>(User.class);
+		User userWithUUID = uDao.fetch(idUserWithUUIDForDeleting);
+		
+		assertNotNull("Wrong UUID in userWithUUID: it's null, it shouldn't be.", userWithUUID.getUuid());
+		
+		UserService.deleteUUID(userWithUUID);
+		
+		User userNowWithoutUUID = uDao.fetch(idUserWithUUIDForDeleting);
+		assertNull("Wrong UUID in userWithUUID: it's not null, it should be.", userNowWithoutUUID.getUuid());
+		
+		logger.info("testDeleteUUID finished.");
+	}
+
+
+	@Test
+	public void testGetUserOnUUID() {
+		logger.info("Starting testGetUserOnUUID...");
+		
+		User userFoundOnUUID = UserService.getUserOnUUID(uuidForSearchingUUID);
+		
+		User userVerification = new User();
+		userVerification.setId(idUserWithUUIDForSearching);
+		userVerification.setLogin(LOGIN_WITH_UUID_1);
+		userVerification.setPassword(PWD_WITH_UUID);
+		userVerification.setUuid(uuidForSearchingUUID);
+		
+		Validator.validateUser("test to fetch User on UUID", userVerification, userFoundOnUUID);
+		
+		logger.info("testGetUserOnUUID finished.");
+	}
+	
+
+
+	@Test
+	public void testSaveUUID() {
+		logger.info("Starting testSaveUUID...");
+		
+		GenericDao<User> uDao = new GenericDao<User>(User.class);
+		
+		User userWithoutUUID = uDao.fetch(idUserWithoutUUID);
+		
+		assertNull("Wrong UUID in userWithUUID: it's not null, it should be.", userWithoutUUID.getUuid());
+		
+		String updatingUUIDTo = UUID.randomUUID().toString();
+		
+		UserService.saveUUID(userWithoutUUID, updatingUUIDTo);
+		
+		User userNowWithUUID = uDao.fetch(idUserWithoutUUID);
+
+		assertNotNull("Wrong UUID in userWithUUID: it's null, it shouldn't be.", userNowWithUUID.getUuid());
+		
+		logger.info("testSaveUUID finished.");
 	}
 }

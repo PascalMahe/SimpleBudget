@@ -1,0 +1,119 @@
+
+.allButtons {
+	border-radius: 3px;
+}
+
+.menuButton {
+	vertical-align: middle;
+	padding: 3px;
+}
+
+.ui-button:hover {
+	background-color: #F0F5F3; /* RGB: 240 245 243 */ 
+	border: 1px solid #F0F5F3;
+}
+
+.highlighted-button {
+	background-color: fuchsia;
+	color: blue;
+}
+
+.bulkImportTextArea {
+	background-color: white;
+	width: 400pt;
+	height: 800pt;
+}
+
+.lineComponent{
+	margin-right: 1em;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.editImage{
+	vertical-align: bottom;
+}
+
+.textLineComponent {
+	margin-bottom: 0.3em;
+}
+
+.categoryZone {
+	border-radius: 8px;
+	border-color: #6633CC;
+	border-style: solid;
+	border-width: 1px;
+	padding: 5px;
+	margin: 2px;
+}
+
+.lineCategory{
+	width: 28em;
+}
+
+.amount {
+	font-weight: bold;
+}
+
+.neg {
+	color: red;
+}
+
+.pos {
+	color: green;
+}
+
+
+
+.dateLi {
+	
+}
+
+.imageLi{
+}
+
+.labelLi{
+	width: 20%;
+}
+
+.amountLi {
+	min-width: 5%;
+	text-align: right;
+}
+
+.categoLi {
+	
+}
+
+ .tableFormLabel{
+ 	text-align: right;
+ }
+ 
+ .tableFormField {
+ 	text-align: left;
+ }
+
+.marginLeft {
+	margin-left: 1em;
+}
+
+
+.amountInput {
+	width: 4em;
+	vertical-align: top;
+}
+
+.plus {
+	background-image: url("/simplebudget/javax.faces.resource/AddCategory.png.xhtml?ln=images") !important;
+}
+
+.plus-hover {
+	background-image: url("/simplebudget/javax.faces.resource/AddCategory-hover.png.xhtml?ln=images") !important;
+}
+
+/**
+	Overrides Primefaces' theme
+ **/
+.ui-datascroller-list{
+	padding-left: 25% !important;	
+}

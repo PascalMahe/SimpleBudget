@@ -9,63 +9,206 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
         <title>Appli Budget</title>
-        <link rel="stylesheet" media="screen" href="../css/treeView.css" />
+        <link rel="stylesheet" media="screen" href="../simpleBudget.css" />
         <script type="text/javascript" src="../js/treeView.js"></script>
 
     </h:head>
 	
 	<h:body>
-		<h1>Liste exhaustive des lignes de compte</h1>
+		<f:metadata>
+			<f:viewParam name="id" value="#{lineController.idToFetch}" />
+			<f:viewAction action="#{lineController.fetch}" />
+		</f:metadata>
+	
+		<h1>Modifier une ligne de compte</h1>
 		<ui:include page="menu.xhtml" />
-		#TumbleWeed
 		
-        <h:form id="form">
-        	<p:outputLabel value="#{bundle['labelSite']}" for="site" />
-			<p:autoComplete id="site" value="#{searchController.site}" completeMethod="#{searchController.completeSite}" />
- 			<br/>
- 			<p:outputLabel value="#{bundle['labelDesi']}" for="desi" />
-			<p:inputText id="desi" value="#{searchController.desi}" />
- 			<br/>
- 			<p:commandButton 	value="#{bundle['labelSearch']}" 
- 								id="searchButton" 
- 								actionListener="#{searchController.searchAction}" 
- 								ajax="false" />
- 								
- 			<br/>
- 			<br/>
- 			
- 			<p:dataTable var="line" value="#{searchController.listeLigne}" rendered="#{not empty searchController.listeLigne}">
-			    <p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.id}" />
-			    </p:column>
-			 	<p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.date}" />
-			    </p:column>
-			 	<p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.mainLabel}" /><br/>
-			        <h:outputText value="#{line.secondaryLabel}" />
-			    </p:column>
-			 	<p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.amount}" />
-			    </p:column>
-			 	<p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.recurring}" />
-			    </p:column>
-			 	<p:column headerText="#{bundle['headerCode']}">
-			        <h:outputText value="#{line.category}" />
-			    </p:column>
-			 	
-			    <ui:remove>
-			    
-				    <p:column headerText="">
-				        <p:button outcome="edit" value="#{bundle['labelEdit']}">
-						    <f:param name="code" value="#{mach.code}" />
-						    <f:param name="site" value="#{mach.codeSite}" />
-						</p:button>
-						 
-				    </p:column>
-			    </ui:remove>
-			</p:dataTable>
-    	</h:form>
+        <p:messages id="messages"/>
+        
+        <br/>
+        
+		<h:form id="lineForm">
+			<h:inputHidden value="#{lineController.line.id}" />
+			
+			<div style="text-align: center;">
+			<div style="display: inline-block;">
+				<table>
+					<tr>
+						<td>
+							<table>
+								<tr>
+									<td class="tableFormLabel">
+										 <p:outputLabel value="#{bundle['labelLineDate']}" for="lineDate" />
+									</td>
+									<td class="tableFormField">
+										<h:outputText value="#{lineController.line.formattedRealDate}" id="lineDate" />
+									</td>
+				   				</tr>
+				    			<tr>
+									<td class="tableFormLabel">
+										<p:outputLabel value="#{bundle['labelLineCCardDate']}" for="lineCCardDate" rendered="#{lineController.line.formattedCCardDate != ''}"/>
+									</td>
+									<td class="tableFormField">
+										<h:outputText value="#{lineController.line.formattedCCardDate}" id="lineCCardDate" rendered="#{lineController.line.formattedCCardDate != ''}"/>
+									</td>
+				   				</tr>
+				   			</table>
+			   			</td>
+			   			<td>
+			   				<table>
+								<tr>
+									<td class="tableFormLabel">
+										<p:outputLabel value="#{bundle['labelLineAmount']}" for="lineAmount" />
+									</td>
+									<td class="tableFormField">
+										<h:outputText value="#{lineController.line.formattedAmount} €" id="lineAmount" />
+									</td>
+				   				</tr>
+				    			<tr>
+									<td class="tableFormLabel">
+										<p:outputLabel value="#{bundle['labelLineType']}" for="lineType" />
+									</td>
+									<td class="tableFormField">
+										<p:selectOneMenu id="lineType" 
+															value="#{lineController.line.type}" 
+															converter="typeConverter" 
+															var="t">
+											<f:selectItems 	value="#{lineController.typeList}" 
+								      						var="type" 
+															itemLabel="#{type.name}"/>
+															
+											<p:column>
+												<h:graphicImage library="images" 
+																name="#{t.name}.png" 
+																alt="#{t.name}" 
+																title="#{t.name}"
+																styleClass="" />
+											</p:column>
+											
+											<p:column>
+												<h:outputText value="#{t.name}" />
+											</p:column>
+										</p:selectOneMenu>
+										
+										<!-- 
+										<h:graphicImage id="typeImage" 
+														library="images" 
+														name="#{lineController.line.formattedTypeName}.png" 
+														alt="#{lineController.line.type.name}" 
+														title="#{lineController.line.type.name}"
+														styleClass="marginLeft" />
+										 --> 
+									</td>
+				   				</tr>
+				   			</table>
+				   		</td>
+				   	</tr>
+				    <tr>
+				    	<td class="tableFormLabel">
+				    		<p:outputLabel value="#{bundle['labelLineDetailedLabel']}" for="lineDetailedLabel" />
+				    	</td>
+				    	<td class="tableFormField">
+				    		<h:outputText value="#{lineController.line.detailedLabel}" id="lineDetailedLabel" />
+				    	</td>
+				   	</tr>
+				    <tr>
+				    	<td class="tableFormLabel">
+				    		<p:outputLabel value="#{bundle['labelLineShortLabel']}" for="lineShortLabel" />
+				    	</td>
+				    	<td class="tableFormField">
+				    		<h:inputText value="#{lineController.line.shortLabel}" id="lineShortLabel" />
+				    	</td>
+				   	</tr>
+				    <tr>
+				    	<td class="tableFormLabel">
+				    		<p:outputLabel value="#{bundle['labelNote']}" for="lineNote" />
+				    	</td>
+				    	<td class="tableFormField">
+				    		<h:inputText value="#{lineController.line.note}" id="lineNote" />
+				    	</td>
+				   	</tr>
+				   	<tr>
+				    	<td class="tableFormLabel">
+				    		<p:outputLabel value="#{bundle['labelLineCategories']}" />
+				    	</td>
+				    	<td class="tableFormField">
+				    		<h:panelGroup id="catChoiceLine">
+					    		<c:forEach items="#{lineController.catChoiceMapAsList}" var="catChoice" varStatus="loopStatus">
+					    			<div class="categoryZone lineCategory">
+							    		<!-- Choice for father Category -->
+						                <p:selectOneMenu 	id="fatherCategory#{catChoice.categoId}" 
+						                					value="#{catChoice.fatherCategory}" 
+						                					editable="true"
+						                					converter="categoryConverter" 
+						                					var="t">
+						                	<p:ajax listener="#{lineController.onFatherCategoryChange}"
+						                			update="sonCategoryFather#{catChoice.categoId}" />
+											<f:selectItems 	value="#{lineController.firstRankCategoryList}" 
+								      						var="cat" 
+															itemLabel="#{cat.name}"/>
+											<p:column>
+												<h:outputText value="#{t.name}" />
+											</p:column>
+										</p:selectOneMenu>
+										
+										<!-- Choice for son Category (only appears if father Category
+											already has other sons) -->
+										<h:panelGroup id="sonCategoryFather#{catChoice.categoId}">
+											<p:selectOneMenu 	id="lineSonCategory#{catChoice.categoId}" 
+																value="#{catChoice.sonCategory}"
+																editable="true"
+																converter="categoryConverter" 
+																var="sCat"
+																rendered="#{catChoice.secondRankCategoryList != null}">
+												<f:selectItems 	value="#{catChoice.secondRankCategoryList}"
+																var="sonCat" 
+																itemLabel="#{sonCat.name}"
+																itemValue="#{sonCat}" />
+												<p:column>
+													<h:outputText value="#{sCat.name}" />
+												</p:column>
+											</p:selectOneMenu>
+										</h:panelGroup>
+										
+										<span style="position: relative;">
+											<p:inputText value="#{catChoice.amount}" styleClass="amountInput" />
+										</span>
+										
+									</div>
+					    		</c:forEach>
+					    	</h:panelGroup>	
+				    		<div class="categoryZone">
+				    			<p:commandButton	id="addCatChoice" 
+													styleClass="allButtons"
+													icon="plus"
+													alt="#{bundle['ajouterCategorie']}"
+													title="#{bundle['ajouterCategorie']}"
+													action="#{lineController.addCatChoice}" 
+													update="catChoiceLine"
+													onmouseover="hoverOverCommandButtonWithImage('lineForm:addCatChoice', 'plus-hover', 'plus')"
+													onmouseout="outOfCommandButtonWithImage('lineForm:addCatChoice', 'plus-hover', 'plus')"/>
+				    		</div>
+				    	</td>
+				   	</tr>
+				   	<tr>
+				   		<td>
+				   			
+				   		</td>
+				   		<td class="tableFormLabel">
+				   			<br/>
+							<p:commandButton	value="#{bundle['labelSauvegarder']}" 
+												id="saveButton" 
+												styleClass="allButtons"
+												action="#{lineController.saveAction}" 
+												update="messages"/>
+				   		</td>
+				   	</tr>
+				</table>
+	        	
+		    </div>
+		    </div>
+		    
+		</h:form>
+		
    	</h:body>
 </html>

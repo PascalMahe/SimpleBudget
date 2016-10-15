@@ -4,7 +4,11 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5">
 	<display-name>quartis-pro-gestion-controle 1.0</display-name>
-	
+    
+    <context-param>  
+        <param-name>primefaces.THEME</param-name>  
+        <param-value>sba</param-value>  
+    </context-param> 
 	<context-param>
 		<param-name>javax.faces.PROJECT_STAGE</param-name>
 		<param-value>Development</param-value>

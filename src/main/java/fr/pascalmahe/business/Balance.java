@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 
 /**
- * Classe representing an account's line
+ * Class representing an account's line
  * @author Pascal
  */
 @Entity

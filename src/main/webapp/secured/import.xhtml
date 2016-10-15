@@ -9,7 +9,7 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
         <title>Appli Budget</title>
-        <link rel="stylesheet" media="screen" href="../css/treeView.css" />
+        <link rel="stylesheet" media="screen" href="../simpleBudget.css" />
         <script type="text/javascript" src="../js/treeView.js"></script>
 
     </h:head>
@@ -17,6 +17,19 @@
 	<h:body>
 		<h1>Import en groupe</h1>
         <ui:include page="menu.xhtml" />
-        #TumbleWeed
+        
+        <p:messages id="messages"/>
+        
+        <br/>
+        
+        <h:form id="importForm" onsubmit="submitLoginForm()">
+	        <p:inputTextarea id="text" value="#{importController.text}" styleClass="bulkImportTextArea"/>
+	        
+	        <p:commandButton  	value="#{bundle['labelImporter']}" 
+								id="importButton" 
+								styleClass="allButtons"
+								action="#{importController.importAction}" 
+								update="messages"/>
+		</h:form>
    	</h:body>
 </html>
