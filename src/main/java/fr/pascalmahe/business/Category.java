@@ -46,6 +46,15 @@ public class Category implements Serializable, Comparable<Category> {
 	public Category(String categoryName) {
 		this.name = categoryName;
 	}
+	
+	public String getCompleteName(){
+		String completeName = "";
+		if(this.fatherCategory != null){
+			completeName += fatherCategory.name + ":";
+		}
+		completeName += name;
+		return completeName;
+	}
 
 	public Integer getId() {
 		return id;

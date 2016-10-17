@@ -2,10 +2,14 @@ package fr.pascalmahe.services;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import fr.pascalmahe.business.CatChoice;
+import fr.pascalmahe.business.Categorisation;
+import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.persistence.GenericDao;
 
@@ -64,6 +68,57 @@ public class LineService {
 		returnLine = lineDao.fetch(id);
 		logger.info("Fetched line #" + id + ".");
 		return returnLine;
+	}
+
+	public static void updateCategoInLineFromCatChoiceMap(Line line, Map<Integer, CatChoice> catChoiceMap) {
+		logger.info("Updating catego list from line #" + line.getId() + "...");
+		
+		StringBuilder beforeMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - before : [");
+		StringBuilder afterMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - after : [");
+		for(Integer categoID : catChoiceMap.keySet()){
+			Categorisation catego = line.getCategorisationById(categoID);
+			
+			// logging before
+			if(beforeMsg.length() > 48){
+				beforeMsg.append(", ");
+			}
+			String initialCatName = "null";
+			if(catego.getCategory() != null){
+				initialCatName = catego.getCategory().getCompleteName();
+			}
+			beforeMsg.append("catego #" + categoID + " -> cat : " + initialCatName);
+			
+			CatChoice catChoice = catChoiceMap.get(categoID);
+			Category finalCat;
+			if(catChoice.getSonCategory() == null){
+				finalCat = catChoice.getFatherCategory();
+			} else {
+				finalCat = catChoice.getSonCategory();
+				finalCat.setFatherCategory(catChoice.getFatherCategory());
+			}
+			catego.setCategory(finalCat);
+			
+			Float newAmount = catChoice.getAmount();
+			if(newAmount != null && newAmount != catego.getAmount()){
+				catego.setAmount(newAmount);
+			}
+			
+			// logging after
+			if(afterMsg.length() > 46){
+				afterMsg.append(", ");
+			}
+			String finalCatName = "null";
+			if(finalCat != null){
+				finalCatName = finalCat.getCompleteName();
+			}
+			afterMsg.append("catego #" + categoID + " -> cat : " + finalCatName);
+		}
+		beforeMsg.append("]");
+		afterMsg.append("]");
+		logger.debug(beforeMsg);
+		logger.debug(afterMsg);
+		
+		logger.info("Updating catego list from line #" + line.getId() + " done.");
 	}
 	
 	

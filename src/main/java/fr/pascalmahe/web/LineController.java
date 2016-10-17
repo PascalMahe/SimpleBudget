@@ -168,7 +168,7 @@ public class LineController implements Serializable {
 		StringBuilder dbgMsg = new StringBuilder(header + " - catChoiceMap : [");
 		for(Integer key : catChoiceMap.keySet()){
 			CatChoice catCh = catChoiceMap.get(key);
-			if(dbgMsg.length() > 31){
+			if(dbgMsg.length() > 19 + header.length()){
 				dbgMsg.append(", ");
 			}
 			Category fatCat = catCh.getFatherCategory();
@@ -188,17 +188,45 @@ public class LineController implements Serializable {
 		return dbgMsg.toString();
 	}
 	
+
+	private String categoListToString(String header){
+
+		StringBuilder dbgMsg = new StringBuilder(header + " - categoList : [");
+		for(Categorisation catego : line.getCategorisationList()){
+			
+			if(dbgMsg.length() > 17 + header.length()){
+				dbgMsg.append(", ");
+			}
+			Category sonCat = catego.getCategory();
+			
+			if(sonCat != null){
+				Category fatCat = sonCat.getFatherCategory();
+				if(fatCat != null){
+					dbgMsg.append(fatCat.getName());
+				} else {
+					dbgMsg.append("(NOCAT):");
+				}
+				dbgMsg.append(sonCat.getName());
+			}
+		}
+		dbgMsg.append("]");
+		
+		return dbgMsg.toString();
+	}
+	
 	public void addCatChoice(){
 		logger.debug("addCatChoice - start...");
 		
-		logger.debug(catChoiceMapToString("addCatChoice"));
-		
 		this.line.addCategorisation(0, null);
+		logger.debug(categoListToString("addCatChoice"));
+		LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
 		LineService.updateLine(line);
+		logger.debug(catChoiceMapToString("addCatChoice"));
+		logger.debug(categoListToString("addCatChoice"));
 		this.catChoiceMap = populateCatChoiceMap(this.line.getCategorisationList());
 		
+		logger.debug(categoListToString("addCatChoice"));
 		logger.debug(catChoiceMapToString("addCatChoice"));
-		
 		logger.debug("addCatChoice - end.");
 	}
 	
@@ -208,27 +236,7 @@ public class LineController implements Serializable {
 		Severity msgSeverity = FacesMessage.SEVERITY_INFO;
 		
 		// replace Categories in Categorizations
-		for(Integer categoID : catChoiceMap.keySet()){
-			CatChoice catChoice = catChoiceMap.get(categoID);
-			Categorisation catego = line.getCategorisationById(categoID);
-			Category finalCat;
-			if(catChoice.getSonCategory() == null){
-				finalCat = catChoice.getFatherCategory();
-			} else {
-				finalCat = catChoice.getSonCategory();
-				finalCat.setFatherCategory(catChoice.getFatherCategory());
-			}
-			catego.setCategory(finalCat);
-			
-			Float newAmount = catChoice.getAmount();
-			if(newAmount != null && newAmount != catego.getAmount()){
-				catego.setAmount(newAmount);
-			}
-			logger.debug("saveAction - " + 
-					"catego #" + categoID + 
-					" -> cat : " + finalCat);
-		}
-		
+		LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
 		LineService.updateLine(line);
 
 		FacesMessage fmInfoBulkImport = new FacesMessage(msgSeverity, 
