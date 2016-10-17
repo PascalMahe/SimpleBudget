@@ -1,5 +1,6 @@
 package fr.pascalmahe.services;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -73,13 +74,27 @@ public class LineService {
 	public static void updateCategoInLineFromCatChoiceMap(Line line, Map<Integer, CatChoice> catChoiceMap) {
 		logger.info("Updating catego list from line #" + line.getId() + "...");
 		
-		StringBuilder beforeMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - before : [");
-		StringBuilder afterMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - after : [");
+		// deleting values not in catChoiceMap
+		List<Categorisation> listOfCategoToDelete = new ArrayList<>();
+		for(Categorisation catego : line.getCategorisationList()){
+			if(!catChoiceMap.containsKey(catego.getId())){
+				listOfCategoToDelete.add(catego);
+			}
+		}
+		logger.debug("updateCategoInLineFromCatChoiceMap - "
+				+ "removing " + listOfCategoToDelete.size() + " "
+				+ "categorisations that have been deleted...");
+		line.getCategorisationList().removeAll(listOfCategoToDelete);
+		
+		// NB: 'updateCategoInLineFromCatChoiceMap -> 37 char
+		StringBuilder beforeMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - catChoiceMap in: [");
+		StringBuilder afterMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - categoList out: [");
+		
 		for(Integer categoID : catChoiceMap.keySet()){
 			Categorisation catego = line.getCategorisationById(categoID);
 			
 			// logging before
-			if(beforeMsg.length() > 48){
+			if(beforeMsg.length() > 37 + 18){
 				beforeMsg.append(", ");
 			}
 			String initialCatName = "null";
@@ -104,7 +119,7 @@ public class LineService {
 			}
 			
 			// logging after
-			if(afterMsg.length() > 46){
+			if(afterMsg.length() > 37 + 17){
 				afterMsg.append(", ");
 			}
 			String finalCatName = "null";

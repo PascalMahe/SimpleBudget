@@ -85,19 +85,22 @@ public class LineController implements Serializable {
 		for(Categorisation catego : categorisationList){
 			
 			Category cat = catego.getCategory();
+			
 			Category sonCat = null;
 			Category fatCat = null;
-			
-			if(cat.getFatherCategory() != null){
-				sonCat = cat;
-				fatCat = cat.getFatherCategory();
-			} else {
-				fatCat = cat;
+			List<Category> secondRankCatList = new ArrayList<>();
+			if(cat != null){
+				if(cat.getFatherCategory() != null){
+					sonCat = cat;
+					fatCat = cat.getFatherCategory();
+				} else {
+					fatCat = cat;
+				}
+				
+//				logger.debug("populateCatChoiceMap - fatCat: " + fatCat);
+//				logger.debug("populateCatChoiceMap - sonCat: " + sonCat);
+				secondRankCatList = sonCatMap.get(fatCat.getId());
 			}
-			
-//			logger.debug("populateCatChoiceMap - fatCat: " + fatCat);
-//			logger.debug("populateCatChoiceMap - sonCat: " + sonCat);
-			List<Category> secondRankCatList = sonCatMap.get(fatCat.getId());
 			
 			CatChoice currCatChoice = new CatChoice(catego.getId(), fatCat, sonCat, catego.getAmount(), secondRankCatList);
 			returnedMap.put(catego.getId(), currCatChoice);
@@ -220,7 +223,7 @@ public class LineController implements Serializable {
 		this.line.addCategorisation(0, null);
 		logger.debug(categoListToString("addCatChoice"));
 		LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
-		LineService.updateLine(line);
+//		LineService.updateLine(line);
 		logger.debug(catChoiceMapToString("addCatChoice"));
 		logger.debug(categoListToString("addCatChoice"));
 		this.catChoiceMap = populateCatChoiceMap(this.line.getCategorisationList());
@@ -230,19 +233,36 @@ public class LineController implements Serializable {
 		logger.debug("addCatChoice - end.");
 	}
 	
+	public void removeCatChoice(Integer categoID){
+		logger.debug("removeCatChoice - start...");
+		
+		logger.debug("removeCatChoice - categoID: #" + categoID);
+		this.catChoiceMap.remove(categoID);
+		logger.debug("removeCatChoice - end.");
+	}
+	
 	public void saveAction(){
 		logger.debug("saveAction - start...");
 		
 		Severity msgSeverity = FacesMessage.SEVERITY_INFO;
+		String userMsg = "Ligne sauvegardée.";
 		
-		// replace Categories in Categorizations
-		LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
-		LineService.updateLine(line);
+		try {
+			// replace Categories in Categorizations
+			LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
+			LineService.updateLine(line);
 
-		FacesMessage fmInfoBulkImport = new FacesMessage(msgSeverity, 
-														"Ligne sauvegardée.", 
-														"");
-		FacesContext.getCurrentInstance().addMessage("saved_a_line", fmInfoBulkImport);
+		} catch (Exception e){
+			logger.error("Exception while updating Line: " + e.getLocalizedMessage(), e);
+			msgSeverity = FacesMessage.SEVERITY_ERROR;
+			userMsg = "Erreur lors de la sauvegarde de la ligne : " + e.getLocalizedMessage() + ".";
+			
+		}
+
+		FacesMessage fmInfoSave = new FacesMessage(msgSeverity, 
+													userMsg, 
+													"");
+		FacesContext.getCurrentInstance().addMessage("saved_a_line", fmInfoSave);
 		
 		logger.debug("saveAction - end.");
 	}
