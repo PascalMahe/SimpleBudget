@@ -171,18 +171,18 @@
 										</h:panelGroup>
 										
 										<span style="position: relative;">
-											<p:inputText value="#{catChoice.amount}" styleClass="amountInput" />
+											<p:inputText value="#{catChoice.amount}" styleClass="amountInput vertTop" />
 										</span>
 										
 										<p:commandButton	id="removeCatChoice#{catChoice.categoId}" 
-															styleClass="allButtons"
-															icon="minus"
+															styleClass="allButtons vertTop"
+															icon="remove"
 															alt="#{bundle['retirerCategorie']}"
 															title="#{bundle['retirerCategorie']}"
 															action="#{lineController.removeCatChoice(catChoice.categoId)}" 
 															update="catChoiceLine"
-															onmouseover="hoverOverCommandButtonWithImage('lineForm:removeCatChoice', 'minus-hover', 'minus')"
-															onmouseout="outOfCommandButtonWithImage('lineForm:removeCatChoice', 'minus-hover', 'minus')"/>
+															onmouseover="hoverOverCommandButtonWithImage('lineForm:removeCatChoice#{catChoice.categoId}', 'remove-hover', 'remove')"
+															onmouseout="outOfCommandButtonWithImage('lineForm:removeCatChoice#{catChoice.categoId}', 'remove-hover', 'remove')"/>
 									</div>
 					    		</c:forEach>
 					    	</h:panelGroup>	

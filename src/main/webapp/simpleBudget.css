@@ -97,10 +97,12 @@
 	margin-left: 1em;
 }
 
+.vertTop{
+	vertical-align: top;
+}
 
 .amountInput {
 	width: 4em;
-	vertical-align: top;
 }
 
 .plus {
@@ -109,6 +111,14 @@
 
 .plus-hover {
 	background-image: url("/simplebudget/javax.faces.resource/AddCategory-hover.png.xhtml?ln=images") !important;
+}
+
+.remove {
+	background-image: url("/simplebudget/javax.faces.resource/RemoveCategory.png.xhtml?ln=images") !important;
+}
+
+.remove-hover {
+	background-image: url("/simplebudget/javax.faces.resource/RemoveCategory-hover.png.xhtml?ln=images") !important;
 }
 
 /**

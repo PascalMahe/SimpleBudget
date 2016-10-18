@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -190,6 +191,7 @@ public class TestLogin {
 	}
 	
 	@Test
+	@Ignore
 	public void testSimpleLogin(){
 		if(detectedHost != null){
 			testSimpleLogin(driverFirefox);
