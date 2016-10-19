@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import fr.pascalmahe.business.Type;
 
-public class TestTypeService extends BulkImportService {
+public class TestTypeService extends TypeService {
 
 	private static final Logger logger = LogManager.getLogger();
 

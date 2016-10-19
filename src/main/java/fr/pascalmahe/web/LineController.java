@@ -248,9 +248,16 @@ public class LineController implements Serializable {
 		String userMsg = "Ligne sauvegardée.";
 		
 		try {
+			for(Integer categoID : catChoiceMap.keySet()){
+				CatChoice catChoice = catChoiceMap.get(categoID);
+				logger.debug("saveAction - catChoice #" + categoID + " amount: " + catChoice.getAmount());
+			}
+			
 			// replace Categories in Categorizations
 			LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
+			
 			LineService.updateLine(line);
+			this.catChoiceMap = populateCatChoiceMap(line.getCategorisationList());
 
 		} catch (Exception e){
 			logger.error("Exception while updating Line: " + e.getLocalizedMessage(), e);
@@ -266,6 +273,7 @@ public class LineController implements Serializable {
 		
 		logger.debug("saveAction - end.");
 	}
+	
 	
 	public void onFatherCategoryChange(AjaxBehaviorEvent abe){
 		
