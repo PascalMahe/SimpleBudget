@@ -9,6 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 
 /**
@@ -17,7 +20,6 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class Category implements Serializable, Comparable<Category> {
-
 
 	private static final long serialVersionUID = 3208053020237026635L;
 	
@@ -79,6 +81,19 @@ public class Category implements Serializable, Comparable<Category> {
 	public void setFatherCategory(Category fatherCategory) {
 		this.fatherCategory = fatherCategory;
 	}
+	
+//	@Override
+//	public String toString() {
+//		return "Category [id=" + id + ", name=" + name + ", fatherCategory=" + fatherCategory + "]";
+//	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -95,11 +110,6 @@ public class Category implements Serializable, Comparable<Category> {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "Category [id=" + id + ", name=" + name + ", fatherCategory=" + fatherCategory + "]";
 	}
 
 	@Override

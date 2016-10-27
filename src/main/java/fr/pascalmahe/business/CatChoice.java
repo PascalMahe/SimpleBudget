@@ -11,6 +11,9 @@ public class CatChoice implements Serializable {
 
 	private static final long serialVersionUID = -7871636425686858451L;
 
+	public static final String VALID_CLASS = "validField";
+	public static final String INVALID_CLASS = "invalidField";
+	
 	private Integer categoId;
 	
 	private Float amount;
@@ -21,6 +24,9 @@ public class CatChoice implements Serializable {
 
 	private List<Category> secondRankCategoryList;
 	
+	private boolean validFather;
+	
+	private boolean validSon;
 
 	public CatChoice(Integer categoId, Category fatCat, Category sonCat, Float amount, List<Category> secondRankCatList) {
 		this.categoId = categoId;
@@ -28,6 +34,8 @@ public class CatChoice implements Serializable {
 		this.sonCategory = sonCat;
 		this.amount = amount;
 		this.secondRankCategoryList = secondRankCatList;
+		this.validSon = true;
+		this.validFather = true;
 	}
 
 
@@ -41,8 +49,7 @@ public class CatChoice implements Serializable {
 		return "CatChoice [categoId=" + categoId + ", amount=" + amount + ", fatherCategory=" + fatherCategory
 				+ ", sonCategory=" + sonCategory + "]";
 	}
-
-
+	
 	public Integer getCategoId() {
 		return categoId;
 	}
@@ -90,6 +97,43 @@ public class CatChoice implements Serializable {
 
 	public void setSecondRankCategoryList(List<Category> secondRankCategoryList) {
 		this.secondRankCategoryList = secondRankCategoryList;
+	}
+	
+	public String getValidFather(){
+		String styleClass = VALID_CLASS;
+		if(!validFather){
+			styleClass = INVALID_CLASS;
+		}
+		return styleClass;
+	}
+
+	public String getValidSon(){
+		String styleClass = VALID_CLASS;
+		if(!validSon){
+			styleClass = INVALID_CLASS;
+		}
+		return styleClass;
+	}
+
+
+	public void setInvalid() {
+		if(sonCategory != null){
+			validSon = false;
+		} else {
+			validFather = false;
+		}
+	}
+
+
+	public Category getFullCategory() {
+		Category fullCat = fatherCategory;
+		if(sonCategory != null){
+			if(sonCategory.getFatherCategory() == null){
+				sonCategory.setFatherCategory(fatherCategory);
+			}
+			fullCat = sonCategory;
+		}
+		return fullCat;
 	}
 
 }
