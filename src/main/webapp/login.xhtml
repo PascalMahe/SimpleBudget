@@ -10,7 +10,6 @@
 	<h:head>
         <title>Appli Budget</title>
         <link rel="stylesheet" media="screen" href="simpleBudget.css" />
-        <script type="text/javascript" src="../js/jquery-3.0.0.js"></script>
         <script type="text/javascript" src="../js/login.js"></script>
 
     </h:head>
@@ -21,7 +20,7 @@
 			<f:viewAction action="#{loginController.fetchErrorMessagesAction}"/>
 		</f:metadata>
 		<p:messages id="messages"/>
-		<h:form id="loginForm" onsubmit="submitLoginForm()">
+		<h:form id="loginForm">
 			<div>
 				<p:outputLabel value="#{bundle['labelLogin']}" for="login" />
 				<p:inputText id="login" value="#{loginController.login}" />

@@ -1,8 +1,10 @@
 package fr.pascalmahe.persistence;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -795,6 +797,9 @@ public class TestGenericDao extends AbstractTest {
 		catToUpdate.setFatherCategory(new Category(updatingFatherCategoryNameTo, null));
 		
 		// Saving
+		// NB: saving father Category first, otherwise
+		// Hibernate throws an error
+		catDao.saveOrUpdate(catToUpdate.getFatherCategory());
 		catDao.saveOrUpdate(catToUpdate);
 		
 		// Fetching value for verification
@@ -1061,25 +1066,40 @@ public class TestGenericDao extends AbstractTest {
 	public void testFetchByName(){
 		logger.info("Starting testFetchByName...");
 		
-
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		GenericDao<Category> otherCatDao = new GenericDao<>(Category.class);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS");
-		
 		LocalDateTime dateForCatDiff = LocalDateTime.now();
-		
 		String categoryDifferentiator = dateForCatDiff.format(formatter);
+		
+		//father
 		String catName = "TestFatherCategory" + categoryDifferentiator;
 		Category fatherCategory = new Category(catName);
 		
-		GenericDao<Category> catDao = new GenericDao<>(Category.class);
 		catDao.saveOrUpdate(fatherCategory);
 		
 		logger.debug("testFetchByName - fatCat got #" + fatherCategory.getId());
 		
-
-		GenericDao<Category> otherCatDao = new GenericDao<>(Category.class);
 		Category actualFatCat = otherCatDao.fetchByName(catName);
 		
+		listToDelete.add(fatherCategory);
+		
 		Validator.validateCategory("of testFetchByName", fatherCategory, actualFatCat);
+		
+		// son (must fetch father)
+		String sonCatName = "TestCategory" + categoryDifferentiator;
+		Category sonCategory = new Category(sonCatName, fatherCategory);
+
+		catDao.saveOrUpdate(sonCategory);
+		
+		logger.debug("testFetchByName - sonCat got #" + fatherCategory.getId());
+
+		Category fetchedSonCat = otherCatDao.fetchByName(sonCatName);
+
+		listToDelete.add(sonCategory);
+		assertThat(sonCategory.getFatherCategory(), notNullValue());
+		Validator.validateCategory("of testFetchByName", sonCategory, fetchedSonCat);
+		
 		
 		logger.info("testFetchByName done.");
 	}
