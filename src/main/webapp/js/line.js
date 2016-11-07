@@ -219,10 +219,13 @@ function validateCatChoices(){
 	
 	console.log("validateCatChoices - " + nbInvalidPairs + " invalid pair(s) after both loops.");
 	
+	var saveButton = PF("saveButton");
 	var errorMessageSing = $("#infoNoCatChoiceDuplicateSingularMsg");
 	var errorMessagePlur = $("#infoNoCatChoiceDuplicatePluralMsg");
 	errorMessageSing.hide();
 	errorMessagePlur.hide();
+	saveButton.enable();
+	
 	
 	if(nbInvalidPairs > 0){
 		var duplicateCatChoiceElmt = errorMessagePlur;
@@ -238,6 +241,7 @@ function validateCatChoices(){
 		duplicateCatChoiceElmt.css({'top': msgTop + "px", 'left': msgLeft + "px"});
 		duplicateCatChoiceElmt.show();
 		
+		saveButton.disable();
 	}
 	
 	console.log("validateCatChoices - End.");
