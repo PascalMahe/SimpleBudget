@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import javax.faces.event.AjaxBehaviorEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.primefaces.context.RequestContext;
 
 import fr.pascalmahe.business.CatChoice;
 import fr.pascalmahe.business.Categorisation;
@@ -205,7 +207,8 @@ public class LineController implements Serializable {
 			if(sonCat != null){
 				Category fatCat = sonCat.getFatherCategory();
 				if(fatCat != null){
-					dbgMsg.append(fatCat.getName());
+					dbgMsg.append(fatCat.getName())
+							.append(":");
 				} else {
 					dbgMsg.append("(NOCAT):");
 				}
@@ -220,16 +223,20 @@ public class LineController implements Serializable {
 	public void addCatChoice(){
 		logger.debug("addCatChoice - start...");
 		
-		this.line.addCategorisation(0, null);
+		
 		logger.debug(categoListToString("addCatChoice"));
 		LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
 //		LineService.updateLine(line);
+		this.line.addCategorisation(0, null);
 		logger.debug(catChoiceMapToString("addCatChoice"));
 		logger.debug(categoListToString("addCatChoice"));
 		this.catChoiceMap = populateCatChoiceMap(this.line.getCategorisationList());
 		
 		logger.debug(categoListToString("addCatChoice"));
 		logger.debug(catChoiceMapToString("addCatChoice"));
+		
+		RequestContext.getCurrentInstance().execute("validateCatChoices()");
+		
 		logger.debug("addCatChoice - end.");
 	}
 	
@@ -244,37 +251,132 @@ public class LineController implements Serializable {
 	public void saveAction(){
 		logger.debug("saveAction - start...");
 		
-		Severity msgSeverity = FacesMessage.SEVERITY_INFO;
-		String userMsg = "Ligne sauvegardée.";
-		
+		FacesMessage fMess = null;
 		try {
-			for(Integer categoID : catChoiceMap.keySet()){
-				CatChoice catChoice = catChoiceMap.get(categoID);
-				logger.debug("saveAction - catChoice #" + categoID + " amount: " + catChoice.getAmount());
+			// validation of father/son choices
+			int invalidPairsNumber = validateMapCatChoice(catChoiceMap);
+			fMess = getInvalidMessage(invalidPairsNumber);
+				
+			if(invalidPairsNumber == 0){
+				// continue update
+
+				// replace Categories in Categorizations
+				LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
+				
+				LineService.updateLine(line);
+				this.catChoiceMap = populateCatChoiceMap(line.getCategorisationList());
+
+				String userMsg = "Ligne sauvegardée.";
+				fMess = new FacesMessage(FacesMessage.SEVERITY_INFO, 
+						userMsg, 
+						"");
 			}
 			
-			// replace Categories in Categorizations
-			LineService.updateCategoInLineFromCatChoiceMap(line, catChoiceMap);
-			
-			LineService.updateLine(line);
-			this.catChoiceMap = populateCatChoiceMap(line.getCategorisationList());
 
 		} catch (Exception e){
 			logger.error("Exception while updating Line: " + e.getLocalizedMessage(), e);
-			msgSeverity = FacesMessage.SEVERITY_ERROR;
-			userMsg = "Erreur lors de la sauvegarde de la ligne : " + e.getLocalizedMessage() + ".";
 			
+			String userMsg = "Erreur lors de la sauvegarde de la ligne : " + e.getLocalizedMessage() + ".";
+			fMess = new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+							userMsg, 
+							"");
 		}
 
-		FacesMessage fmInfoSave = new FacesMessage(msgSeverity, 
-													userMsg, 
-													"");
-		FacesContext.getCurrentInstance().addMessage("saved_a_line", fmInfoSave);
+		FacesContext.getCurrentInstance().addMessage("saved_a_line", fMess);
 		
 		logger.debug("saveAction - end.");
 	}
 	
+	private FacesMessage getInvalidMessage(int invalidPairsNumber){
+		FacesMessage fMess = null;
+		
+		if(invalidPairsNumber > 0){
+			// show error message
+			String userMsg = null;
+			Severity msgSeverity = FacesMessage.SEVERITY_ERROR;
+			if(invalidPairsNumber == 1){
+				// singular
+				userMsg = "Impossible d'avoir plusieurs fois la même catégorie.";
+			} else {
+				// plural
+				userMsg = "Impossible d'avoir plusieurs fois les mêmes catégories.";
+			}
+			fMess = new FacesMessage(msgSeverity, 
+									userMsg, 
+									"");
+		}
+		
+		return fMess;
+	}
 	
+	static protected int validateMapCatChoice(Map<Integer, CatChoice> catChoiceMapToValidate) {
+
+		Map<Category, CatChoice> alreadyValidatedCategories = new HashMap<>();
+		int invalidPairsNumber = 0;
+		
+		StringBuilder dbgBefore = new StringBuilder("");
+		for(Integer categoID : catChoiceMapToValidate.keySet()){
+			CatChoice catChoice = catChoiceMapToValidate.get(categoID);
+
+			Category currentCategory = catChoice.getFullCategory();
+			dbgBefore.append("\n\tcatChoice #")
+					.append(categoID)
+					.append(" Cat#")
+					.append(currentCategory.getId())
+					.append(" ")
+					.append(currentCategory.getCompleteName())
+					.append(" is FatherValid? ")
+					.append(catChoice.isFatherValid())
+					.append(", is SonValid? ")
+					.append(catChoice.isSonValid());
+		}
+		logger.debug("validateMapCatChoice - before: " + dbgBefore.toString());
+		
+		for(Integer categoID : catChoiceMapToValidate.keySet()){
+			CatChoice catChoice = catChoiceMapToValidate.get(categoID);
+
+			Category currentCategory = catChoice.getFullCategory();
+			logger.debug("validateMapCatChoice - catChoice #" + categoID + 
+							": Cat#" + currentCategory.getId() + 
+							" " + currentCategory.getCompleteName());
+			if(alreadyValidatedCategories.containsKey(currentCategory)){
+				logger.debug("validateMapCatChoice - category already in list");
+				CatChoice previousCatChoiceWithSameCategory = alreadyValidatedCategories.get(currentCategory);
+				logger.debug("validateMapCatChoice - other catChoice was #" + previousCatChoiceWithSameCategory.getCategoId());
+				previousCatChoiceWithSameCategory.setInvalid();
+				catChoice.setInvalid();
+				invalidPairsNumber++;
+				logger.debug("validateMapCatChoice - invalidPairsNumber is now : " + invalidPairsNumber);
+				
+			} else {
+				catChoice.setValid();
+				alreadyValidatedCategories.put(currentCategory, catChoice);
+				logger.debug("validateMapCatChoice - category wasn't in list, is now");
+			}
+		}
+		
+
+		StringBuilder dbgAfter = new StringBuilder("");
+		for(Integer categoID : catChoiceMapToValidate.keySet()){
+			CatChoice catChoice = catChoiceMapToValidate.get(categoID);
+
+			Category currentCategory = catChoice.getFullCategory();
+			dbgAfter.append("\n\tcatChoice #")
+				.append(categoID)
+				.append(" Cat#")
+				.append(currentCategory.getId())
+				.append(" ")
+				.append(currentCategory.getCompleteName())
+				.append(" is FatherValid? ")
+				.append(catChoice.isFatherValid())
+				.append(", is SonValid? ")
+				.append(catChoice.isSonValid());			
+		}
+		logger.debug("validateMapCatChoice - after: " + dbgBefore.toString());
+		
+		return invalidPairsNumber;
+	}
+
 	public void onFatherCategoryChange(AjaxBehaviorEvent abe){
 		
 		UIOutput source = (UIOutput) abe.getSource();
@@ -294,8 +396,10 @@ public class LineController implements Serializable {
 		populateSonCatMap();
 		catChoiceToUpdate.setSecondRankCategoryList(sonCatMap.get(newFatCatID));
 		catChoiceToUpdate.setSonCategory(null);
+		
+		RequestContext.getCurrentInstance().execute("validateCatChoices()");
 	}
-
+	
 	/*
 	 * Getters et Setters
 	 */

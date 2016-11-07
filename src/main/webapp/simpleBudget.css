@@ -48,7 +48,7 @@
 }
 
 .lineCategory{
-	width: 28em;
+	width: 29em;
 }
 
 .amount {
@@ -119,6 +119,35 @@
 
 .remove-hover {
 	background-image: url("/simplebudget/javax.faces.resource/RemoveCategory-hover.png.xhtml?ln=images") !important;
+}
+
+.autoCompleteTarget {
+	border-style: solid !important;
+	border-width: 3px !important;
+}
+
+.autoComplete{
+	position: absolute;
+}
+
+.infoAutoCompleteTarget {
+	border-color: #3a87ad !important;
+}
+
+.warnAutoCompleteTarget {
+	border-color: #c09853 !important;
+}
+
+.invalidField{
+	border-style: solid !important;
+	border-width: 3px !important;
+	border-color: red !important;
+}
+
+.validField{
+	border-style: hidden !important;
+	border-width: 3px !important;
+	border-color: white !important;
 }
 
 /**

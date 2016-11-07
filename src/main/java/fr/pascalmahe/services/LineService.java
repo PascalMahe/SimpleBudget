@@ -76,6 +76,8 @@ public class LineService {
 		
 		// computing value if only one has null or 0.00 as value
 		// -> it's set to the rest of the line's amount
+		logger.debug("updateCategoInLineFromCatChoiceMap - "
+				+ "autoCompleting the last CatChoice's amount");
 		computeCatChoiceAmounts(line.getAmount(), catChoiceMap);
 		
 		// deleting values not in catChoiceMap
@@ -90,22 +92,9 @@ public class LineService {
 				+ "categorisations that have been deleted...");
 		line.getCategorisationList().removeAll(listOfCategoToDelete);
 		
-		// NB: 'updateCategoInLineFromCatChoiceMap -> 37 char
-		StringBuilder beforeMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - catChoiceMap in: [");
-		StringBuilder afterMsg = new StringBuilder("updateCategoInLineFromCatChoiceMap - categoList out: [");
 		
 		for(Integer categoID : catChoiceMap.keySet()){
 			Categorisation catego = line.getCategorisationById(categoID);
-			
-			// logging before
-			if(beforeMsg.length() > 37 + 18){
-				beforeMsg.append(", ");
-			}
-			String initialCatName = "null";
-			if(catego.getCategory() != null){
-				initialCatName = catego.getCategory().getCompleteName();
-			}
-			beforeMsg.append("catego #" + categoID + " -> cat : " + initialCatName);
 			
 			CatChoice catChoice = catChoiceMap.get(categoID);
 			Category finalCat;
@@ -118,54 +107,29 @@ public class LineService {
 			catego.setCategory(finalCat);
 			
 			Float newAmount = catChoice.getAmount();
-//			if(newAmount != null && newAmount != catego.getAmount()){
-				catego.setAmount(newAmount);
-//			}
-			
-			// logging after
-			if(afterMsg.length() > 37 + 17){
-				afterMsg.append(", ");
-			}
-			String finalCatName = "null";
-			if(finalCat != null){
-				finalCatName = finalCat.getCompleteName();
-			}
-			afterMsg.append("catego #" + categoID + " -> cat : " + finalCatName);
+			catego.setAmount(newAmount);
 		}
-		beforeMsg.append("]");
-		afterMsg.append("]");
-		logger.debug(beforeMsg);
-		logger.debug(afterMsg);
 		
 		logger.info("Updating catego list from line #" + line.getId() + " done.");
 	}
 	
 
 	public static void computeCatChoiceAmounts(Float lineAmount, Map<Integer, CatChoice> catChoiceMap) {
-		logger.debug("computeCatChoiceAmounts - start with " + catChoiceMap.size() + " CatChoices...");
 		List<CatChoice> catChoiceWithEmptyAmountList = new ArrayList<>();
 		float totalCategoAmount = 0.0f;
 		for(Integer key : catChoiceMap.keySet()){
 			CatChoice currentCatChoice = catChoiceMap.get(key);
-			logger.debug("computeCatChoiceAmounts - current amount: " + currentCatChoice.getAmount());
 			if(currentCatChoice.getAmount() == null || 
 					(currentCatChoice.getAmount() != null && currentCatChoice.getAmount() == 0.0f)){
 				catChoiceWithEmptyAmountList.add(currentCatChoice);
-				logger.debug("computeCatChoiceAmounts - adding to list of empty catego");
 			} else {
 				totalCategoAmount += currentCatChoice.getAmount();
-				logger.debug("computeCatChoiceAmounts - adding to total amount");
 			}
 		}
-		logger.debug("computeCatChoiceAmounts - # of CatChoices with no amount: " + catChoiceWithEmptyAmountList.size());
+		
 		if(catChoiceWithEmptyAmountList.size() == 1){
-			
 			CatChoice catChoice = catChoiceWithEmptyAmountList.get(0);
-			logger.debug("computeCatChoiceAmounts - only one detected: #" + catChoice.getCategoId());
 			catChoice.setAmount(lineAmount - totalCategoAmount);
-			logger.debug("computeCatChoiceAmounts - totalCategoAmount: " + totalCategoAmount);
-			logger.debug("computeCatChoiceAmounts - lineAmount: " + lineAmount);
-			logger.debug("computeCatChoiceAmounts - final amount is: " + catChoice.getAmount() + " (should be: " + (lineAmount - totalCategoAmount) + ").");
 		}
 	}
 

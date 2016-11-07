@@ -10,11 +10,16 @@
 	<h:head>
         <title>Appli Budget</title>
         <link rel="stylesheet" media="screen" href="../simpleBudget.css" />
-        <script type="text/javascript" src="../js/treeView.js"></script>
+        <!-- <script type="text/javascript" src="../js/jquery-3.0.0.js"></script> Primefaces brings it along... --> 
+        <script type="text/javascript" src="../js/line.js"></script>
 
     </h:head>
 	
 	<h:body>
+		<div id="watchMe" class="watchMe-outer">
+			 <span></span>
+		</div>
+		
 		<f:metadata>
 			<f:viewParam name="id" value="#{lineController.idToFetch}" />
 			<f:viewAction action="#{lineController.fetch}" />
@@ -137,12 +142,14 @@
 					    			<div class="categoryZone lineCategory">
 							    		<!-- Choice for father Category -->
 						                <p:selectOneMenu 	id="fatherCategory#{catChoice.categoId}" 
+															widgetVar="wvFather-#{catChoice.categoId}" 
 						                					value="#{catChoice.fatherCategory}" 
 						                					editable="true"
 						                					converter="categoryConverter" 
+						                					styleClass="catChoiceFather #{catChoice.validFather}"
 						                					var="t">
 						                	<p:ajax listener="#{lineController.onFatherCategoryChange}"
-						                			update="sonCategoryFather#{catChoice.categoId}" />
+						                			update="messages,catChoiceLine" />
 											<f:selectItems 	value="#{lineController.firstRankCategoryList}" 
 								      						var="cat" 
 															itemLabel="#{cat.name}"/>
@@ -155,12 +162,16 @@
 											already has other sons) -->
 										<h:panelGroup id="sonCategoryFather#{catChoice.categoId}">
 											<p:selectOneMenu 	id="lineSonCategory#{catChoice.categoId}" 
+																widgetVar="wvSon-#{catChoice.categoId}" 
 																value="#{catChoice.sonCategory}"
 																editable="true"
 																converter="categoryConverter" 
 																var="sCat"
+																styleClass="catChoiceSon #{catChoice.validSon}"
+																onchange="validateCatChoices()"
 																rendered="#{catChoice.secondRankCategoryList != null}">
 												<f:selectItems 	value="#{catChoice.secondRankCategoryList}"
+																id="catChoiceSonSelect#{catChoice.categoId}#{sonCat.name}"
 																var="sonCat" 
 																itemLabel="#{sonCat.name}"
 																itemValue="#{sonCat}" />
@@ -208,6 +219,8 @@
 							<p:commandButton	value="#{bundle['labelSauvegarder']}" 
 												id="saveButton" 
 												styleClass="allButtons"
+												onmouseover="warningForLineForm()"
+												onmouseout="hideWarnings()"
 												action="#{lineController.saveAction}" 
 												update="messages, catChoiceLine"/>
 				   		</td>
@@ -218,6 +231,31 @@
 		    </div>
 		    
 		</h:form>
+		
+		<div id="autoCompleteMsgOneCat" class="ui-messages ui-messages-info ui-widget autoComplete infoAutoComplete" style="display: none;">
+			<span class="ui-messages-info-icon"></span>
+			<h:outputText value="#{bundle['messageAutoCompletionUneCategorie']}" styleClass="ui-messages-info-summary" />
+		</div>
+		
+		<div id="autoCompleteMsgMultiCat" class="ui-messages ui-messages-info  ui-corner-all ui-widget autoComplete infoAutoComplete" style="display: none;">
+			<span class="ui-messages-info-icon"></span>
+			<h:outputText value="#{bundle['messageAutoCompletionPlsCategories']}" styleClass="ui-messages-info-summary" />
+		</div>
+		
+		<div id="infoNoAutoCompleteMsg" class="ui-messages-warn ui-corner-all ui-widget autoComplete warnAutoComplete" style="display: none;">
+			<span class="ui-messages-warn-icon"></span>
+			<h:outputText value="#{bundle['messagePasAutoCompletion']}" styleClass="ui-messages-warn-summary" />
+		</div>
+		
+		<div id="infoNoCatChoiceDuplicateSingularMsg" class="ui-messages-warn ui-corner-all ui-widget autoComplete warnAutoComplete" style="display: none;">
+			<span class="ui-messages-warn-icon"></span>
+			<h:outputText value="#{bundle['messageImpossibleDoublonCategorieSingulier']}" styleClass="ui-messages-warn-summary" />
+		</div>
+		
+		<div id="infoNoCatChoiceDuplicatePluralMsg" class="ui-messages-warn ui-corner-all ui-widget autoComplete warnAutoComplete" style="display: none;">
+			<span class="ui-messages-warn-icon"></span>
+			<h:outputText value="#{bundle['messageImpossibleDoublonCategoriePluriel']}" styleClass="ui-messages-warn-summary" />
+		</div>
 		
    	</h:body>
 </html>

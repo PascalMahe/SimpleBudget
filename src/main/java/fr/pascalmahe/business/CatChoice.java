@@ -125,6 +125,12 @@ public class CatChoice implements Serializable {
 	}
 
 
+	public void setValid() {
+		validSon = true;
+		validFather = true;
+	}
+
+
 	public Category getFullCategory() {
 		Category fullCat = fatherCategory;
 		if(sonCategory != null){
@@ -134,6 +140,14 @@ public class CatChoice implements Serializable {
 			fullCat = sonCategory;
 		}
 		return fullCat;
+	}
+
+	public boolean isSonValid() {
+		return validFather;
+	}
+
+	public boolean isFatherValid() {
+		return validFather;
 	}
 
 }
