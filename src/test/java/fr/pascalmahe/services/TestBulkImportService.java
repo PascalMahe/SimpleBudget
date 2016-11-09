@@ -20,7 +20,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import fr.pascalmahe.business.BulkImportResult;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
@@ -29,6 +28,7 @@ import fr.pascalmahe.ex.MalformedTextException;
 import fr.pascalmahe.persistence.GenericDao;
 import fr.pascalmahe.testUtil.AbstractTest;
 import fr.pascalmahe.testUtil.Validator;
+import fr.pascalmahe.web.beans.BulkImportResult;
 
 public class TestBulkImportService extends AbstractTest {
 

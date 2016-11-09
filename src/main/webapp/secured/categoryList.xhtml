@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<h:head>
+        <title>Appli Budget</title>
+       	<link rel="stylesheet" media="screen" href="../simpleBudget.css" />
+        
+    </h:head>
+	
+	<h:body>
+		<h1>Liste des catégories</h1>
+        <ui:include page="menu.xhtml" />
+       	
+       	<div class="ui-widget">
+	       	<table>
+	       		<thead>
+	       			<tr class="ui-widget-header">
+		       			<th>Category</th>
+		       			<th>Sous-Catégorie</th>
+		       			<ui:repeat value="#{categoryListController.monthList}" var="month">
+		       				<th class="headerRow"><h:outputText value="#{month}" /></th>
+		       			</ui:repeat>
+	       			</tr>
+	       		</thead>
+	       		<tbody>
+	       			<ui:repeat value="#{categoryListController.rowList}" var="catRow" varStatus="catRowStatus">
+	       				
+	       					<h:panelGroup rendered="#{catRow.childFree}">
+	       						<tr class="#{catRowStatus.even}RowClass">
+		       						<td>#{catRow.category.name}</td>
+									<td> </td>
+									<ui:repeat value="#{catRow.monthList}" var="monthCell">
+										<ui:include page="sumAmountCell.xhtml" />
+									</ui:repeat>
+								</tr>
+	       					</h:panelGroup>
+	       					<h:panelGroup rendered="#{not catRow.childFree}">
+	       						<ui:repeat value="#{catRow.sonsCatRowList}" var="catRowSon" varStatus="catRowSonStatus">
+		       						<tr class="#{catRowStatus.even}RowClass">
+		       							<h:panelGroup rendered="#{catRowSonStatus.first}">
+				       						<td rowspan="#{catRow.sizeOfSonsCatRowList}">
+												<h:outputText value="#{catRow.category.name}" />
+											</td>
+										</h:panelGroup>
+										<td><h:outputText value="#{catRowSon.category.name}" /></td>
+										<ui:repeat value="#{catRowSon.monthList}" var="monthCell">
+											<ui:include page="sumAmountCell.xhtml" />
+										</ui:repeat>
+										
+									</tr>
+								</ui:repeat>
+	       					</h:panelGroup>
+	       				
+	       				
+	       			</ui:repeat>
+	       		</tbody>
+	       	</table>
+       	</div>
+   	</h:body>
+</html>

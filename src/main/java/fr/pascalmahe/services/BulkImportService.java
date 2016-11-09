@@ -9,13 +9,14 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import fr.pascalmahe.business.BulkImportResult;
+
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.ex.MalformedLineException;
 import fr.pascalmahe.ex.MalformedTextException;
 import fr.pascalmahe.persistence.GenericDao;
+import fr.pascalmahe.web.beans.BulkImportResult;
 
 public class BulkImportService {
 

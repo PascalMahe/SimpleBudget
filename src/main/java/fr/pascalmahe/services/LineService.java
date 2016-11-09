@@ -8,11 +8,11 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.pascalmahe.business.CatChoice;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.persistence.GenericDao;
+import fr.pascalmahe.web.beans.CatChoice;
 
 public class LineService {
 

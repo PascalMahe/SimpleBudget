@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fr.pascalmahe.business.CatChoice;
 import fr.pascalmahe.business.Category;
+import fr.pascalmahe.web.beans.CatChoice;
 
 public class TestLineService extends LineService {
 

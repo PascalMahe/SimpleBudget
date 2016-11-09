@@ -1,10 +1,13 @@
-package fr.pascalmahe.business;
+package fr.pascalmahe.web.beans;
 
 import java.io.Serializable;
 import java.util.List;
 
+import fr.pascalmahe.business.Category;
+
 /**
  * Class for manipulating Categories in order to choose a father-son pair
+ * in the line page.
  * @author Pascal
  */
 public class CatChoice implements Serializable {

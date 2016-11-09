@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.context.RequestContext;
 
-import fr.pascalmahe.business.CatChoice;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
@@ -28,6 +26,7 @@ import fr.pascalmahe.business.Type;
 import fr.pascalmahe.services.CategoryService;
 import fr.pascalmahe.services.LineService;
 import fr.pascalmahe.services.TypeService;
+import fr.pascalmahe.web.beans.CatChoice;
 
 @SessionScoped
 @ManagedBean

@@ -1,8 +1,10 @@
-package fr.pascalmahe.business;
+package fr.pascalmahe.web.beans;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import fr.pascalmahe.business.Line;
 
 /**
  * Utility class to manipulate results from a bulk import

@@ -1,4 +1,4 @@
-package fr.pascalmahe.web;
+package fr.pascalmahe.web.conv;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
