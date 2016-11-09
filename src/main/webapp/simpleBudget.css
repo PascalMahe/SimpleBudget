@@ -150,6 +150,42 @@
 	border-color: white !important;
 }
 
+table {
+	border-collapse: collapse;
+}
+
+td {
+	padding-right: 1em;
+	padding-left: 1em;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
+.headerRow:FIRST-LETTER {
+	text-transform: capitalize;
+}
+
+.trueRowClass {
+	background-color: #bce8f1;
+	
+}
+
+.rightJustified {
+	text-align: right;
+}
+
+.falseRowClass {
+	background-color: #d9edf7;
+}
+
 /**
 	Overrides Primefaces' theme
  **/
