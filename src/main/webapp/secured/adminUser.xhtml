@@ -22,16 +22,16 @@
 		<h:form>
 			<div>
 				<p:outputLabel value="#{bundle['labelLogin']}" for="login" />
-				<p:inputText id="login" value="#{addUserController.login}" />
+				<p:inputText id="login" value="#{adminUserController.login}" />
 	 			<br/>
 				<p:outputLabel value="#{bundle['labelPassword']}" for="password" />
-				<p:password id="password" value="#{addUserController.password}" />
+				<p:password id="password" value="#{adminUserController.password}" />
 				<br/>
 				<span class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only button">
 					<p:commandButton 	value="#{bundle['labelAddUser']}" 
 										id="searchButton" 
 										styleClass="allButtons"
-	 									action="#{addUserController.addUserAction}" />
+	 									action="#{adminUserController.addUserAction}" />
 	 									
 	 			</span>
 			</div>
