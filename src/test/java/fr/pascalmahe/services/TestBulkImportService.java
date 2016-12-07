@@ -20,6 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import fr.pascalmahe.business.Account;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
@@ -217,6 +218,8 @@ public class TestBulkImportService extends AbstractTest {
 			boolean recurring = false;
 			Type type = TypeService.fromDetailedLabel("Frais");
 			
+			Account acc = Account.fromName(Account.NAME_CA);
+			
 			// choose category on oddness of i
 			boolean isOdd = i % 2 == 0;
 			if(isOdd){
@@ -234,6 +237,7 @@ public class TestBulkImportService extends AbstractTest {
 					amount, 
 					recurring,
 					type,
+					acc,
 					categoList);
 			
 			listToInsert.add(currentLine);

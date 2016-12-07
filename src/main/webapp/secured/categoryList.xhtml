@@ -21,8 +21,8 @@
 	       	<table>
 	       		<thead>
 	       			<tr class="ui-widget-header">
-		       			<th>Category</th>
-		       			<th>Sous-Catégorie</th>
+		       			<th>#{bundle['categorie']}</th>
+		       			<th>#{bundle['sousCategorie']}</th>
 		       			<ui:repeat value="#{categoryListController.monthList}" var="month">
 		       				<th class="headerRow"><h:outputText value="#{month}" /></th>
 		       			</ui:repeat>
@@ -59,6 +59,22 @@
 	       				
 	       				
 	       			</ui:repeat>
+	       			
+					<tr class="trueRowClass">
+						<td> </td>
+						<td>#{bundle['somme']}</td>
+						<ui:repeat value="#{categoryListController.sumRow}" var="monthCell">
+							<ui:include page="sumAmountCell.xhtml" />
+						</ui:repeat>
+					</tr>
+					
+					<tr class="falseRowClass">
+						<td> </td>
+						<td>#{bundle['sommeSansVirementsInternes']}</td>
+						<ui:repeat value="#{categoryListController.sumExceptInternalMovmtRow}" var="monthCell">
+							<ui:include page="sumAmountCell.xhtml" />
+						</ui:repeat>
+					</tr>
 	       		</tbody>
 	       	</table>
        	</div>

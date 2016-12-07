@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import fr.pascalmahe.business.Account;
 import fr.pascalmahe.business.Balance;
 import fr.pascalmahe.business.Budget;
 import fr.pascalmahe.business.Categorisation;
@@ -230,6 +232,8 @@ public class TestGenericDao extends AbstractTest {
 		idCategorisationForUpdate = catego2.getId();
 		idCategorisationForDeletion = categoToDelete3.getId();
 		
+		Account acc = Account.fromName(Account.NAME_LBP);
+		
 		Line lin1 = new Line(	LocalDate.of(2016, Month.MARCH, 01), 
 								LocalDate.of(2016, Month.JULY, 15),
 								"TestLine 01", 
@@ -238,6 +242,7 @@ public class TestGenericDao extends AbstractTest {
 								123.45f, 
 								false, 
 								type1,
+								acc,
 								emptyListCatego);
 
 		Line lin2 = new Line(	LocalDate.of(2016, Month.APRIL, 02), 
@@ -248,6 +253,7 @@ public class TestGenericDao extends AbstractTest {
 								-123.45f, 
 								false,  
 								type1,
+								acc,
 								oneListCatego);
 
 		Line lin3 = new Line(	LocalDate.of(2016, Month.MAY, 05), 
@@ -258,6 +264,7 @@ public class TestGenericDao extends AbstractTest {
 								612024.45f, 
 								false,  
 								type1,
+								acc,
 								twoListCatego);
 
 		Line lin4 = new Line(	LocalDate.of(2016, Month.MAY, 05), 
@@ -268,6 +275,7 @@ public class TestGenericDao extends AbstractTest {
 								-24.45f, 
 								true,  
 								type1,
+								acc,
 								new ArrayList<Categorisation>());
 
 		Line linToDelete = new Line(LocalDate.of(2016, Month.JUNE, 01), 
@@ -278,6 +286,7 @@ public class TestGenericDao extends AbstractTest {
 								-616.0f, 
 								true,  
 								type1,
+								acc,
 								twoOtherListCatego);
 		
 		lineDao.saveOrUpdate(lin1);
@@ -567,6 +576,8 @@ public class TestGenericDao extends AbstractTest {
 		// Counting before
 		GenericDao<Line> linDao = new GenericDao<>(Line.class);
 		int nbLinesBeforeInsertion = linDao.count();
+
+		Account acc = Account.fromName(Account.NAME_LBP);
 		
 		// Creating value
 		Line linToInsert = new Line(LocalDate.now(), 
@@ -577,6 +588,7 @@ public class TestGenericDao extends AbstractTest {
 									0.123f, 
 									false,
 									typeToInsert,
+									acc,
 									new ArrayList<>());
 		linDao.saveOrUpdate(linToInsert);
 
@@ -642,6 +654,7 @@ public class TestGenericDao extends AbstractTest {
 											-15150.123f, 
 											false, 
 											typeToInsert,
+											acc,
 											listeCatego);
 		linDao.saveOrUpdate(linToInsertWithCategory);
 
@@ -1102,5 +1115,28 @@ public class TestGenericDao extends AbstractTest {
 		
 		
 		logger.info("testFetchByName done.");
+	}
+	
+	@Test
+	public void testFetchLinesLast6Months(){
+		logger.info("Starting testFetchLinesLast6Months...");
+		
+		GenericDao<Line> lineDao = new GenericDao<>(Line.class);
+		List<Line> lineList = lineDao.fetchLinesLast6Months();
+		
+		assertTrue("Number of Lines should be more than 0: ", lineList.size() > 0);
+		
+		logger.debug("testFetchLinesLast6Months - retrieved: " + lineList.size() + " lines.");
+		
+		LocalDate sixMonthsAgo = LocalDate.now();
+		sixMonthsAgo = sixMonthsAgo.minusMonths(6);
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		for(Line currentLine : lineList){
+			assertTrue("Line #" + currentLine.getId() + " (" + currentLine + ") "
+							+ "is before the limit (" + dtf.format(sixMonthsAgo) + ").", 
+					currentLine.getDate().isAfter(sixMonthsAgo));
+		}
+		
+		logger.info("testFetchLinesLast6Months done.");
 	}
 }

@@ -128,106 +128,106 @@ public class TestTypeService extends TypeService {
 		// Type before rest of label
 
 		// AUTO_DEBIT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.AUTO_DEBIT_LONG);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.AUTO_DEBIT_LONG);
 		fetchedType = TypeService.fromDetailedLabel(AUTO_DEBIT_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.AUTO_DEBIT_LONG));
+		assertThat(fetchedType.getName(), is(Type.AUTO_DEBIT_LONG));
 
 		// ATM
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.ATM);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.ATM);
 		fetchedType = TypeService.fromDetailedLabel(ATM_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.ATM));
+		assertThat(fetchedType.getName(), is(Type.ATM));
 
 		// CCARD_PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CCARD_PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CCARD_PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(CC_PAYMENT_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CCARD_PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.CCARD_PAYMENT));
 
 		// CHARGES
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CHARGES);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CHARGES);
 		fetchedType = TypeService.fromDetailedLabel(CHARGES_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CHARGES));
+		assertThat(fetchedType.getName(), is(Type.CHARGES));
 
 		// CHECK
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CHECK);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CHECK);
 		fetchedType = TypeService.fromDetailedLabel(CHECK_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CHECK));
+		assertThat(fetchedType.getName(), is(Type.CHECK));
 
 		// CREDIT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CREDIT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CREDIT);
 		fetchedType = TypeService.fromDetailedLabel(CREDIT_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CREDIT));
+		assertThat(fetchedType.getName(), is(Type.CREDIT));
 
 		// FEE
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.FEE);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.FEE);
 		fetchedType = TypeService.fromDetailedLabel(FEE_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.FEE));
+		assertThat(fetchedType.getName(), is(Type.FEE));
 
 		// LOAN_PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.LOAN_PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.LOAN_PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(LOAN_PAYMENT_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.LOAN_PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.LOAN_PAYMENT));
 
 		// PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(PAYMENT_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.PAYMENT));
 
 		// TRANSFER
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.TRANSFER);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.TRANSFER);
 		fetchedType = TypeService.fromDetailedLabel(TRANSFER_FIRST_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.TRANSFER));
+		assertThat(fetchedType.getName(), is(Type.TRANSFER));
 		
 		// Type after rest of label
 
 		// AUTO_DEBIT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.AUTO_DEBIT_LONG);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.AUTO_DEBIT_LONG);
 		fetchedType = TypeService.fromDetailedLabel(AUTO_DEBIT_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.AUTO_DEBIT_LONG));
+		assertThat(fetchedType.getName(), is(Type.AUTO_DEBIT_LONG));
 
 		// ATM
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.ATM);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.ATM);
 		fetchedType = TypeService.fromDetailedLabel(ATM_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.ATM));
+		assertThat(fetchedType.getName(), is(Type.ATM));
 
 		// CCARD_PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CCARD_PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CCARD_PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(CC_PAYMENT_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CCARD_PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.CCARD_PAYMENT));
 
 		// CHARGES
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CHARGES);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CHARGES);
 		fetchedType = TypeService.fromDetailedLabel(CHARGES_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CHARGES));
+		assertThat(fetchedType.getName(), is(Type.CHARGES));
 
 		// CHECK
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CHECK);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CHECK);
 		fetchedType = TypeService.fromDetailedLabel(CHECK_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CHECK));
+		assertThat(fetchedType.getName(), is(Type.CHECK));
 
 		// CREDIT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.CREDIT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.CREDIT);
 		fetchedType = TypeService.fromDetailedLabel(CREDIT_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.CREDIT));
+		assertThat(fetchedType.getName(), is(Type.CREDIT));
 
 		// FEE
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.FEE);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.FEE);
 		fetchedType = TypeService.fromDetailedLabel(FEE_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.FEE));
+		assertThat(fetchedType.getName(), is(Type.FEE));
 
 		// LOAN_PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.LOAN_PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.LOAN_PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(LOAN_PAYMENT_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.LOAN_PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.LOAN_PAYMENT));
 
 		// PAYMENT
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.PAYMENT);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.PAYMENT);
 		fetchedType = TypeService.fromDetailedLabel(PAYMENT_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.PAYMENT));
+		assertThat(fetchedType.getName(), is(Type.PAYMENT));
 
 		// TRANSFER
-		logger.debug("testFromDetailedLabel - Expecting : " + TypeService.TRANSFER);
+		logger.debug("testFromDetailedLabel - Expecting : " + Type.TRANSFER);
 		fetchedType = TypeService.fromDetailedLabel(TRANSFER_OTHER_LINE);
-		assertThat(fetchedType.getName(), is(TypeService.TRANSFER));
+		assertThat(fetchedType.getName(), is(Type.TRANSFER));
 		
 		logger.info("testFromDetailedLabel finished.");
 	}

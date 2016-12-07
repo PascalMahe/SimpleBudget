@@ -29,6 +29,9 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import fr.pascalmahe.services.AccountService;
+
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class TestLogin {
@@ -71,7 +74,7 @@ public class TestLogin {
 	public static void browserSetup(){
 		long timeBeforeDriverLaunch = System.currentTimeMillis();
 		
-		FirefoxProfile firefoxProfile = getFFProfile();
+		FirefoxProfile firefoxProfile = AccountService.getFFProfile();
 		driverFirefox = new FirefoxDriver(firefoxProfile);
 //		driverFirefox = new FirefoxDriver();
 		
@@ -124,8 +127,6 @@ public class TestLogin {
 		
 		logger.debug("browserSetup - time to launch Chrome: " + formattedElapsedTime);
 		
-		
-		
 		try {
 			driverFirefox.get(WebConstants.TEST_HOST);
 			detectedHost = WebConstants.TEST_HOST;
@@ -144,43 +145,6 @@ public class TestLogin {
 		}
 	}
 	
-	private static FirefoxProfile getFFProfile() {
-
-		FirefoxProfile firefoxProfile = new FirefoxProfile();
-	    firefoxProfile.setAcceptUntrustedCertificates(true);
-	    firefoxProfile.setAssumeUntrustedCertificateIssuer(false);
-	    firefoxProfile.setPreference("browser.download.folderList",2);
-	    firefoxProfile.setPreference("browser.download.manager.showWhenStarting",false);
-	    
-	    firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk","text/csv,application/pdf,application/csv,application/vnd.ms-excel");
-	    firefoxProfile.setPreference("browser.download.manager.showAlertOnComplete",false);  firefoxProfile.setPreference("browser.download.manager.showAlertOnComplete",false);
-	    firefoxProfile.setPreference("browser.download.manager.showWhenStartinge",false);
-	    firefoxProfile.setPreference("browser.download.panel.shown",false);
-	    firefoxProfile.setPreference("browser.download.useToolkitUI",true);
-	    firefoxProfile.setPreference("pdfjs.disabled", true);
-	    firefoxProfile.setPreference("pdfjs.firstRun", false);
-	    
-	    firefoxProfile.setPreference("browser.bookmarks.max_backups", 0);
-		firefoxProfile.setPreference("browser.cache.memory.enable", true);
-		firefoxProfile.setPreference("browser.cache.disk.enable", true);
-		firefoxProfile.setPreference("browser.download.manager.scanWhenDone", false);
-		firefoxProfile.setPreference("browser.formfill.enable", false);
-		firefoxProfile.setPreference("network.http.pipeline", true);
-		firefoxProfile.setPreference("network.http.pipeline.maxrequests", 8);
-		firefoxProfile.setPreference("browser.search.suggest.enabled", false);
-		firefoxProfile.setPreference("browser.sessionhistory.max_entries", 3);
-		firefoxProfile.setPreference("browser.sessionhistory.max_tabs_undo", 0);
-		firefoxProfile.setPreference("browser.sessionhistory.max_total_viewer", 1);
-		firefoxProfile.setPreference("browser.sessionhistory.max_total_viewers", 1);
-		firefoxProfile.setPreference("browser.startup.homepage", "about:blank");
-		firefoxProfile.setPreference("browser.tabs.animated", false);
-		firefoxProfile.setPreference("image.animation_modr", "none");
-		firefoxProfile.setPreference("general.useragent.override", "FF Selenium UA");
-		firefoxProfile.setPreference("nglayout.initialpaint.delay", 0);
-	    
-	    return firefoxProfile;
-	}
-
 	@AfterClass
 	public static void browserTeardown(){
 		driverFirefox.quit();
@@ -239,6 +203,7 @@ public class TestLogin {
 	private void waitForStalenessOf(WebDriver driver, String elmtId) {
 		try {
 			WebElement elmt = driver.findElement(By.id(elmtId));
+			
 			(new WebDriverWait(driver, 5)).until(ExpectedConditions.stalenessOf(elmt));
 		} catch (NoSuchElementException nsee) {
 			logger.debug("waitForStalenessOf - Looks like the element "
