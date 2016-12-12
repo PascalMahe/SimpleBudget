@@ -253,4 +253,30 @@ public class TestUserService extends AbstractTest {
 		
 		logger.info("testSaveUUID finished.");
 	}
+	
+	@Test
+	public void testCreateRealUsers(){
+		logger.info("Starting testCreateRealUsers...");
+		
+		String user1 = System.getenv("USER1");
+		String pwd1 = System.getenv("USER_PWD1");
+		
+		String user2 = System.getenv("USER2");
+		String pwd2 = System.getenv("USER_PWD2");
+		
+		try {
+			UserService.addUser(user1, pwd1);
+		} catch (LoginAlreadyExistsException laee){
+			// do nothing, user already exists
+		}
+
+		try {
+			UserService.addUser(user2, pwd2);
+		} catch (LoginAlreadyExistsException laee){
+			// do nothing, user already exists
+		}
+		
+		
+		logger.info("testCreateRealUsers finished.");
+	}
 }
