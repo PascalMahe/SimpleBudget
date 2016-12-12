@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -323,27 +326,6 @@ public class GenericDao<T> {
 		return listToReturn;
 	}
 	
-	public List<T> searchBudgetContainingCategory(Category cat){
-
-		Session currSession = sessionFactory.openSession();
-		
-		Criteria crita = currSession.createCriteria(classToUse);
-		crita.createAlias("categoryList", "cat", JoinType.INNER_JOIN);
-		
-//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
-		crita.add(Restrictions.eqOrIsNull("cat.id", cat.getId()));
-		
-		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
-		
-		@SuppressWarnings("unchecked")
-		List<T> listToReturn = crita.list();
-		
-		currSession.close();
-		
-		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
-		return listToReturn;
-	}
-
 	public List<T> fetchAll() {
 
 		logger.debug("Fetching all " + classToUse.getSimpleName() + "s...");
@@ -406,6 +388,98 @@ public class GenericDao<T> {
 		}
 		
 		return returnedOne;
+	}
+
+	public List<Line> fetchLinesLast6Months() {
+		
+		logger.info("Fetching lines for the last 6 months...");
+		
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		crita.setFetchMode("categorisationList", FetchMode.JOIN);
+		
+		LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		logger.debug("fetchLinesLast6Months - getting lines with dates as old as: " + dtf.format(sixMonthsAgo));
+		crita.add(Restrictions.ge("date", sixMonthsAgo));
+		
+		@SuppressWarnings("unchecked")
+		List<Line> list = crita.list();
+		
+		for(Line line : list){
+			logger.warn("fetchLinesLast6Months - line #" + line.getId() + " has " + line.getCategorisationList().size() + " categos.");
+		}
+		
+		return list;
+	}
+
+	public List<T> searchBudgetContainingCategory(Category cat){
+
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.createAlias("categoryList", "cat", JoinType.INNER_JOIN);
+		
+//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
+		crita.add(Restrictions.eqOrIsNull("cat.id", cat.getId()));
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
+		
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+		
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+
+	public List<T> searchCategoContainingCategory(Category cat) {
+
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.createAlias("category", "cat", JoinType.INNER_JOIN);
+		
+//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
+		crita.add(Restrictions.eqOrIsNull("cat.id", cat.getId()));
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
+		
+		@SuppressWarnings("unchecked")
+		List<T> listToReturn = crita.list();
+		
+		currSession.close();
+		
+		logger.debug("Returning " + listToReturn.size() + " " + classToUse.getSimpleName() + "s.");
+		return listToReturn;
+	}
+
+	public T searchLineContainingCatego(Categorisation catego) {
+		Session currSession = sessionFactory.openSession();
+		
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.createAlias("categorisationList", "catego", JoinType.INNER_JOIN);
+		
+//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
+		crita.add(Restrictions.eqOrIsNull("catego.id", catego.getId()));
+		
+		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Categorisation#" + catego.getId() + ".");
+		
+		T lineToReturn = null;
+		
+		@SuppressWarnings("unchecked")
+		List<T> lineList = crita.list();
+		if(lineList.size() == 1){
+			lineToReturn = lineList.get(0);
+		}
+		
+		currSession.close();
+		
+		logger.debug("Returning " + lineList.size() + " " + classToUse.getSimpleName() + "s.");
+		return lineToReturn;
 	}
 
 }

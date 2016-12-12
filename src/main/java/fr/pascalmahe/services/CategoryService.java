@@ -1,7 +1,5 @@
 package fr.pascalmahe.services;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +9,10 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
+import fr.pascalmahe.business.Line;
+import fr.pascalmahe.business.MonthInYear;
 import fr.pascalmahe.persistence.GenericDao;
 import fr.pascalmahe.web.beans.CatRow;
 
@@ -118,99 +119,73 @@ public class CategoryService {
 
 	public static List<CatRow> fetchCategoryTable() {
 		logger.info("Fetching fetchCategoryTable...");
-		List<CatRow> catRowList = new ArrayList<>();
 		
-		CatRow catRo0 = new CatRow();
-		CatRow catRo1 = new CatRow();
-		CatRow catRo10 = new CatRow();
-		CatRow catRo11 = new CatRow();
-		CatRow catRo12 = new CatRow();
-		CatRow catRo2 = new CatRow();
-		CatRow catRo3 = new CatRow();
-		CatRow catRo30 = new CatRow();
-		CatRow catRo31 = new CatRow();
-		CatRow catRo32 = new CatRow();
+		GenericDao<Line> dao = new GenericDao<>(Line.class);
 		
-		Month latestMonth = LocalDate.now().getMonth();
-		Month penultimateMonth = latestMonth.minus(1l);
-		Month antePenultimateMonth = penultimateMonth.minus(1l);
-		Month minus3Month = antePenultimateMonth.minus(1l);
-		Month minus4Month = minus3Month.minus(1l);
-		
-		catRo0.setCategory(new Category("Emprunts"));
-		catRo0.addMonthCell(latestMonth, 0.00f, -1185.00f);
-		catRo0.addMonthCell(penultimateMonth, 0.00f, -1185.00f);
-		catRo0.addMonthCell(antePenultimateMonth, 0.00f, -1185.00f);
-		catRo0.addMonthCell(minus3Month, 0.00f, -1185.00f);
-		catRo0.addMonthCell(minus4Month, 0.00f, -1185.00f);
-		
-		catRo10.setCategory(new Category("Mobiles"));
-		catRo10.addMonthCell(latestMonth, 0.00f, -24.99f);
-		catRo10.addMonthCell(penultimateMonth, 0.00f, -24.99f);
-		catRo10.addMonthCell(antePenultimateMonth, 0.00f, -24.99f);
-		catRo10.addMonthCell(minus3Month, 0.00f, -31.06f);
-		catRo10.addMonthCell(minus4Month, 0.00f, -28.50f);
-		
-		catRo11.setCategory(new Category("Web"));
-		catRo11.addMonthCell(latestMonth, 0.00f, -24.99f);
-		catRo11.addMonthCell(penultimateMonth, 0.00f, -24.99f);
-		catRo11.addMonthCell(antePenultimateMonth, 0.00f, -24.99f);
-		catRo11.addMonthCell(minus3Month, 0.00f, -31.06f);
-		catRo11.addMonthCell(minus4Month, 0.00f, -28.50f);
-
-		catRo12.setCategory(new Category("Electricité"));
-		catRo12.addMonthCell(latestMonth, 0.00f, -187.06f);
-		catRo12.addMonthCell(penultimateMonth, 0.00f, -187.06f);
-		catRo12.addMonthCell(antePenultimateMonth, 0.00f, -187.06f);
-		catRo12.addMonthCell(minus3Month, 0.00f, -187.06f);
-		catRo12.addMonthCell(minus4Month, 150.00f, -187.06f);
-		
-		catRo1.setCategory(new Category("Factures"));
-		catRo1.addSonCatRow(catRo10);
-		catRo1.addSonCatRow(catRo11);
-		catRo1.addSonCatRow(catRo12);
-
-		catRo2.setCategory(new Category("Cadeaux"));
-		catRo2.addMonthCell(latestMonth, 0.00f, -55.00f);
-		catRo2.addMonthCell(penultimateMonth, 0.00f, -12.50f);
-		catRo2.addMonthCell(antePenultimateMonth, 0.00f, -33.66f);
-		catRo2.addMonthCell(minus3Month, 0.00f, -0.00f);
-		catRo2.addMonthCell(minus4Month, 0.00f, -0.00f);
-
-		catRo30.setCategory(new Category("Nourrice"));
-		catRo30.addMonthCell(latestMonth, 0.00f, -424.99f);
-		catRo30.addMonthCell(penultimateMonth, 0.00f, -124.99f);
-		catRo30.addMonthCell(antePenultimateMonth, 0.00f, -124.99f);
-		catRo30.addMonthCell(minus3Month, 0.00f, -142.06f);
-		catRo30.addMonthCell(minus4Month, 0.00f, -400.50f);
-
-		catRo31.setCategory(new Category("Cantine"));
-		catRo31.addMonthCell(latestMonth, 0.00f, -64.99f);
-		catRo31.addMonthCell(penultimateMonth, 0.00f, -128.99f);
-		catRo31.addMonthCell(antePenultimateMonth, 0.00f, -120.99f);
-		catRo31.addMonthCell(minus3Month, 0.00f, -135.06f);
-		catRo31.addMonthCell(minus4Month, 0.00f, -60.50f);
-
-		catRo32.setCategory(new Category("Epargne"));
-		catRo32.addMonthCell(latestMonth, 0.00f, -200.00f);
-		catRo32.addMonthCell(penultimateMonth, 0.00f, -200.00f);
-		catRo32.addMonthCell(antePenultimateMonth, 0.00f, -200.00f);
-		catRo32.addMonthCell(minus3Month, 0.00f, -200.00f);
-		catRo32.addMonthCell(minus4Month, 0.00f, -200.00f);
-
-		catRo3.setCategory(new Category("Enfants"));
-		catRo3.addSonCatRow(catRo30);
-		catRo3.addSonCatRow(catRo31);
-		catRo3.addSonCatRow(catRo32);
-		
-		catRowList.add(catRo0);
-		catRowList.add(catRo1);
-		catRowList.add(catRo2);
-		catRowList.add(catRo3);
-
+		List<Line> lineList = dao.fetchLinesLast6Months();
+		List<CatRow> catRowList = lineListToCatRowList(lineList);
+	
 		logger.info("Fetched " + catRowList.size() + " rows "
 				+ "on " + catRowList.get(0).getNumberOfMonths() + " months.");
 		return catRowList;
+	}
+
+	private static List<CatRow> lineListToCatRowList(List<Line> lineList) {
+		
+		logger.debug("lineListToCatRowList - Creating list of CatRows with " + lineList.size() + " lines...");
+		
+		List<CatRow> listToReturn = new ArrayList<>();
+		int lineNb = 0;
+		MonthInYear oldestMonthYet = null;
+		
+		HashMap<Category, CatRow> catRowTempMap = new HashMap<>();
+		for(Line currentLine : lineList){
+			List<Categorisation> listCatego = currentLine.getCategorisationList();
+			MonthInYear currentMonth = new MonthInYear(currentLine.getDate().getMonth(), currentLine.getDate().getYear());
+			
+			if(oldestMonthYet == null || oldestMonthYet.compareTo(currentMonth) < 0){
+				oldestMonthYet = currentMonth;
+			}
+			
+			logger.debug("lineListToCatRowList - line number " + lineNb + " "
+					+ "(#" + currentLine.getId() + " in month: " + currentMonth + ") "
+					+ "has " + listCatego.size() + " categos."); 
+			
+			for(Categorisation catego : listCatego){
+				Category currentCat = catego.getCategory();
+				
+				CatRow currentCatRow = null;
+				String dbgMsg = "lineListToCatRowList - current Cat: #" + currentCat.getId() + "(" + currentCat.getName() + ")";
+				if(catRowTempMap.containsKey(currentCat)){
+					currentCatRow = catRowTempMap.get(currentCat);
+					dbgMsg += ", already present, adding to its current amount...";
+				} else {
+					currentCatRow = new CatRow(currentCat);
+					catRowTempMap.put(currentCat, currentCatRow);
+					dbgMsg += ", was added, adding to its current amount...";
+				}
+				logger.debug(dbgMsg);
+				
+				currentCatRow.addAmountToMonth(currentMonth, catego.getAmount());
+			}
+			lineNb++;
+		}
+
+		logger.debug("lineListToCatRowList - Adding catRow to list (" + catRowTempMap.size() + " in the map)...");
+		
+		for(CatRow catRow : catRowTempMap.values()){
+			catRow.fillMonthsUpTo(oldestMonthYet);
+			listToReturn.add(catRow);
+		}
+		
+		logger.debug("lineListToCatRowList - Added all catRows (" + listToReturn.size() + " of 'em). Sorting...");
+		
+		Collections.sort(listToReturn);
+		
+		logger.debug("lineListToCatRowList - Sorted.");
+		
+		
+		return listToReturn;
 	}
 
 }
