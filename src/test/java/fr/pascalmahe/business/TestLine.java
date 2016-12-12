@@ -125,7 +125,7 @@ public class TestLine {
 		lineCreditChildlessExpected.setNote("");
 		lineCreditChildlessExpected.setShortLabel("Carte La Redoute");
 		lineCreditChildlessExpected.setType(
-				TypeService.fromDetailedLabel(TypeService.CREDIT));
+				TypeService.fromDetailedLabel(Type.CREDIT));
 		lineCreditChildlessExpected.addCategorisation(55.25f, "Remboursement achat");
 		
 		Validator.validateLine(" constructor test (credit, childless) ", 
@@ -160,7 +160,7 @@ public class TestLine {
 		lineDebitChildCatExpected.setNote("");
 		lineDebitChildCatExpected.setShortLabel("Cyrillus.Fr Paris");
 		lineDebitChildCatExpected.setType(
-				TypeService.fromDetailedLabel(TypeService.CCARD_PAYMENT));
+				TypeService.fromDetailedLabel(Type.CCARD_PAYMENT));
 		lineDebitChildCatExpected.addCategorisation(-14.90f, "Courses", "Quotidiennes");
 		
 		Validator.validateLine(" constructor test (debit, child cat) ", 
@@ -197,7 +197,7 @@ public class TestLine {
 		lineDebitChildlessExpected.setNote("");
 		lineDebitChildlessExpected.setShortLabel("Objets Et Cie Massy");
 		lineDebitChildlessExpected.setType(
-				TypeService.fromDetailedLabel(TypeService.CCARD_PAYMENT));
+				TypeService.fromDetailedLabel(Type.CCARD_PAYMENT));
 		lineDebitChildlessExpected.addCategorisation(-38.95f, "Meubles & Déco");
 		lineDebitChildlessExpected.addCategorisation(-10.00f, "Déjeuners");
 		
@@ -243,7 +243,7 @@ public class TestLine {
 		lineDebitWithChildExpected.setShortLabel("Edf Clients Particuliers Numero De Client : 6002643630 Num" + 
 												" Ero De Compte : Xxx");
 		lineDebitWithChildExpected.setType(
-				TypeService.fromDetailedLabel(TypeService.AUTO_DEBIT_LONG));
+				TypeService.fromDetailedLabel(Type.AUTO_DEBIT_LONG));
 		lineDebitWithChildExpected.addCategorisation(-187.96f, "Factures", "Électricité");
 		lineDebitWithChildExpected.addCategorisation(-30.00f, "Loisirs", "Livres");
 		

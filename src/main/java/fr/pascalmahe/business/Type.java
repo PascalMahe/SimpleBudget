@@ -5,9 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 /**
  * Class representing an line's type (credit card, transfer, ATM...)
@@ -18,13 +15,35 @@ public class Type implements Serializable {
 
 	private static final long serialVersionUID = 9159139161365087772L;
 	
-	private static final Logger logger = LogManager.getLogger();
-	
 	@Id
 	@GeneratedValue
 	private Integer id;
 	
     private String name;
+
+	public static final String TRANSFER_IN_UR_FAVOR = "Virement En Votre Faveur";
+
+	public static final String TRANSFER = "Virement";
+
+	public static final String PAYMENT = "Reglement";
+
+	public static final String LOAN_PAYMENT = "Remboursement De Pret";
+
+	public static final String FEE = "Cotisation";
+
+	public static final String CREDIT = "Avoir";
+
+	public static final String CHECK = "Cheque";
+
+	public static final String CHARGES = "Frais";
+
+	public static final String CCARD_PAYMENT = "Paiement Par Carte";
+
+	public static final String ATM = "Retrait Au Distributeur";
+
+	public static final String AUTO_DEBIT_LONG = "Prelevement";
+
+	public static final String AUTO_DEBIT_SHORT = "Prelevmnt";
 
 	public Type() {}
 	

@@ -14,31 +14,6 @@ public class TypeService {
 
 	private static final Logger logger = LogManager.getLogger();
 
-	public static final String AUTO_DEBIT_SHORT = "Prelevmnt";
-	
-	public static final String AUTO_DEBIT_LONG = "Prelevement"; 
-	
-	public static final String ATM = "Retrait Au Distributeur";
-	
-	public static final String CCARD_PAYMENT = "Paiement Par Carte";
-
-	public static final String CHARGES = "Frais";
-
-	public static final String CHECK = "Cheque";
-	
-	public static final String CREDIT = "Avoir";
-	
-	public static final String FEE = "Cotisation";
-	
-	public static final String LOAN_PAYMENT = "Remboursement De Pret";
-	
-	public static final String PAYMENT = "Reglement";
-	
-	public static final String TRANSFER = "Virement";
-	
-	public static final String TRANSFER_IN_UR_FAVOR = "Virement En Votre Faveur";
-	
-	
 	/**
 	 * Returns the type based on the content of the label
 	 * @param detailedLabel
@@ -47,29 +22,29 @@ public class TypeService {
 	public static Type fromDetailedLabel(String detailedLabel){
 		
 		String detectedTypeName;
-		if(detailedLabel.contains(AUTO_DEBIT_LONG)){
-			detectedTypeName = AUTO_DEBIT_LONG;
-		} else if(detailedLabel.contains(AUTO_DEBIT_SHORT)){
-			detectedTypeName = AUTO_DEBIT_LONG;
-		} else if(detailedLabel.contains(ATM)){
-			detectedTypeName = ATM;
-		} else if(detailedLabel.contains(CCARD_PAYMENT)){
-			detectedTypeName = CCARD_PAYMENT;
-		} else if(detailedLabel.contains(CHARGES)){
-			detectedTypeName = CHARGES;
-		} else if(detailedLabel.contains(CHECK)){
-			detectedTypeName = CHECK;
-		} else if(detailedLabel.contains(CREDIT)){
-			detectedTypeName = CREDIT;
-		} else if(detailedLabel.contains(FEE)){
-			detectedTypeName = FEE;
-		} else if(detailedLabel.contains(LOAN_PAYMENT)){
-			detectedTypeName = LOAN_PAYMENT;
-		} else if(detailedLabel.contains(PAYMENT)){
-			detectedTypeName = PAYMENT;
+		if(detailedLabel.contains(Type.AUTO_DEBIT_LONG)){
+			detectedTypeName = Type.AUTO_DEBIT_LONG;
+		} else if(detailedLabel.contains(Type.AUTO_DEBIT_SHORT)){
+			detectedTypeName = Type.AUTO_DEBIT_LONG;
+		} else if(detailedLabel.contains(Type.ATM)){
+			detectedTypeName = Type.ATM;
+		} else if(detailedLabel.contains(Type.CCARD_PAYMENT)){
+			detectedTypeName = Type.CCARD_PAYMENT;
+		} else if(detailedLabel.contains(Type.CHARGES)){
+			detectedTypeName = Type.CHARGES;
+		} else if(detailedLabel.contains(Type.CHECK)){
+			detectedTypeName = Type.CHECK;
+		} else if(detailedLabel.contains(Type.CREDIT)){
+			detectedTypeName = Type.CREDIT;
+		} else if(detailedLabel.contains(Type.FEE)){
+			detectedTypeName = Type.FEE;
+		} else if(detailedLabel.contains(Type.LOAN_PAYMENT)){
+			detectedTypeName = Type.LOAN_PAYMENT;
+		} else if(detailedLabel.contains(Type.PAYMENT)){
+			detectedTypeName = Type.PAYMENT;
 		
 		} else {
-			detectedTypeName = TRANSFER;
+			detectedTypeName = Type.TRANSFER;
 		}
 		
 //		logger.debug("fromDetailedLabel - found name: " + detectedTypeName);
