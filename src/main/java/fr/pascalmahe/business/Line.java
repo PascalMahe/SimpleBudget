@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import fr.pascalmahe.ex.MalformedLineException;
+import fr.pascalmahe.services.AccountService;
 import fr.pascalmahe.services.TypeService;
 
 
@@ -60,6 +61,8 @@ public class Line implements Serializable, Comparable<Line> {
     
     private Type type;
     
+    private Account account;
+    
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Categorisation> categorisationList;
 
@@ -68,12 +71,13 @@ public class Line implements Serializable, Comparable<Line> {
 	}
     
 	public Line(Integer id, 
-			LocalDate date, 
+				LocalDate date, 
 				String detailedLabel, 
 				String shortLabel, 
 				Float amount, 
 				Boolean recurring,
 				Type type,
+				Account account,
 				List<Categorisation> categorisationList) {
 		super();
 		this.id = id;
@@ -83,6 +87,7 @@ public class Line implements Serializable, Comparable<Line> {
 		this.amount = amount;
 		this.recurring = recurring;
 		this.type = type;
+		this.account = account;
 		this.categorisationList = categorisationList;
 	}
 
@@ -94,6 +99,7 @@ public class Line implements Serializable, Comparable<Line> {
 				Float amount, 
 				Boolean recurring,
 				Type type,
+				Account account,
 				List<Categorisation> categorisationList) {
 		super();
 		this.date = date;
@@ -104,6 +110,7 @@ public class Line implements Serializable, Comparable<Line> {
 		this.amount = amount;
 		this.recurring = recurring;
 		this.type = type;
+		this.account = account;
 		this.categorisationList = categorisationList;
 	}
 
@@ -188,9 +195,10 @@ public class Line implements Serializable, Comparable<Line> {
 		this.shortLabel = detailedToShort(detailedLabel);
 		this.type = TypeService.fromDetailedLabel(detailedLabel);
 		this.note = note;
+		this.account = AccountService.fromDetailedLabel(detailedLabel);
 		
-		Type cCardType = TypeService.fromDetailedLabel(TypeService.CCARD_PAYMENT);
-		Type autoType = TypeService.fromDetailedLabel(TypeService.AUTO_DEBIT_LONG);
+		Type cCardType = TypeService.fromDetailedLabel(Type.CCARD_PAYMENT);
+		Type autoType = TypeService.fromDetailedLabel(Type.AUTO_DEBIT_LONG);
 		if(type.equals(cCardType) || type.equals(autoType)){
 			this.cCardDate = extractDate(detailedLabel);
 		}
@@ -271,23 +279,23 @@ public class Line implements Serializable, Comparable<Line> {
 		// to avoid a problem when an auto debit is labelled "fee" by the
 		// other party, auto debits don't affect the others
 		// (and to keep it readable they're the only ones)
-		if(shortLabel.contains(TypeService.AUTO_DEBIT_LONG) ||
-				shortLabel.contains(TypeService.AUTO_DEBIT_SHORT)){
-			shortLabel = shortLabel.replace(TypeService.AUTO_DEBIT_LONG, "");
-			shortLabel = shortLabel.replace(TypeService.AUTO_DEBIT_SHORT, "");
+		if(shortLabel.contains(Type.AUTO_DEBIT_LONG) ||
+				shortLabel.contains(Type.AUTO_DEBIT_SHORT)){
+			shortLabel = shortLabel.replace(Type.AUTO_DEBIT_LONG, "");
+			shortLabel = shortLabel.replace(Type.AUTO_DEBIT_SHORT, "");
 		} else {
-			shortLabel = shortLabel.replace(TypeService.ATM, "");
-			shortLabel = shortLabel.replace(TypeService.CCARD_PAYMENT, "");
-			shortLabel = shortLabel.replace(TypeService.CHARGES, "");
+			shortLabel = shortLabel.replace(Type.ATM, "");
+			shortLabel = shortLabel.replace(Type.CCARD_PAYMENT, "");
+			shortLabel = shortLabel.replace(Type.CHARGES, "");
 			// shortLabel = shortLabel.replace(TypeService.CHECK, "");
 			// Cheque can stay 'cause it's often all there is as label (or close enough)
-			shortLabel = shortLabel.replace(TypeService.CREDIT, "");
-			shortLabel = shortLabel.replace(TypeService.FEE, "");
-			shortLabel = shortLabel.replace(TypeService.LOAN_PAYMENT, "");
-			shortLabel = shortLabel.replace(TypeService.PAYMENT, "");
-			shortLabel = shortLabel.replace(TypeService.TRANSFER_IN_UR_FAVOR, "");
+			shortLabel = shortLabel.replace(Type.CREDIT, "");
+			shortLabel = shortLabel.replace(Type.FEE, "");
+			shortLabel = shortLabel.replace(Type.LOAN_PAYMENT, "");
+			shortLabel = shortLabel.replace(Type.PAYMENT, "");
+			shortLabel = shortLabel.replace(Type.TRANSFER_IN_UR_FAVOR, "");
 			// TRANSFER after TRANSFER_IN_UR_FAVOR so that TRANSFER_IN_UR_FAVOR is not partially erased
-			shortLabel = shortLabel.replace(TypeService.TRANSFER, "");
+			shortLabel = shortLabel.replace(Type.TRANSFER, "");
 		}
 		
 		
@@ -536,4 +544,22 @@ public class Line implements Serializable, Comparable<Line> {
 		return returnedOne;
 	}
 
+	public LocalDate getcCardDate() {
+		return cCardDate;
+	}
+
+	public void setcCardDate(LocalDate cCardDate) {
+		this.cCardDate = cCardDate;
+	}
+
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
+	
+	
 }

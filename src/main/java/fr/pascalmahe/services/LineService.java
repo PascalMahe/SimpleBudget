@@ -49,7 +49,6 @@ public class LineService {
 
 		Line returnLine = null;
 		
-		
 		try {
 			Integer id = Integer.parseInt(idToFetch);
 			returnLine = fetchLine(id);
@@ -131,6 +130,13 @@ public class LineService {
 			CatChoice catChoice = catChoiceWithEmptyAmountList.get(0);
 			catChoice.setAmount(lineAmount - totalCategoAmount);
 		}
+	}
+
+	public static int countLines() {
+
+		GenericDao<Line> lineDao = new GenericDao<>(Line.class);
+		
+		return lineDao.count();
 	}
 
 }
