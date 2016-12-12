@@ -102,22 +102,29 @@ public class AbstractTest {
 						" because it's already been deleted.");
 			} else {
 				if(currObject instanceof Balance){
+					
 					Balance balTodelete = (Balance) currObject;
+					logger.debug("Deleting Balance #" + balTodelete.getId() + "...");
+					
 					balanceDao.delete(balTodelete);
 					nbDeletedObjects++;
+					logger.debug("Balance #" + balTodelete.getId() + " deleted.");
 				} else if(currObject instanceof Budget){
-					Budget balTodelete = (Budget) currObject;
-					budgetDao.delete(balTodelete);
+					Budget budgetTodelete = (Budget) currObject;
+					logger.debug("Deleting Budget #" + budgetTodelete.getId() + "...");
+					budgetDao.delete(budgetTodelete);
 					nbDeletedObjects++;
+					logger.debug("Budget #" + budgetTodelete.getId() + " deleted.");
 				} else if(currObject instanceof Category){
 					Category catTodelete = (Category) currObject;
+					logger.debug("Deleting Category #" + catTodelete.getId() + "...");
 					try{
 						categoryDao.delete(catTodelete);
 						nbDeletedObjects++;
 					}  catch(ConstraintViolationException cve){
-						logger.warn("'Seems like there are still Budgets or Categorys needing "
+						logger.warn("'Seems like there are still Budgets, Categorys or Categorisations (or Lines through the Categorisations) needing "
 								+ "to be deleted before this Category (#" + catTodelete.getId() 
-								+ ") can be. Deleting them now...");
+								+ ": " + catTodelete + ") can be. Deleting them now...");
 						
 						List<Budget> budgetListToDelete = 
 								budgetDao.searchBudgetContainingCategory(catTodelete);
@@ -146,17 +153,43 @@ public class AbstractTest {
 							nbDeletedObjects++;
 						}
 						
-						logger.warn("Category(s) deleted. Re-trying to delete Category...");
+						logger.warn("Category(s) deleted. Deleting Categorisation(s) (and associated Line(s))...");
+
+						List<Categorisation> categoListToDelete = 
+								categoDao.searchCategoContainingCategory(catTodelete);
+						
+						logger.debug("categoListToDelete: " + categoListToDelete);
+						
+						for(Categorisation categoToDelete : categoListToDelete){
+							
+							Line lineToDelete = 
+									lineDao.searchLineContainingCatego(categoToDelete);
+							
+							logger.debug("Deleting Line #" + lineToDelete.getId());
+							listAlreadyDeleted.add(lineToDelete);
+							lineDao.delete(lineToDelete);
+							nbDeletedObjects++;
+
+							// deleting Line deletes Categorization
+							listAlreadyDeleted.add(categoToDelete);
+							nbDeletedObjects++;
+						}
+						
+						logger.warn("Categorisation(s) deleted. Re-trying to delete Category...");
 						categoryDao.delete(catTodelete);
 						nbDeletedObjects++;
 						logger.warn("Category deleted.");
 					}
+					logger.debug("Category #" + catTodelete.getId() + " deleted.");
 				} else if(currObject instanceof Categorisation){
 					Categorisation categoTodelete = (Categorisation) currObject;
+					logger.debug("Deleting Categorisation #" + categoTodelete.getId() + "...");
 					categoDao.delete(categoTodelete);
 					nbDeletedObjects++;
+					logger.debug("Categorisation #" + categoTodelete.getId() + " deleted.");
 				} else if(currObject instanceof Line){
 					Line linToDelete = (Line) currObject;
+					logger.debug("Deleting Line #" + linToDelete.getId() + "...");
 					try {
 						lineDao.delete(linToDelete);
 						nbDeletedObjects++;
@@ -182,15 +215,20 @@ public class AbstractTest {
 								categoDeleted.getId() + 
 								") to list of already deleted objects.");
 					}
-					
+
+					logger.debug("Line #" + linToDelete.getId() + " deleted.");
 				} else if(currObject instanceof User){
 					User userToDelete = (User) currObject;
+					logger.debug("Deleting User #" + userToDelete.getId() + "...");
 					userDao.delete(userToDelete);
 					nbDeletedObjects++;
+					logger.debug("User #" + userToDelete.getId() + " deleted.");
 				} else if(currObject instanceof Type){
 					Type typeToDelete = (Type) currObject;
+					logger.debug("Deleting Type #" + typeToDelete.getId() + "...");
 					typeDao.delete(typeToDelete);
 					nbDeletedObjects++;
+					logger.debug("Type #" + typeToDelete.getId() + " deleted.");
 				} else {
 					throw new IllegalArgumentException("An object had no corresponding DAO! It's a: " 
 							+ currObject.getClass().getSimpleName() + ".");
