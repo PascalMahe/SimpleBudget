@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
@@ -207,6 +208,20 @@ public class TestCategoryService extends AbstractTest {
 		Categorisation catego56 = new Categorisation(-100f, cat5);
 		categoList5.add(catego56);
 		Line l5 = new Line(date5, date5.plusDays(3), "Category Table test 5", "Category Table test 5", "", -500f, false, ccard, acc, categoList5);
+		
+		logger.debug("testFetchCategoryTable - all dates used: ");
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		logger.debug(date1.format(dtf));
+		logger.debug(date1.plusDays(3).format(dtf));
+		logger.debug(date2.format(dtf));
+		logger.debug(date2.plusDays(3).format(dtf));
+		logger.debug(date3.format(dtf));
+		logger.debug(date3.plusDays(3).format(dtf));
+		logger.debug(date4.format(dtf));
+		logger.debug(date4.plusDays(3).format(dtf));
+		logger.debug(date5.format(dtf));
+		logger.debug(date5.plusDays(3).format(dtf));
 		
 		listToDelete.add(ccard);
 		listToDelete.add(cat1);

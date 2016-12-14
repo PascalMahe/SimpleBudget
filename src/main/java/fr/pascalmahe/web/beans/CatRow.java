@@ -1,6 +1,7 @@
 package fr.pascalmahe.web.beans;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -170,21 +171,22 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 		} else {
 
 			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-					" (with currently " + monthList.size() + " months), filling up months up to " + oldestMonthYet + "...");
+					" (with currently " + monthList.size() + " months), filling up months down to " + oldestMonthYet + "...");
 			
 			// actual filling up
-			MonthInYear youngestMonthAlreadyPresent = getYoungestMonth();
+			LocalDate now = LocalDate.now();
+			MonthInYear thisMonth = new MonthInYear(now.getMonth(), now.getYear());
 			
 			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-					", filling up from " + youngestMonthAlreadyPresent + "...");
+					", filling up from " + thisMonth + "...");
 			
-			List<MonthInYear> monthRange = oldestMonthYet.rangeTo(youngestMonthAlreadyPresent);
+			List<MonthInYear> monthRange = oldestMonthYet.rangeTo(thisMonth);
 			for(MonthInYear miy : monthRange){
 				this.addAmountToMonth(miy, 0.0f);
 			}
 
 			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-					", done. Now with: " + this.getMonthList().size() + " months.");
+					", done. Now with: " + this.getMonthList().size() + " months: " + this.getMonthList());
 			
 		}
 		

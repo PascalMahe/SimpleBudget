@@ -132,7 +132,7 @@ public class CategoryService {
 
 	private static List<CatRow> lineListToCatRowList(List<Line> lineList) {
 		
-		logger.debug("lineListToCatRowList - Creating list of CatRows with " + lineList.size() + " lines...");
+		logger.debug("lineListToCatRowList - Creating list of CatRows with " + lineList.size() + " Lines...");
 		
 		List<CatRow> listToReturn = new ArrayList<>();
 		int lineNb = 0;
@@ -143,13 +143,18 @@ public class CategoryService {
 			List<Categorisation> listCatego = currentLine.getCategorisationList();
 			MonthInYear currentMonth = new MonthInYear(currentLine.getDate().getMonth(), currentLine.getDate().getYear());
 			
-			if(oldestMonthYet == null || oldestMonthYet.compareTo(currentMonth) < 0){
+			String message = "lineListToCatRowList - comparing oldestMonthYet (" + oldestMonthYet + ") "
+					+ "to currentMonth (" + currentMonth + "), new oldest is: ";
+			if(oldestMonthYet == null || oldestMonthYet.compareTo(currentMonth) > 0){
 				oldestMonthYet = currentMonth;
 			}
+			message += oldestMonthYet + ".";
+			logger.debug(message);
 			
-			logger.debug("lineListToCatRowList - line number " + lineNb + " "
+			
+			logger.debug("lineListToCatRowList - Line number " + lineNb + " "
 					+ "(#" + currentLine.getId() + " in month: " + currentMonth + ") "
-					+ "has " + listCatego.size() + " categos."); 
+					+ "has " + listCatego.size() + " Catego(s)."); 
 			
 			for(Categorisation catego : listCatego){
 				Category currentCat = catego.getCategory();
