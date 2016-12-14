@@ -294,9 +294,10 @@ public class TestCategoryService extends AbstractTest {
 		
 		List<CatRow> catRowList = CategoryService.fetchCategoryTable();
 		
-		assertThat("Number of Categorys in list of CatRows should be 5: ", 
+		int expectedCatNb = 7; 
+		assertThat("Number of Categorys in list of CatRows should be " + expectedCatNb + ": ", 
 				catRowList.size(), 
-				is(5));
+				is(expectedCatNb));
 		
 		for(CatRow catRow : catRowList){
 			

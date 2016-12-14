@@ -441,10 +441,10 @@ public class GenericDao<T> {
 		Session currSession = sessionFactory.openSession();
 		
 		Criteria crita = currSession.createCriteria(classToUse);
-		crita.createAlias("category", "cat", JoinType.INNER_JOIN);
+//		crita.createAlias("category", "cat", JoinType.INNER_JOIN);
 		
 //		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
-		crita.add(Restrictions.eqOrIsNull("cat.id", cat.getId()));
+		crita.add(Restrictions.eqOrIsNull("category", cat));
 		
 		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Category#" + cat.getId() + ".");
 		
@@ -463,7 +463,6 @@ public class GenericDao<T> {
 		Criteria crita = currSession.createCriteria(classToUse);
 		crita.createAlias("categorisationList", "catego", JoinType.INNER_JOIN);
 		
-//		crita.add(Restrictions.in("categoryList", new ArrayList<Category>().add(cat)));
 		crita.add(Restrictions.eqOrIsNull("catego.id", catego.getId()));
 		
 		logger.debug("Searching " + classToUse.getSimpleName() + "s containing Categorisation#" + catego.getId() + ".");

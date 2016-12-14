@@ -109,12 +109,14 @@ public class AbstractTest {
 					balanceDao.delete(balTodelete);
 					nbDeletedObjects++;
 					logger.debug("Balance #" + balTodelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof Budget){
 					Budget budgetTodelete = (Budget) currObject;
 					logger.debug("Deleting Budget #" + budgetTodelete.getId() + "...");
 					budgetDao.delete(budgetTodelete);
 					nbDeletedObjects++;
 					logger.debug("Budget #" + budgetTodelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof Category){
 					Category catTodelete = (Category) currObject;
 					logger.debug("Deleting Category #" + catTodelete.getId() + "...");
@@ -153,40 +155,39 @@ public class AbstractTest {
 							nbDeletedObjects++;
 						}
 						
-						logger.warn("Category(s) deleted. Deleting Categorisation(s) (and associated Line(s))...");
-
-						List<Categorisation> categoListToDelete = 
-								categoDao.searchCategoContainingCategory(catTodelete);
-						
-						logger.debug("categoListToDelete: " + categoListToDelete);
-						
-						for(Categorisation categoToDelete : categoListToDelete){
-							
-							Line lineToDelete = 
-									lineDao.searchLineContainingCatego(categoToDelete);
-							
-							logger.debug("Deleting Line #" + lineToDelete.getId());
-							listAlreadyDeleted.add(lineToDelete);
-							lineDao.delete(lineToDelete);
-							nbDeletedObjects++;
-
-							// deleting Line deletes Categorization
-							listAlreadyDeleted.add(categoToDelete);
-							nbDeletedObjects++;
-						}
-						
-						logger.warn("Categorisation(s) deleted. Re-trying to delete Category...");
+						logger.warn("Category(s) deleted. Re-trying to delete Category...");
 						categoryDao.delete(catTodelete);
 						nbDeletedObjects++;
 						logger.warn("Category deleted.");
 					}
 					logger.debug("Category #" + catTodelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof Categorisation){
 					Categorisation categoTodelete = (Categorisation) currObject;
 					logger.debug("Deleting Categorisation #" + categoTodelete.getId() + "...");
-					categoDao.delete(categoTodelete);
-					nbDeletedObjects++;
+					
+					try{
+						categoDao.delete(categoTodelete);
+						nbDeletedObjects++;
+					}  catch(ConstraintViolationException cve){
+						logger.warn("'Seems like there is still a Line needing "
+								+ "to be deleted before this Categorisation (#" + categoTodelete.getId() 
+								+ ") can be. Deleting it (and all its Categorisations) now...");
+						
+
+						Line lineToDelete = 
+								lineDao.searchLineContainingCatego(categoTodelete);
+						
+						listAlreadyDeleted.add(lineToDelete);
+						listAlreadyDeleted.addAll(lineToDelete.getCategorisationList());
+						lineDao.delete(lineToDelete);
+						nbDeletedObjects = nbDeletedObjects + 1 + lineToDelete.getCategorisationList().size();
+
+						logger.warn("Line deleted. The Categorisations have been deleted with it.");
+					}
+					
 					logger.debug("Categorisation #" + categoTodelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof Line){
 					Line linToDelete = (Line) currObject;
 					logger.debug("Deleting Line #" + linToDelete.getId() + "...");
@@ -217,18 +218,21 @@ public class AbstractTest {
 					}
 
 					logger.debug("Line #" + linToDelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof User){
 					User userToDelete = (User) currObject;
 					logger.debug("Deleting User #" + userToDelete.getId() + "...");
 					userDao.delete(userToDelete);
 					nbDeletedObjects++;
 					logger.debug("User #" + userToDelete.getId() + " deleted.");
+					
 				} else if(currObject instanceof Type){
 					Type typeToDelete = (Type) currObject;
 					logger.debug("Deleting Type #" + typeToDelete.getId() + "...");
 					typeDao.delete(typeToDelete);
 					nbDeletedObjects++;
 					logger.debug("Type #" + typeToDelete.getId() + " deleted.");
+					
 				} else {
 					throw new IllegalArgumentException("An object had no corresponding DAO! It's a: " 
 							+ currObject.getClass().getSimpleName() + ".");
