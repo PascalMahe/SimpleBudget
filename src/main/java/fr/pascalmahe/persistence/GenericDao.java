@@ -27,6 +27,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.sql.JoinType;
 
+import fr.pascalmahe.business.Account;
+import fr.pascalmahe.business.AccountCA;
+import fr.pascalmahe.business.AccountLBP;
 import fr.pascalmahe.business.Balance;
 import fr.pascalmahe.business.Budget;
 import fr.pascalmahe.business.Categorisation;
@@ -134,6 +137,9 @@ public class GenericDao<T> {
 
 	private static void createSessionFactory(Configuration configuration) {
 		// Add annotated classes 
+		configuration.addAnnotatedClass(Account.class);
+		configuration.addAnnotatedClass(AccountCA.class);
+		configuration.addAnnotatedClass(AccountLBP.class);
 		configuration.addAnnotatedClass(Balance.class);
 		configuration.addAnnotatedClass(Budget.class);
 		configuration.addAnnotatedClass(Category.class);
