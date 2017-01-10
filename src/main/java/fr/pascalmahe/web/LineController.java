@@ -15,6 +15,7 @@ import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.primefaces.context.RequestContext;
@@ -381,7 +382,10 @@ public class LineController implements Serializable {
 		UIOutput source = (UIOutput) abe.getSource();
 		String rawCategoIDAsStr = source.getClientId();
 		rawCategoIDAsStr = rawCategoIDAsStr.replace("lineForm:fatherCategory", "");
-		Integer categoID = Integer.parseInt(rawCategoIDAsStr);
+		Integer categoID = null;
+		if(StringUtils.isNotBlank(rawCategoIDAsStr)){
+			categoID = Integer.parseInt(rawCategoIDAsStr);
+		}
 		
 		Category value = (Category) source.getValue();
 		Integer newFatCatID = value.getId();
