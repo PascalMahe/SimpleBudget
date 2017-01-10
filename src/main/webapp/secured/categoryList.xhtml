@@ -24,7 +24,7 @@
 		       			<th>#{bundle['categorie']}</th>
 		       			<th>#{bundle['sousCategorie']}</th>
 		       			<ui:repeat value="#{categoryListController.monthList}" var="month">
-		       				<th class="headerRow"><h:outputText value="#{month}" /></th>
+		       				<th class="headerRow">#{month}</th>
 		       			</ui:repeat>
 	       			</tr>
 	       		</thead>
@@ -34,8 +34,8 @@
 	       					<h:panelGroup rendered="#{catRow.childFree}">
 	       						<tr class="#{catRowStatus.even}RowClass">
 		       						<td>#{catRow.category.name}</td>
-									<td> </td>
-									<ui:repeat value="#{catRow.monthList}" var="monthCell">
+		       						<td />
+									<ui:repeat value="#{catRow.monthList.entrySet().toArray()}" var="monthAsEntry">
 										<ui:include page="sumAmountCell.xhtml" />
 									</ui:repeat>
 								</tr>
@@ -49,7 +49,7 @@
 											</td>
 										</h:panelGroup>
 										<td><h:outputText value="#{catRowSon.category.name}" /></td>
-										<ui:repeat value="#{catRowSon.monthList}" var="monthCell">
+										<ui:repeat value="#{catRowSon.monthList.entrySet().toArray()}" var="monthAsEntry">
 											<ui:include page="sumAmountCell.xhtml" />
 										</ui:repeat>
 										
@@ -63,7 +63,7 @@
 					<tr class="trueRowClass">
 						<td> </td>
 						<td>#{bundle['somme']}</td>
-						<ui:repeat value="#{categoryListController.sumRow}" var="monthCell">
+						<ui:repeat value="#{categoryListController.sumRow.entrySet().toArray()}" var="monthAsEntry">
 							<ui:include page="sumAmountCell.xhtml" />
 						</ui:repeat>
 					</tr>
@@ -71,7 +71,7 @@
 					<tr class="falseRowClass">
 						<td> </td>
 						<td>#{bundle['sommeSansVirementsInternes']}</td>
-						<ui:repeat value="#{categoryListController.sumExceptInternalMovmtRow}" var="monthCell">
+						<ui:repeat value="#{categoryListController.sumExceptInternalMovmtRow.entrySet().toArray()}" var="monthAsEntry">
 							<ui:include page="sumAmountCell.xhtml" />
 						</ui:repeat>
 					</tr>

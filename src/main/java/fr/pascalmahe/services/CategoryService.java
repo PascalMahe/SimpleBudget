@@ -15,6 +15,7 @@ import fr.pascalmahe.business.Line;
 import fr.pascalmahe.business.MonthInYear;
 import fr.pascalmahe.persistence.GenericDao;
 import fr.pascalmahe.web.beans.CatRow;
+import fr.pascalmahe.web.beans.MonthCell;
 
 public class CategoryService {
 
@@ -113,7 +114,14 @@ public class CategoryService {
 		GenericDao<Category> catDao = new GenericDao<>(Category.class);
 		Category cat = catDao.fetch(catId);
 		
-		logger.info("Fetched Category #" + catId + ": '" + cat.getName() + "'.");
+		String infoMsg = "Fetched Category #" + catId + ": ";
+		if(cat != null){
+			infoMsg += "'" + cat.getName() + "'";
+		} else {
+			infoMsg += "null";
+		}
+		infoMsg += ".";
+		logger.info(infoMsg);
 		return cat;
 	}
 
@@ -124,9 +132,16 @@ public class CategoryService {
 		
 		List<Line> lineList = dao.fetchLinesLast6Months();
 		List<CatRow> catRowList = lineListToCatRowList(lineList);
-	
-		logger.info("Fetched " + catRowList.size() + " rows "
-				+ "on " + catRowList.get(0).getNumberOfMonths() + " months.");
+		
+		String infoMsg = "Fetched " + catRowList.size() + " rows on ";
+		if(catRowList.size() > 0){
+			infoMsg += catRowList.get(0).getNumberOfMonths();
+		} else {
+			infoMsg += 0;
+		}
+		infoMsg += " months.";
+		
+		logger.info(infoMsg);
 		return catRowList;
 	}
 
@@ -136,6 +151,7 @@ public class CategoryService {
 		
 		List<CatRow> listToReturn = new ArrayList<>();
 		int lineNb = 0;
+		int nbCatAdded = 0;
 		MonthInYear oldestMonthYet = null;
 		
 		HashMap<Category, CatRow> catRowTempMap = new HashMap<>();
@@ -149,7 +165,8 @@ public class CategoryService {
 				oldestMonthYet = currentMonth;
 			}
 			message += oldestMonthYet + ".";
-			logger.debug(message);
+//			logger.debug(message);
+			
 			
 			
 			logger.debug("lineListToCatRowList - Line number " + lineNb + " "
@@ -159,15 +176,43 @@ public class CategoryService {
 			for(Categorisation catego : listCatego){
 				Category currentCat = catego.getCategory();
 				
+				// if ID is null, the cat is loaded from the DB
+				// otherwise the maps swallows the categories with
+				// null IDs silently (as is expected since the Category.equals
+				// and category.hashCode are based on ID only).
+				if(currentCat.getId() == null){
+					GenericDao<Category> catDao = new GenericDao<>(Category.class);
+					currentCat = catDao.fetchByName(currentCat.getName());
+				}
+				
 				CatRow currentCatRow = null;
 				String dbgMsg = "lineListToCatRowList - current Cat: #" + currentCat.getId() + "(" + currentCat.getName() + ")";
 				if(catRowTempMap.containsKey(currentCat)){
 					currentCatRow = catRowTempMap.get(currentCat);
-					dbgMsg += ", already present, adding to its current amount...";
+					MonthCell mo = currentCatRow.getMonth(currentMonth);
+					if(mo == null){
+						mo = new MonthCell(currentMonth, 0.0f, 0.0f);
+					}
+					dbgMsg += ", already present (" + mo.getPosAmount() + "; " + mo.getNegAmount() + "), "
+							+ "adding " + catego.getAmount() + " to its current amount...";
+				} else if(currentCat.getFatherCategory() != null) {
+					CatRow fatherCatRow;
+					Category fatCat = currentCat.getFatherCategory();
+					if(catRowTempMap.containsKey(fatCat)){
+						fatherCatRow = catRowTempMap.get(fatCat);
+					} else {
+						fatherCatRow = new CatRow(fatCat);
+						catRowTempMap.put(fatCat, fatherCatRow);
+					}
+					
+					// if it doesn't exist, create catRow and add it to fatherCatRow
+					currentCatRow = fatherCatRow.createOrReturnSonCatRow(currentCat);
+ 
 				} else {
 					currentCatRow = new CatRow(currentCat);
 					catRowTempMap.put(currentCat, currentCatRow);
 					dbgMsg += ", was added, adding to its current amount...";
+					nbCatAdded++;
 				}
 				logger.debug(dbgMsg);
 				
@@ -175,7 +220,7 @@ public class CategoryService {
 			}
 			lineNb++;
 		}
-
+		logger.debug("lineListToCatRowList - Added " + nbCatAdded + " catRow(s) in the map.");
 		logger.debug("lineListToCatRowList - Adding catRow to list (" + catRowTempMap.size() + " in the map)...");
 		
 		for(CatRow catRow : catRowTempMap.values()){

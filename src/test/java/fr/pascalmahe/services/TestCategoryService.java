@@ -6,11 +6,14 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
@@ -21,10 +24,13 @@ import fr.pascalmahe.business.Account;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
+import fr.pascalmahe.business.MonthInYear;
 import fr.pascalmahe.business.Type;
 import fr.pascalmahe.persistence.GenericDao;
 import fr.pascalmahe.testUtil.AbstractTest;
+import fr.pascalmahe.testUtil.Validator;
 import fr.pascalmahe.web.beans.CatRow;
+import fr.pascalmahe.web.beans.MonthCell;
 
 public class TestCategoryService extends AbstractTest {
 
@@ -131,25 +137,34 @@ public class TestCategoryService extends AbstractTest {
 		
 		Type ccard = TypeService.fromDetailedLabel(Type.CCARD_PAYMENT);
 		
-		Category cat1 = new Category("Armure");
-		Category cat2 = new Category("Armes");
-		Category cat3 = new Category("Cheval");
-		Category cat4 = new Category("Hommes d'armes");
-		Category cat5 = new Category("Château");
+		String armure = "Armure";
+		String armes = "Armes";
+		String cheval = "Cheval";
+		String hommesDArmes = "Hommes d'armes";
+		String chateau = "Château";
+		String siege = "Sièges";
+		String melee = "Mêlée";
+		String aDistance = "A distance";
+		
+		Category cat1 = new Category(armure);
+		Category cat2 = new Category(armes);
+		Category cat3 = new Category(cheval);
+		Category cat4 = new Category(hommesDArmes);
+		Category cat5 = new Category(chateau);
 
-		Category cat6 = new Category("Sièges", cat2);
-		Category cat7 = new Category("Mêlée", cat2);
-		Category cat8 = new Category("A distance", cat2);
+		Category cat6 = new Category(siege, cat2);
+		Category cat7 = new Category(melee, cat2);
+		Category cat8 = new Category(aDistance, cat2);
 		
 		Account acc = Account.fromName(Account.NAME_LBP);
 		
-		LocalDate date1 = LocalDate.now().minusMonths(5);
+		LocalDate todayMinus5Months = LocalDate.now().minusMonths(5);
 		List<Categorisation> categoList1 = new ArrayList<>();
 		Categorisation catego10 = new Categorisation(-100f, cat1);
 		categoList1.add(catego10);
-		Line l1 = new Line(date1, date1.plusDays(3), "Category Table test 1", "Category Table test 1", "", -100f, false, ccard, acc, categoList1);
+		Line l1 = new Line(todayMinus5Months, todayMinus5Months.plusDays(3), "Category Table test 1", "Category Table test 1", "", -100f, false, ccard, acc, categoList1);
 
-		LocalDate date2 = LocalDate.now().minusMonths(4);
+		LocalDate todayMinus4Months = LocalDate.now().minusMonths(4);
 		List<Categorisation> categoList2 = new ArrayList<>();
 		Categorisation catego20 = new Categorisation(-100f, cat1);
 		categoList2.add(catego20);
@@ -159,9 +174,9 @@ public class TestCategoryService extends AbstractTest {
 		categoList2.add(catego22);
 		Categorisation catego23 = new Categorisation(-50f, cat8);
 		categoList2.add(catego23);
-		Line l2 = new Line(date2, date2.plusDays(3), "Category Table test 2", "Category Table test 2", "", -200f, false, ccard, acc, categoList2);
+		Line l2 = new Line(todayMinus4Months, todayMinus4Months.plusDays(3), "Category Table test 2", "Category Table test 2", "", -200f, false, ccard, acc, categoList2);
 		
-		LocalDate date3 = LocalDate.now().minusMonths(3);
+		LocalDate todayMinus3Months = LocalDate.now().minusMonths(3);
 		List<Categorisation> categoList3 = new ArrayList<>();
 		Categorisation catego30 = new Categorisation(-100f, cat1);
 		categoList3.add(catego30);
@@ -173,9 +188,8 @@ public class TestCategoryService extends AbstractTest {
 		categoList3.add(catego33);
 		Categorisation catego34 = new Categorisation(-100f, cat3);
 		categoList3.add(catego34);
-		Line l3 = new Line(date3, date3.plusDays(3), "Category Table test 3", "Category Table test 3", "", -300f, false, ccard, acc, categoList3);
+		Line l3 = new Line(todayMinus3Months, todayMinus3Months.plusDays(3), "Category Table test 3", "Category Table test 3", "", -300f, false, ccard, acc, categoList3);
 
-		LocalDate date4 = LocalDate.now().minusMonths(3);
 		List<Categorisation> categoList4 = new ArrayList<>();
 		Categorisation catego40 = new Categorisation(100f, cat1);
 		categoList4.add(catego40);
@@ -189,9 +203,8 @@ public class TestCategoryService extends AbstractTest {
 		categoList4.add(catego44);
 		Categorisation catego45 = new Categorisation(100f, cat4);
 		categoList4.add(catego45);
-		Line l4 = new Line(date4, date4.plusDays(3), "Category Table test 4", "Category Table test 4", "", 400f, false, ccard, acc, categoList4);
+		Line l4 = new Line(todayMinus3Months, todayMinus3Months.plusDays(3), "Category Table test 4", "Category Table test 4", "", 400f, false, ccard, acc, categoList4);
 
-		LocalDate date5 = LocalDate.now().minusMonths(3);
 		List<Categorisation> categoList5 = new ArrayList<>();
 		Categorisation catego50 = new Categorisation(-100f, cat1);
 		categoList5.add(catego50);
@@ -207,21 +220,17 @@ public class TestCategoryService extends AbstractTest {
 		categoList5.add(catego55);
 		Categorisation catego56 = new Categorisation(-100f, cat5);
 		categoList5.add(catego56);
-		Line l5 = new Line(date5, date5.plusDays(3), "Category Table test 5", "Category Table test 5", "", -500f, false, ccard, acc, categoList5);
+		Line l5 = new Line(todayMinus3Months, todayMinus3Months.plusDays(3), "Category Table test 5", "Category Table test 5", "", -500f, false, ccard, acc, categoList5);
 		
 		logger.debug("testFetchCategoryTable - all dates used: ");
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		
-		logger.debug(date1.format(dtf));
-		logger.debug(date1.plusDays(3).format(dtf));
-		logger.debug(date2.format(dtf));
-		logger.debug(date2.plusDays(3).format(dtf));
-		logger.debug(date3.format(dtf));
-		logger.debug(date3.plusDays(3).format(dtf));
-		logger.debug(date4.format(dtf));
-		logger.debug(date4.plusDays(3).format(dtf));
-		logger.debug(date5.format(dtf));
-		logger.debug(date5.plusDays(3).format(dtf));
+		logger.debug("todayMinus5Months: " + todayMinus5Months.format(dtf));
+		logger.debug("todayMinus5Months + 3 days: " + todayMinus5Months.plusDays(3).format(dtf));
+		logger.debug("todayMinus4Months: " + todayMinus4Months.format(dtf));
+		logger.debug("todayMinus4Months + 3 days: " + todayMinus4Months.plusDays(3).format(dtf));
+		logger.debug("todayMinus3Months: " + todayMinus3Months.format(dtf));
+		logger.debug("todayMinus3Months + 3 days: " + todayMinus3Months.plusDays(3).format(dtf));
 		
 		listToDelete.add(ccard);
 		listToDelete.add(cat1);
@@ -307,6 +316,22 @@ public class TestCategoryService extends AbstractTest {
 		
 		logger.debug("testFetchCategoryTable - data inserted.");
 		
+		// Expected result (as of 03/01/2017)
+		// All values not shown are 0
+		// 						-5 months	-4 months	-3 months
+		// cat1 Armure			-100		-100		-200 (-100 -100) + 100 
+		// 
+		// cat2 Armes
+		// 	cat6 Sièges						-25			-75 (-25 -25 -25)
+		// 	cat7 Mêlée						-25			-75 (-25 -25 -25)
+		// 	cat8 A distance					-50			-150 (-50 -50 -50)
+		// 
+		// cat3 Cheval									-200 (-100 -100) + 100 
+		// 
+		// cat4 Hommes d'armes							-100 + 100
+		// 
+		// cat5 Château									-100
+		
 		List<CatRow> catRowList = CategoryService.fetchCategoryTable();
 		
 		int expectedCatNb = 7; 
@@ -315,7 +340,7 @@ public class TestCategoryService extends AbstractTest {
 				is(expectedCatNb));
 		
 		for(CatRow catRow : catRowList){
-			
+			// only one category with children
 			if(!catRow.isChildFree()){
 				Category fatCat = catRow.getCategory();
 				assertThat("CatRow with Category #" + fatCat.getId() + " (" + fatCat.getName() + ") should be #?(Armes): ",
@@ -324,9 +349,71 @@ public class TestCategoryService extends AbstractTest {
 				List<CatRow> catRowSons = catRow.getSonsCatRowList();
 				for(CatRow son : catRowSons){
 					Category cat = son.getCategory();
+					Map<MonthInYear, MonthCell> monthList = son.getMonthList();
+					
+					// checking number of months
 					assertThat("CatRow with Category #" + cat.getId() + " (" + cat.getName() + ") doesn't have 6 months: ",
 							son.getNumberOfMonths(),
 							is(6));
+					
+					// checking values
+					for(MonthInYear moy : monthList.keySet()){
+
+						String validatorMessage = " test to fetchCategoryTable, category: " + cat.getName() + ", month: " + moy;
+						if(cat.getName().equalsIgnoreCase(siege)){
+							
+							if(moy.getMonth() == todayMinus4Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus4Months)", 
+															new MonthCell(moy, 0f, -25f), 
+															monthList.get(moy));
+								
+							} else if(moy.getMonth() == todayMinus3Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+															new MonthCell(moy, 0f, -75f), 
+															monthList.get(moy));
+							} else {
+								Validator.validateMonthCell(validatorMessage, 
+															new MonthCell(moy, 0f, 0f), 
+															monthList.get(moy));
+							}
+
+						} else if (cat.getName().equalsIgnoreCase(melee)){
+							
+							if(moy.getMonth() == todayMinus4Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus4Months)", 
+															new MonthCell(moy, 0f, -25f), 
+															monthList.get(moy));
+								
+							} else if(moy.getMonth() == todayMinus3Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+															new MonthCell(moy, 0f, -75f), 
+															monthList.get(moy));
+							} else {
+								Validator.validateMonthCell(validatorMessage, 
+															new MonthCell(moy, 0f, 0f), 
+															monthList.get(moy));
+							}
+								
+						} else if (cat.getName().equalsIgnoreCase(aDistance)){
+							if(moy.getMonth() == todayMinus4Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus4Months)", 
+															new MonthCell(moy, 0f, -50f), 
+															monthList.get(moy));
+								
+							} else if(moy.getMonth() == todayMinus3Months.getMonth()){
+								Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+															new MonthCell(moy, 0f, -150f), 
+															monthList.get(moy));
+							} else {
+								Validator.validateMonthCell(validatorMessage, 
+															new MonthCell(moy, 0f, 0f), 
+															monthList.get(moy));
+							}
+						} else {
+							fail("Unexpected child category of " + fatCat.getName() + ": " + cat.getName());
+						}
+					}
+					
 				}
 			} else {
 				Category cat = catRow.getCategory();
@@ -334,9 +421,71 @@ public class TestCategoryService extends AbstractTest {
 				assertThat("CatRow with Category #" + cat.getId() + " (" + cat.getName() + ") should not be #?(Armes): ",
 						cat.getName(), not(is("Armes")));
 				
+				// checking number of months
 				assertThat("CatRow with Category #" + cat.getId() + " (" + cat.getName() + ") doesn't have 6 months: ",
 						catRow.getNumberOfMonths(),
 						is(6));
+				
+				Map<MonthInYear, MonthCell> monthList = catRow.getMonthList();
+
+				// checking values
+				for(MonthInYear moy : monthList.keySet()){
+
+					String validatorMessage = " test to fetchCategoryTable, category: " + cat.getName() + ", month: " + moy;
+					if(cat.getName().equalsIgnoreCase(armure)){
+						
+						if(moy.getMonth() == todayMinus5Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus5Months)", 
+														new MonthCell(moy, 0f, -100f), 
+														monthList.get(moy));
+							
+						} else if(moy.getMonth() == todayMinus4Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus4Months)", 
+														new MonthCell(moy, 0f, -100f), 
+														monthList.get(moy));
+							
+						} else if(moy.getMonth() == todayMinus3Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+														new MonthCell(moy, 100f, -200f), 
+														monthList.get(moy));
+						} else {
+							Validator.validateMonthCell(validatorMessage, 
+														new MonthCell(moy, 0f, 0f), 
+														monthList.get(moy));
+						}
+
+					} else if (cat.getName().equalsIgnoreCase(cheval)){
+						 if(moy.getMonth() == todayMinus3Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+														new MonthCell(moy, 100f, -200f), 
+														monthList.get(moy));
+						} else {
+							Validator.validateMonthCell(validatorMessage, 
+														new MonthCell(moy, 0f, 0f), 
+														monthList.get(moy));
+						}
+					} else if (cat.getName().equalsIgnoreCase(hommesDArmes)){
+						if(moy.getMonth() == todayMinus3Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+														new MonthCell(moy, 100f, -100f), 
+														monthList.get(moy));
+						} else {
+							Validator.validateMonthCell(validatorMessage, 
+														new MonthCell(moy, 0f, 0f), 
+														monthList.get(moy));
+						}
+					} else if (cat.getName().equalsIgnoreCase(chateau)){
+						if(moy.getMonth() == todayMinus3Months.getMonth()){
+							Validator.validateMonthCell(validatorMessage + " (todayMinus3Months)", 
+														new MonthCell(moy, 0f, -100f), 
+														monthList.get(moy));
+						} else {
+							Validator.validateMonthCell(validatorMessage, 
+														new MonthCell(moy, 0f, 0f), 
+														monthList.get(moy));
+						}
+					}
+				}
 			}
 			
 			

@@ -300,21 +300,24 @@ public class TestLineController extends AbstractTest {
 		
 		Category catQuotidiennes = CategoryService.fetchById(20351);
 		Category catCourses = CategoryService.fetchById(20350);
-		CatChoice catCh0 = new CatChoice(20526, catCourses, catQuotidiennes, 45.0f, null);
-		CatChoice catCh1 = new CatChoice(20527, catCourses, catQuotidiennes, 40.0f, null);
-		
-		catChoiceMapToValidate.put(catCh0.getCategoId(), catCh0);
-		catChoiceMapToValidate.put(catCh1.getCategoId(), catCh1);
-		
-		nbInvalidPairs = LineController.validateMapCatChoice(catChoiceMapToValidate);
-		assertThat(nbInvalidPairs, is(1));
-		for(Integer categoID : catChoiceMapToValidate.keySet()){
-			CatChoice catChoice = catChoiceMapToValidate.get(categoID);
+		if(catQuotidiennes != null && catCourses != null){
+			CatChoice catCh0 = new CatChoice(20526, catCourses, catQuotidiennes, 45.0f, null);
+			CatChoice catCh1 = new CatChoice(20527, catCourses, catQuotidiennes, 40.0f, null);
 			
-			assertThat(catChoice.getValidFather(), is(CatChoice.VALID_CLASS));
-			assertThat(catChoice.getValidSon(), is(CatChoice.INVALID_CLASS));
+			catChoiceMapToValidate.put(catCh0.getCategoId(), catCh0);
+			catChoiceMapToValidate.put(catCh1.getCategoId(), catCh1);
 			
+			nbInvalidPairs = LineController.validateMapCatChoice(catChoiceMapToValidate);
+			assertThat(nbInvalidPairs, is(1));
+			for(Integer categoID : catChoiceMapToValidate.keySet()){
+				CatChoice catChoice = catChoiceMapToValidate.get(categoID);
+				
+				assertThat(catChoice.getValidFather(), is(CatChoice.VALID_CLASS));
+				assertThat(catChoice.getValidSon(), is(CatChoice.INVALID_CLASS));
+				
+			}
 		}
+		
 		logger.info("testPopulateSonCatMap finished.");
 	}
 

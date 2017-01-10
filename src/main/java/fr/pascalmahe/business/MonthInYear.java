@@ -56,7 +56,13 @@ public class MonthInYear implements Comparable<MonthInYear> {
 	}
 	
 	public String toString(){
-		return month.getValue() + "/" + year;
+		int value = month.getValue();
+		String strValue = "";
+		if(value < 10){
+			strValue = "0";
+		}
+		strValue += value + "/" + year;
+		return strValue;
 	}
 
 	public Month getMonth() {

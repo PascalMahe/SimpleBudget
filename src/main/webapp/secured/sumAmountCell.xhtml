@@ -5,19 +5,19 @@
 				xmlns:p="http://primefaces.org/ui"
 				xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<td class="rightJustified">
-		<p:outputLabel id="cell" value="#{monthCell.negAmount + monthCell.posAmount}">
+		<p:outputLabel id="cell" value="#{monthAsEntry.value.negAmount + monthAsEntry.value.posAmount}">
 			<f:convertNumber pattern="#0.00" />
 		</p:outputLabel>
 		<p:tooltip id="tooltip" 
 					for="cell"
 					styleClass="rightJustified">
 			<div class="green">
-				<p:outputLabel value="#{monthCell.posAmount}">
+				<p:outputLabel value="#{monthAsEntry.value.posAmount}">
 					<f:convertNumber pattern="#0.00" />
 				</p:outputLabel>
 			</div>
 			<div class="red">
-				<p:outputLabel value="#{monthCell.negAmount}">
+				<p:outputLabel value="#{monthAsEntry.value.negAmount}">
 					<f:convertNumber pattern="#0.00" />
 				</p:outputLabel>
 			</div>

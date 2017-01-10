@@ -11,8 +11,10 @@ import fr.pascalmahe.business.Budget;
 import fr.pascalmahe.business.Categorisation;
 import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
+import fr.pascalmahe.business.MonthInYear;
 import fr.pascalmahe.business.Type;
 import fr.pascalmahe.business.User;
+import fr.pascalmahe.web.beans.MonthCell;
 
 public class Validator {
 	
@@ -120,6 +122,12 @@ public class Validator {
 	public static void validateType(String message, Type expected, Type actual) {
 		assertEquals("Wrong id in Type " + message, expected.getId(), actual.getId());
 		assertEquals("Wrong name in Type " + message, expected.getName(), actual.getName());
+	}
+	
+	public static void validateMonthCell(String message, MonthCell expected, MonthCell actual){
+		assertEquals("Wrong month in MonthCell " + message, expected.getMonthValue(), actual.getMonthValue());
+		assertEquals("Wrong pos. amount in MonthCell " + message, expected.getPosAmount(), actual.getPosAmount());
+		assertEquals("Wrong neg. amount in MonthCell " + message, expected.getNegAmount(), actual.getNegAmount());
 	}
 	
 }

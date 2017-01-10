@@ -66,6 +66,13 @@ public class MonthCell implements Serializable, Comparable<MonthCell> {
 	public void addNegAmount(Float negAmount) {
 		this.negAmount += negAmount;
 	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "[" + negAmount + ", " + posAmount + "]";
+	}
 
 	@Override
 	public int compareTo(MonthCell o) {
