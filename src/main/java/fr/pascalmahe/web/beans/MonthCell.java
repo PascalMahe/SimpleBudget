@@ -1,7 +1,6 @@
 package fr.pascalmahe.web.beans;
 
 import java.io.Serializable;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
 

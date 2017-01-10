@@ -414,10 +414,6 @@ public class GenericDao<T> {
 		@SuppressWarnings("unchecked")
 		List<Line> list = crita.list();
 		
-		for(Line line : list){
-			logger.warn("fetchLinesLast6Months - line #" + line.getId() + " has " + line.getCategorisationList().size() + " categos.");
-		}
-		
 		return list;
 	}
 

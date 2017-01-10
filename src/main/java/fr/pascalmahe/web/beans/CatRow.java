@@ -80,30 +80,16 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 	}
 
 	public void addAmountToMonth(MonthInYear currentMonth, Float amount) {
-//		logger.debug("addAmountToMonth - CatRow #" + category.getId() + "(" + category.getName() + ")"
-//				+ ", adding " + amount + " to month " + currentMonth + "...");
 		
 		MonthCell currentMoce = null;
 		if(monthList == null){
 			monthList = new TreeMap<>(reverseMonthInYearComparator);
-//			logger.debug("addAmountToMonth - monthList created.");
 		}
 		if(monthList.keySet().contains(currentMonth)){
 			
-//			logger.debug("addAmountToMonth - monthList "
-//					+ "(current size: " + monthList.size() + ") contains " + currentMonth + ".");
 			currentMoce = monthList.get(currentMonth);
-
-//			logger.debug("addAmountToMonth - found it in list. "
-//					+ "Adding to its current value: "
-//					+ "(" + currentMoce.getNegAmount() + "; "
-//					+ "" + currentMoce.getPosAmount() + ")...");
 			currentMoce.addAmount(amount);
-			
 		} else {
-//			logger.debug("addAmountToMonth - monthList does not contain " + currentMonth + " "
-//					+ "(current size: " + monthList.size() + "). "
-//					+ "Adding it...");
 			
 			float posAmount = 0.0f;
 			float negAmount = 0.0f;
@@ -114,16 +100,8 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 			}
 			currentMoce = new MonthCell(currentMonth, posAmount, negAmount);
 			monthList.put(currentMonth, currentMoce);
-			
-//			logger.debug("addAmountToMonth - monthList "
-//					+ "(current size: " + monthList.size() + ") "
-//					+ "contains " + currentMonth + "? : " 
-//					+ (monthList.keySet().contains(currentMonth)));
 		}
 		
-//		logger.debug("addAmountToMonth - value before exiting: "
-//				+ "(" + currentMoce.getNegAmount() + "; "
-//				+ "" + currentMoce.getPosAmount() + ")...");
 	}
 
 	public void fillMonthsUpTo(MonthInYear oldestMonthYet) {
@@ -131,35 +109,21 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 		// filling up sons
 		if(sonsCatRowList != null && !sonsCatRowList.isEmpty()){
 
-//			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-//					", filling up sons...");
-			
 			for(CatRow son : sonsCatRowList){
 				son.fillMonthsUpTo(oldestMonthYet);
 			}
 
-//			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-//					", sons filled up.");
 		} else {
 
-//			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-//					" (with currently " + monthList.size() + " months), filling up months down to " + oldestMonthYet + "...");
-			
 			// actual filling up
 			LocalDate now = LocalDate.now();
 			MonthInYear thisMonth = new MonthInYear(now.getMonth(), now.getYear());
-			
-//			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-//					", filling up from " + thisMonth + "...");
 			
 			List<MonthInYear> monthRange = oldestMonthYet.rangeTo(thisMonth);
 			for(MonthInYear miy : monthRange){
 				this.addAmountToMonth(miy, 0.0f);
 			}
 
-//			logger.debug("fillMonthsUpTo - CatRow: " + category.getName() + 
-//					", done. Now with: " + this.getMonthList().size() + " months: " + this.getMonthList());
-			
 		}
 		
 	}
@@ -172,10 +136,6 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 		}
 		
 		for(CatRow catRow: sonsCatRowList){
-//			logger.debug("createOrReturnSonCatRow - is cat #" + catRow.category.getId() + 
-//					"(" + catRow.category.getName() + ") "
-//					+ "equal to cat #" + currentCat.getId() + 
-//					"(" + currentCat.getName() + ") ? " + (catRow.category.equals(currentCat)));
 			if(catRow.category.equals(currentCat)){
 				toReturn = catRow;
 				break;
@@ -186,7 +146,6 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 			toReturn = new CatRow(currentCat);
 			sonsCatRowList.add(toReturn);
 			Collections.sort(sonsCatRowList);
-			logger.debug("createOrReturnSonCatRow - adding cat " + currentCat.getName() + " to " + this.category.getName());
 		}
 		
 		return toReturn;
