@@ -8,7 +8,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
-        <title>Appli Budget</title>
+        <title>#{bundle['titreGeneral']}</title>
         <link rel="stylesheet" media="screen" href="../simpleBudget.css" />
         <!-- <script type="text/javascript" src="../js/jquery-3.0.0.js"></script> Primefaces brings it along... --> 
         <script type="text/javascript" src="../js/line.js"></script>
@@ -21,7 +21,7 @@
 			<f:viewAction action="#{lineController.fetch}" />
 		</f:metadata>
 	
-		<h1>Modifier une ligne de compte</h1>
+		<h1>#{bundle['titreLigne']}</h1>
 		<ui:include page="menu.xhtml" />
 		
         <p:messages id="messages"/>

@@ -8,13 +8,13 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
-        <title>Appli Budget</title>
+        <title>#{bundle['titreGeneral']}</title>
        	<link rel="stylesheet" media="screen" href="../simpleBudget.css" />
         
     </h:head>
 	
 	<h:body>
-		<h1>Liste des catégories</h1>
+		<h1>#{bundle['titreListeCategorie']}</h1>
         <ui:include page="menu.xhtml" />
        	
        	<div class="ui-widget">
@@ -33,7 +33,13 @@
 	       				
 	       					<h:panelGroup rendered="#{catRow.childFree}">
 	       						<tr class="#{catRowStatus.even}RowClass">
-		       						<td>#{catRow.category.name}</td>
+		       						<td>
+		       							<p:link id="childlessCategoryLink" 
+	       										value="#{catRow.category.name}"
+	       										outcome="/secured/category.xhtml">
+	       											<f:param name="id" value="#{catRow.category.id}" />
+	       								</p:link>
+		       						</td>
 		       						<td />
 									<ui:repeat value="#{catRow.monthList.entrySet().toArray()}" var="monthAsEntry">
 										<ui:include page="sumAmountCell.xhtml" />
@@ -45,10 +51,20 @@
 		       						<tr class="#{catRowStatus.even}RowClass">
 		       							<h:panelGroup rendered="#{catRowSonStatus.first}">
 				       						<td rowspan="#{catRow.sizeOfSonsCatRowList}">
-												<h:outputText value="#{catRow.category.name}" />
+												<p:link id="fatherCategoryLink" 
+			       										value="#{catRow.category.name}"
+			       										outcome="/secured/category.xhtml">
+			       											<f:param name="id" value="#{catRow.category.id}" />
+			       								</p:link>
 											</td>
 										</h:panelGroup>
-										<td><h:outputText value="#{catRowSon.category.name}" /></td>
+										<td>	
+											<p:link id="childCategoryLink" 
+		       										value="#{catRowSon.category.name}"
+		       										outcome="/secured/category.xhtml">
+		       											<f:param name="id" value="#{catRowSon.category.id}" />
+		       								</p:link>
+										</td>
 										<ui:repeat value="#{catRowSon.monthList.entrySet().toArray()}" var="monthAsEntry">
 											<ui:include page="sumAmountCell.xhtml" />
 										</ui:repeat>

@@ -8,14 +8,26 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h:head>
-        <title>Appli Budget</title>
+        <title>#{bundle['titreGeneral']}</title>
        	<link rel="stylesheet" media="screen" href="../simpleBudget.css" />
         
     </h:head>
 	
 	<h:body>
-		<h1>Liste des catégories</h1>
-        <ui:include page="menu.xhtml" />
-        #TumbleWeed
+		<f:metadata>
+			<f:viewParam name="id" value="#{categoryController.idToFetch}" />
+			<f:viewAction action="#{categoryController.fetch}" />
+		</f:metadata>
+	
+		<h1>#{bundle['titreCategorie']}</h1>
+		<ui:include page="menu.xhtml" />
+		
+        <p:messages id="messages"/>
+        
+        <br/>
+        
+		<h:form id="catForm">
+			
+		</h:form>
    	</h:body>
 </html>
