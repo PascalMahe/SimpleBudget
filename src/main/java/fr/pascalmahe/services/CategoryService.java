@@ -150,8 +150,6 @@ public class CategoryService {
 		logger.debug("lineListToCatRowList - Creating list of CatRows with " + lineList.size() + " Lines...");
 		
 		List<CatRow> listToReturn = new ArrayList<>();
-		int lineNb = 0;
-		int nbCatAdded = 0;
 		MonthInYear oldestMonthYet = null;
 		
 		HashMap<Category, CatRow> catRowTempMap = new HashMap<>();
@@ -159,19 +157,9 @@ public class CategoryService {
 			List<Categorisation> listCatego = currentLine.getCategorisationList();
 			MonthInYear currentMonth = new MonthInYear(currentLine.getDate().getMonth(), currentLine.getDate().getYear());
 			
-			String message = "lineListToCatRowList - comparing oldestMonthYet (" + oldestMonthYet + ") "
-					+ "to currentMonth (" + currentMonth + "), new oldest is: ";
 			if(oldestMonthYet == null || oldestMonthYet.compareTo(currentMonth) > 0){
 				oldestMonthYet = currentMonth;
 			}
-			message += oldestMonthYet + ".";
-//			logger.debug(message);
-			
-			
-			
-			logger.debug("lineListToCatRowList - Line number " + lineNb + " "
-					+ "(#" + currentLine.getId() + " in month: " + currentMonth + ") "
-					+ "has " + listCatego.size() + " Catego(s)."); 
 			
 			for(Categorisation catego : listCatego){
 				Category currentCat = catego.getCategory();
@@ -186,15 +174,13 @@ public class CategoryService {
 				}
 				
 				CatRow currentCatRow = null;
-				String dbgMsg = "lineListToCatRowList - current Cat: #" + currentCat.getId() + "(" + currentCat.getName() + ")";
 				if(catRowTempMap.containsKey(currentCat)){
 					currentCatRow = catRowTempMap.get(currentCat);
 					MonthCell mo = currentCatRow.getMonth(currentMonth);
 					if(mo == null){
 						mo = new MonthCell(currentMonth, 0.0f, 0.0f);
 					}
-					dbgMsg += ", already present (" + mo.getPosAmount() + "; " + mo.getNegAmount() + "), "
-							+ "adding " + catego.getAmount() + " to its current amount...";
+
 				} else if(currentCat.getFatherCategory() != null) {
 					CatRow fatherCatRow;
 					Category fatCat = currentCat.getFatherCategory();
@@ -211,16 +197,11 @@ public class CategoryService {
 				} else {
 					currentCatRow = new CatRow(currentCat);
 					catRowTempMap.put(currentCat, currentCatRow);
-					dbgMsg += ", was added, adding to its current amount...";
-					nbCatAdded++;
 				}
-				logger.debug(dbgMsg);
 				
 				currentCatRow.addAmountToMonth(currentMonth, catego.getAmount());
 			}
-			lineNb++;
 		}
-		logger.debug("lineListToCatRowList - Added " + nbCatAdded + " catRow(s) in the map.");
 		logger.debug("lineListToCatRowList - Adding catRow to list (" + catRowTempMap.size() + " in the map)...");
 		
 		for(CatRow catRow : catRowTempMap.values()){
@@ -234,8 +215,35 @@ public class CategoryService {
 		
 		logger.debug("lineListToCatRowList - Sorted.");
 		
-		
 		return listToReturn;
+	}
+
+	public static Category fetchCategory(String idToFetch) {
+
+		logger.debug("fetchCategory - start");
+
+		Category returnLine = null;
+		
+		try {
+			Integer id = Integer.parseInt(idToFetch);
+			returnLine = fetchCategory(id);
+			
+		} catch (NumberFormatException nfe){
+			logger.error("Error while parsing Category id to fetch: " + idToFetch + ".", nfe);
+		}
+		
+		logger.debug("fetchCategory - end");
+		return returnLine;
+	}
+	
+
+	public static Category fetchCategory(Integer id) {
+		Category returnCat = null;
+		logger.info("Fetching cat #" + id + "...");
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		returnCat = catDao.fetch(id);
+		logger.info("Fetched cat #" + id + ".");
+		return returnCat;
 	}
 
 }
