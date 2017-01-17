@@ -31,14 +31,14 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import fr.pascalmahe.services.AccountService;
+import fr.pascalmahe.testUtil.AbstractDriverTest;
+import fr.pascalmahe.testUtil.AbstractTest;
 
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class TestLogin {
+public class TestLogin extends AbstractDriverTest {
 
 	private static final Logger logger = LogManager.getLogger();
-
-	private static final String CHROMEDRIVER_EXE = "chromedriver.exe";
 
 	private static final String LOGIN_FORM_ID = "loginForm";
 	
@@ -63,99 +63,18 @@ public class TestLogin {
 	private static final String DISCONNECT_BUTTON_ID = "disconnectForm:disconnectButton";
 
 	private static final String REMEMBERME_ID = LOGIN_FORM_ID + ":rememberMe";
-
-	private static WebDriver driverFirefox;
-	
-	private static WebDriver driverChrome;
-	
-	private static String detectedHost;
 	
 	@BeforeClass
-	public static void browserSetup(){
-		long timeBeforeDriverLaunch = System.currentTimeMillis();
-		
-		FirefoxProfile firefoxProfile = AccountService.getFFProfile();
-		driverFirefox = new FirefoxDriver(firefoxProfile);
-//		driverFirefox = new FirefoxDriver();
-		
-		long timeAfterDriverLaunch = System.currentTimeMillis();
-		
-		long elapsedTime = timeAfterDriverLaunch - timeBeforeDriverLaunch;
-		String formattedElapsedTime = DurationFormatUtils
-				.formatDuration(elapsedTime, "mm:ss.SSS");
-		
-		logger.debug("browserSetup - time to launch FF: " + formattedElapsedTime);
-		
-		timeBeforeDriverLaunch = System.currentTimeMillis();
-		
-
-		URL url = TestLogin.class.getClassLoader().getResource(CHROMEDRIVER_EXE);
-		
-		try {
-			FileOutputStream output = new FileOutputStream(CHROMEDRIVER_EXE);
-			InputStream input = url.openStream();
-			byte [] buffer = new byte[4096];
-			int bytesRead = input.read(buffer);
-			while (bytesRead != -1) {
-			    output.write(buffer, 0, bytesRead);
-			    bytesRead = input.read(buffer);
-			}
-			output.close();
-			input.close();
-		} catch (FileNotFoundException e) {
-			logger.error("setUp - Error while extracting chromedriver.exe: " + e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			logger.error("setUp - Error while extracting chromedriver.exe: " + e.getLocalizedMessage(), e);
-		}
-		
-		DesiredCapabilities capa = new DesiredCapabilities();
-		ChromeOptions co = new ChromeOptions();
-		Proxy proxy = new Proxy();
-		proxy.setProxyType(ProxyType.MANUAL);
-		
-		proxy.setNoProxy("true");
-		capa.setCapability(CapabilityType.PROXY, proxy);
-		capa.setCapability(ChromeOptions.CAPABILITY, co);
-		
-		driverChrome = new ChromeDriver(capa);
-//		driverChrome = new ChromeDriver();
-		timeAfterDriverLaunch = System.currentTimeMillis();
-		
-		elapsedTime = timeAfterDriverLaunch - timeBeforeDriverLaunch;
-		formattedElapsedTime = DurationFormatUtils
-				.formatDuration(elapsedTime, "mm:ss.SSS");
-		
-		logger.debug("browserSetup - time to launch Chrome: " + formattedElapsedTime);
-		
-		try {
-			driverFirefox.get(WebConstants.TEST_HOST);
-			detectedHost = WebConstants.TEST_HOST;
-			
-		} catch (TimeoutException e) {
-			try{
-				driverFirefox.get(WebConstants.HEROKUAPP_HOST);
-				detectedHost = WebConstants.HEROKUAPP_HOST;
-			} catch(TimeoutException e2){
-				logger.warn("browserSetup - No server found, skipping tests.");
-			}
-		}
-		
-		if(detectedHost != null){
-			logger.info("browserSetup - Server found @: " + detectedHost);
-		}
+	public static void beforeClass(){
+		browserSetup();
 	}
 	
 	@AfterClass
-	public static void browserTeardown(){
-		driverFirefox.quit();
-		driverChrome.quit();
-		
-		File chromeDriverFile = new File(CHROMEDRIVER_EXE);
-		chromeDriverFile.delete();
+	public static void afterClass(){
+		browserTeardown();
 	}
 	
 	@Test
-	@Ignore
 	public void testSimpleLogin(){
 		if(detectedHost != null){
 			testSimpleLogin(driverFirefox);
