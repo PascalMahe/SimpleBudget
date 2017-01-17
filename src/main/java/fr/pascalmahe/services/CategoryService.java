@@ -2,6 +2,7 @@ package fr.pascalmahe.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +245,58 @@ public class CategoryService {
 		returnCat = catDao.fetch(id);
 		logger.info("Fetched cat #" + id + ".");
 		return returnCat;
+	}
+
+	public static List<Category> fetchAll() {
+
+		logger.info("Fetching all categories...");
+		
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		
+		List<Category> returnList = catDao.fetchAll();
+		
+		Comparator<Category> completeNameComparator = new Comparator<Category>(){
+			public int compare(Category cat1, Category cat2){
+				return cat1.getCompleteName().compareTo(cat2.getCompleteName());
+			}
+		};
+		Collections.sort(returnList, completeNameComparator);
+		
+		logger.info("Fetched " + returnList.size() + " categories (all of 'em).");
+
+		return returnList;
+	}
+
+	public static List<Category> fetchSonsOf(Category cat) {
+		logger.info("Fetching son categories of cat #" + cat.getId() + " (" + cat.getCompleteName() + ")...");
+		
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		
+		Map<String, Object> crita = new HashMap<>();
+		crita.put("fatherCategory", cat);
+		
+		List<Category> returnList = catDao.search(crita);
+		
+		Collections.sort(returnList);
+		
+		logger.info("Fetched " + returnList.size() + " son categories of cat #" + cat.getId() + " (" + cat.getCompleteName() + ").");
+		
+		return returnList;
+	}
+
+	public static void saveCategoryAndSons(Category cat, List<Category> sonsList) {
+		logger.info("Saving category #" + cat.getId() + " (" + cat.getCompleteName() + ") and sons...");
+
+		GenericDao<Category> catDao = new GenericDao<>(Category.class);
+		
+		catDao.saveOrUpdate(cat);
+		
+		for(Category sonCat: sonsList){
+			sonCat.setFatherCategory(cat);
+			catDao.saveOrUpdate(sonCat);
+		}
+		
+		logger.info("Saved cat #" + cat.getId() + " (" + cat.getCompleteName() + ") and sons.");		
 	}
 
 }

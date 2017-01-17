@@ -27,7 +27,124 @@
         <br/>
         
 		<h:form id="catForm">
+			<h:inputHidden value="#{categoryController.cat.id}" />
 			
+			<div style="text-align: center;">
+			<div style="display: inline-block;">
+				<table>
+					<tr>
+						<td class="tableForm tableFormLabel">
+							<p:outputLabel value="#{bundle['labelCatName']}" for="catName" />
+						</td>
+						<td class="tableForm tableFormField">
+				    		<h:inputText value="#{categoryController.cat.name}" id="catName" />
+				    	</td>
+				    	<td class="tableForm tableFormLabel">
+							<p:outputLabel value="#{bundle['labelCatReplace']}" for="catReplace" />
+						</td>
+						<td class="tableForm tableFormField">
+				    		<p:selectOneMenu id="catReplace" 
+												value="#{categoryController.otherCatsList}" 
+												converter="categoryCompleteNameConverter"  
+												var="oCat">
+								<f:selectItems 	value="#{categoryController.otherCatsList}" 
+					      						var="fatPot" 
+												itemLabel="#{fatPot.name}"/>
+								<p:column>
+									#{oCat.completeName}
+								</p:column>
+							</p:selectOneMenu>
+				    	</td>
+					</tr>
+					<tr>
+						<td class="tableForm tableFormLabel">
+							<p:outputLabel value="#{bundle['labelCatFather']}" for="catFather" />
+						</td>
+						<td class="tableForm tableFormField">
+				    		<p:selectOneMenu id="catFather" 
+												value="#{categoryController.cat.fatherCategory}" 
+												converter="categoryConverter"  
+												var="fatCat">
+								<f:selectItem itemLabel="#{bundle['pasDeCategorieMere']}" itemValue="" />
+								<f:selectItems 	value="#{categoryController.fatherPotentialsList}" 
+					      						var="fatPot" 
+												itemLabel="#{fatPot.name}"/>
+								<p:column>
+									#{fatCat.name}
+								</p:column>
+							</p:selectOneMenu>
+				    	</td>
+					</tr>
+					<h:panelGroup id="catChoiceLine" rendered="#{categoryController.cat.fatherCategory eq null}">
+					<tr>
+						<td class="tableForm tableFormLabel">
+							<h:panelGroup rendered="#{categoryController.sonsList.size() eq 1}">
+								<p:outputLabel value="#{bundle['labelCatSons']}" />
+							</h:panelGroup>
+							<h:panelGroup rendered="#{categoryController.sonsList.size() gt 1}">
+								<p:outputLabel value="#{bundle['labelCatSonsPlural']}" />
+							</h:panelGroup>
+						</td>
+						<td class="tableForm tableFormField">
+							<h:panelGroup id="sonChoiceLine">
+					    		<c:forEach items="#{categoryController.sonsList}" var="catSon" varStatus="loopStatus">
+					    			<div class="categoryZone">
+					    				#{catSon.name} 
+					    				<p:commandButton	id="removeCatChoice#{catSon.id}" 
+															styleClass="allButtons vertTop"
+															icon="remove"
+															alt="#{bundle['retirerCategorie']}"
+															title="#{bundle['retirerCategorie']}"
+															action="#{categoryController.removeCatChoice(catSon.id)}"  
+															update="messages"
+															onmouseover="hoverOverCommandButtonWithImage('catForm:removeCatChoice#{catSon.id}', 'remove-hover', 'remove')"
+															onmouseout="outOfCommandButtonWithImage('catForm:removeCatChoice#{catSon.id}', 'remove-hover', 'remove')"/>
+					    			</div>
+					    		</c:forEach>
+					    		<div class="categoryZone">
+					    			<p:commandButton	id="addCatChoice" 
+														styleClass="allButtons"
+														icon="plus"
+														alt="#{bundle['ajouterCategorie']}"
+														title="#{bundle['ajouterCategorie']}"
+														action="#{categoryController.addCatChoice}" 
+														update="messages, sonChoiceLine"
+														onmouseover="hoverOverCommandButtonWithImage('catForm:addCatChoice', 'plus-hover', 'plus')"
+														onmouseout="outOfCommandButtonWithImage('catForm:addCatChoice', 'plus-hover', 'plus')"/>
+					    		</div>
+				    		</h:panelGroup>
+				    	</td>
+					</tr>
+					</h:panelGroup>
+					<tr>
+				   		<td>
+				   			
+				   		</td>
+				   		<td class="tableForm tableFormLabel">
+				   			<br/>
+							<p:commandButton	value="#{bundle['labelSauvegarder']}" 
+												id="saveButton" 
+												styleClass="allButtons"
+												onmouseover="warningForCatForm()"
+												onmouseout="hideWarnings()"
+												action="#{categoryController.saveAction}" 
+												update="messages" />
+				   		</td>
+				   	</tr>
+				</table>
+			</div>
+			</div>
 		</h:form>
+		
+		<div id="warningBeforeCatReplace" class="ui-messages ui-messages-info ui-widget autoComplete infoAutoComplete" style="display: none;">
+			<span class="ui-messages-info-icon"></span>
+			<h:outputText value="#{bundle['messageAvantRemplacementCat']}" styleClass="ui-messages-info-summary" />
+		</div>
+		
+		<div id="warningBeforeChoosingFatherWhileWithChild" class="ui-messages ui-messages-info  ui-corner-all ui-widget autoComplete infoAutoComplete" style="display: none;">
+			<span class="ui-messages-info-icon"></span>
+			<h:outputText value="#{bundle['messageAvantChoixDeMereAvecDejaEnfants']}" styleClass="ui-messages-info-summary" />
+		</div>
+		
    	</h:body>
 </html>

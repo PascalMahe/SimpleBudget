@@ -20,6 +20,8 @@ public class Category implements Serializable, Comparable<Category> {
 
 	private static final long serialVersionUID = 3208053020237026635L;
 	
+	public static final String COMPLETE_NAME_SEPARATOR = ":";
+	
 	@Id
 	@GeneratedValue
 	private Integer id;
@@ -49,7 +51,7 @@ public class Category implements Serializable, Comparable<Category> {
 	public String getCompleteName(){
 		String completeName = "";
 		if(this.fatherCategory != null){
-			completeName += fatherCategory.name + ":";
+			completeName += fatherCategory.name + COMPLETE_NAME_SEPARATOR;
 		}
 		completeName += name;
 		return completeName;
