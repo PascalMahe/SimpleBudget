@@ -38,18 +38,18 @@
 						<td>
 							<table>
 								<tr>
-									<td class="tableFormLabel">
+									<td class="tableForm tableFormLabel">
 										 <p:outputLabel value="#{bundle['labelLineDate']}" for="lineDate" />
 									</td>
-									<td class="tableFormField">
+									<td class="tableForm tableFormField">
 										<h:outputText value="#{lineController.line.formattedRealDate}" id="lineDate" />
 									</td>
 				   				</tr>
 				    			<tr>
-									<td class="tableFormLabel">
+									<td class="tableForm tableFormLabel">
 										<p:outputLabel value="#{bundle['labelLineCCardDate']}" for="lineCCardDate" rendered="#{lineController.line.formattedCCardDate != ''}"/>
 									</td>
-									<td class="tableFormField">
+									<td class="tableForm tableFormField">
 										<h:outputText value="#{lineController.line.formattedCCardDate}" id="lineCCardDate" rendered="#{lineController.line.formattedCCardDate != ''}"/>
 									</td>
 				   				</tr>
@@ -58,18 +58,18 @@
 			   			<td>
 			   				<table>
 								<tr>
-									<td class="tableFormLabel">
+									<td class="tableForm tableFormLabel">
 										<p:outputLabel value="#{bundle['labelLineAmount']}" for="lineAmount" />
 									</td>
-									<td class="tableFormField">
+									<td class="tableForm tableFormField">
 										<h:outputText value="#{lineController.line.formattedAmount} €" id="lineAmount" />
 									</td>
 				   				</tr>
 				    			<tr>
-									<td class="tableFormLabel">
+									<td class="tableForm tableFormLabel">
 										<p:outputLabel value="#{bundle['labelLineType']}" for="lineType" />
 									</td>
-									<td class="tableFormField">
+									<td class="tableForm tableFormField">
 										<p:selectOneMenu id="lineType" 
 															value="#{lineController.line.type}" 
 															converter="typeConverter" 
@@ -105,40 +105,39 @@
 				   		</td>
 				   	</tr>
 				    <tr>
-				    	<td class="tableFormLabel">
+				    	<td class="tableForm tableFormLabel">
 				    		<p:outputLabel value="#{bundle['labelLineDetailedLabel']}" for="lineDetailedLabel" />
 				    	</td>
-				    	<td class="tableFormField">
+				    	<td class="tableForm tableFormField">
 				    		<h:outputText value="#{lineController.line.detailedLabel}" id="lineDetailedLabel" />
 				    	</td>
 				   	</tr>
 				    <tr>
-				    	<td class="tableFormLabel">
+				    	<td class="tableForm tableFormLabel">
 				    		<p:outputLabel value="#{bundle['labelLineShortLabel']}" for="lineShortLabel" />
 				    	</td>
-				    	<td class="tableFormField">
+				    	<td class="tableForm tableFormField">
 				    		<h:inputText value="#{lineController.line.shortLabel}" id="lineShortLabel" />
 				    	</td>
 				   	</tr>
 				    <tr>
-				    	<td class="tableFormLabel">
+				    	<td class="tableForm tableFormLabel">
 				    		<p:outputLabel value="#{bundle['labelNote']}" for="lineNote" />
 				    	</td>
-				    	<td class="tableFormField">
+				    	<td class="tableForm tableFormField">
 				    		<h:inputText value="#{lineController.line.note}" id="lineNote" />
 				    	</td>
 				   	</tr>
 				   	<tr>
-				    	<td class="tableFormLabel">
+				    	<td class="tableForm tableFormLabel">
 				    		<p:outputLabel value="#{bundle['labelLineCategories']}" />
 				    	</td>
-				    	<td class="tableFormField">
+				    	<td class="tableForm tableFormField">
 				    		<h:panelGroup id="catChoiceLine">
 					    		<c:forEach items="#{lineController.catChoiceMapAsList}" var="catChoice" varStatus="loopStatus">
 					    			<div class="categoryZone lineCategory">
 							    		<!-- Choice for father Category -->
 						                <p:selectOneMenu 	id="fatherCategory#{catChoice.categoId}" 
-															widgetVar="wvFather-#{catChoice.categoId}" 
 						                					value="#{catChoice.fatherCategory}" 
 						                					editable="true"
 						                					converter="categoryConverter" 
@@ -158,7 +157,6 @@
 											already has other sons) -->
 										<h:panelGroup id="sonCategoryFather#{catChoice.categoId}">
 											<p:selectOneMenu 	id="lineSonCategory#{catChoice.categoId}" 
-																widgetVar="wvSon-#{catChoice.categoId}" 
 																value="#{catChoice.sonCategory}"
 																editable="true"
 																converter="categoryConverter" 
@@ -210,7 +208,7 @@
 				   		<td>
 				   			
 				   		</td>
-				   		<td class="tableFormLabel">
+				   		<td class="tableForm tableFormLabel">
 				   			<br/>
 							<p:commandButton	value="#{bundle['labelSauvegarder']}" 
 												id="saveButton" 
