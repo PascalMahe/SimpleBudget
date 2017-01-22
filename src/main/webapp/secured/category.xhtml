@@ -10,6 +10,7 @@
 	<h:head>
         <title>#{bundle['titreGeneral']}</title>
        	<link rel="stylesheet" media="screen" href="../simpleBudget.css" />
+       	<script type="text/javascript" src="../js/cat.js"></script>
         
     </h:head>
 	
@@ -46,7 +47,8 @@
 				    		<p:selectOneMenu id="catReplace" 
 												value="#{categoryController.otherCatsList}" 
 												converter="categoryCompleteNameConverter"  
-												var="oCat">
+												var="oCat"
+												widgetVar="selectReplacementCat">
 								<f:selectItems 	value="#{categoryController.otherCatsList}" 
 					      						var="fatPot" 
 												itemLabel="#{fatPot.name}"/>
@@ -64,8 +66,9 @@
 				    		<p:selectOneMenu id="catFather" 
 												value="#{categoryController.cat.fatherCategory}" 
 												converter="categoryConverter"  
-												var="fatCat">
-								<f:selectItem itemLabel="#{bundle['pasDeCategorieMere']}" itemValue="" />
+												var="fatCat"
+												widgetVar="selectFatherCat">
+								<f:selectItem itemLabel="#{bundle['pasDeCategorieMere']}" itemValue="nofather" />
 								<f:selectItems 	value="#{categoryController.fatherPotentialsList}" 
 					      						var="fatPot" 
 												itemLabel="#{fatPot.name}"/>
@@ -135,6 +138,10 @@
 			</div>
 			</div>
 		</h:form>
+		
+		<script type="text/javascript">
+			var originalFatherValue = "#{categoryController.cat.fatherCategory.name}";
+		</script>
 		
 		<div id="warningBeforeCatReplace" class="ui-messages ui-messages-info ui-widget autoComplete infoAutoComplete" style="display: none;">
 			<span class="ui-messages-info-icon"></span>

@@ -61,6 +61,8 @@ public class TestLine {
 	@Test
 	public void testConstructorFromArray(){
 		logger.info("Starting testConstructorFromArray...");
+
+		int currentYear = LocalDate.now().getYear();
 		
 		// less than 10 values
 		String[] valuesArray5 = {"2016-02-24",
@@ -133,7 +135,7 @@ public class TestLine {
 								lineCreditChildlessActual);
 		
 		// debit, child category
-		String[] valuesArrayDebitChildCat = {"2016-02-19",
+		String[] valuesArrayDebitChildCat = {currentYear + "-02-19",
 												"\"Cyrillus.Fr Paris 16/02\n Paiement Par Carte\"",
 												"\"14,90€\"",
 												"",
@@ -154,8 +156,8 @@ public class TestLine {
 		}
 		Line lineDebitChildCatExpected = new Line();
 		lineDebitChildCatExpected.setAmount(-14.90f);
-		lineDebitChildCatExpected.setDate(LocalDate.of(2016, 02, 19));
-		lineDebitChildCatExpected.setCCardDate(LocalDate.of(2016, 02, 16));
+		lineDebitChildCatExpected.setDate(LocalDate.of(currentYear, 02, 19));
+		lineDebitChildCatExpected.setCCardDate(LocalDate.of(currentYear, 02, 16));
 		lineDebitChildCatExpected.setDetailedLabel("Cyrillus.Fr Paris 16/02\n Paiement Par Carte");
 		lineDebitChildCatExpected.setNote("");
 		lineDebitChildCatExpected.setShortLabel("Cyrillus.Fr Paris");
@@ -170,7 +172,7 @@ public class TestLine {
 
 		
 		// debit, childless, 2nd cat
-		String[] valuesArray9DebitChildless = {"2016-06-20",
+		String[] valuesArray9DebitChildless = {currentYear + "-06-20",
 												"\"Paiement Par Carte Objets Et Cie Massy 17/06\"",
 												"48,95€",
 												"",
@@ -191,8 +193,8 @@ public class TestLine {
 		}
 		Line lineDebitChildlessExpected = new Line();
 		lineDebitChildlessExpected.setAmount(-48.95f);
-		lineDebitChildlessExpected.setDate(LocalDate.of(2016, 06, 20));
-		lineDebitChildlessExpected.setCCardDate(LocalDate.of(2016, 06, 17));
+		lineDebitChildlessExpected.setDate(LocalDate.of(currentYear, 06, 20));
+		lineDebitChildlessExpected.setCCardDate(LocalDate.of(currentYear, 06, 17));
 		lineDebitChildlessExpected.setDetailedLabel("Paiement Par Carte Objets Et Cie Massy 17/06");
 		lineDebitChildlessExpected.setNote("");
 		lineDebitChildlessExpected.setShortLabel("Objets Et Cie Massy");
@@ -372,12 +374,14 @@ public class TestLine {
 	@Test
 	public void testExtractDate(){
 		logger.info("Starting testExtractDate...");
-
+		
+		int currentYear = LocalDate.now().getYear();
+		
 		// Auto Debit
 		String input = "Cdn Le Mans 1 18/03 12h48  \n" +  
 						" Retrait Au Distributeur";
 		
-		LocalDate expectedOutput = LocalDate.of(2016, 03, 18);
+		LocalDate expectedOutput = LocalDate.of(currentYear, 03, 18);
 		
 		LocalDate actualOutput = Line.extractDate(input);
 		
@@ -387,7 +391,7 @@ public class TestLine {
 		input = "Dpam Le Mans 26/02 \n" +
 				" Paiement Par Carte";
 		
-		expectedOutput = LocalDate.of(2016, 02, 26);
+		expectedOutput = LocalDate.of(currentYear, 02, 26);
 		
 		actualOutput = Line.extractDate(input);
 		
@@ -397,7 +401,7 @@ public class TestLine {
 		input = "Paiement Par Carte  \n" +
 				" Phcie Leduc Le Mans 27/07";
 		
-		expectedOutput = LocalDate.of(2016, 07, 27);
+		expectedOutput = LocalDate.of(currentYear, 07, 27);
 		
 		actualOutput = Line.extractDate(input);
 		

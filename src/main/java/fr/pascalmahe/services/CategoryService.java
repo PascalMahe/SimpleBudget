@@ -171,6 +171,7 @@ public class CategoryService {
 				// and category.hashCode are based on ID only).
 				if(currentCat.getId() == null){
 					GenericDao<Category> catDao = new GenericDao<>(Category.class);
+					logger.debug("lineListToCatRowList - looking for Cat w/ name: " + currentCat.getName());
 					currentCat = catDao.fetchByName(currentCat.getName());
 				}
 				

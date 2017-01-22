@@ -234,7 +234,6 @@ function validateCatChoices(){
 		var msgTop = firstElmt.offset().top; // top is same as first catChoice's top
 		var categoryZone = $(".categoryZone"); // left is right of categoryZone
 		
-		var pos = categoryZone.position();
 		var msgLeft = categoryZone.offset().left + categoryZone.outerWidth();
 		duplicateCatChoiceElmt.css({'top': msgTop + "px", 'left': msgLeft + "px"});
 		duplicateCatChoiceElmt.show();
