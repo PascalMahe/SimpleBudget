@@ -19,11 +19,17 @@ public class WebConstants {
 	// cookie age in seconds: 90 days * 24 hrs * 60 min * 60 secs
 	public static final Integer REMEMBERME_COOKIE_AGE = 90 * 24 * 60 * 60;
 
-	public static final String TEST_HOST = "http://localhost:5000";
+	public static final String LOCAL_HEROKU_HOST = "http://localhost:5000";
 	
-	public static final String TEST_LOGIN_URL = TEST_HOST + LOGIN_PAGE;
+	public static final String LOCAL_TOMCAT_HOST = "http://localhost:8080/simplebudget";
+
+	public static final String LOCAL_TOMCAT_LOGIN_URL = LOCAL_TOMCAT_HOST + LOGIN_PAGE;
 	
-	public static final String TEST_ROOT_URL = TEST_HOST + "/";
+	public static final String LOCAL_TOMCAT_ROOT_URL = LOCAL_TOMCAT_HOST + "/";
+
+	public static final String LOCAL_HEROKU_LOGIN_URL = LOCAL_HEROKU_HOST + LOGIN_PAGE;
+	
+	public static final String LOCAL_HEROKU_ROOT_URL = LOCAL_HEROKU_HOST + "/";
 
 	public static final String HEROKUAPP_HOST = "https://immense-headland-25588.herokuapp.com";
 	

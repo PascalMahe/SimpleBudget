@@ -30,6 +30,7 @@ public class AbstractDriverTest extends AbstractTest {
 	private static Logger logger = LogManager.getLogger();
 
 	protected static final String CHROMEDRIVER_EXE = "chromedriver.exe";
+	protected static final String GECKODRIVER_EXE = "geckodriver.exe";
 
 	protected static WebDriver driverFirefox;
 	
@@ -38,41 +39,34 @@ public class AbstractDriverTest extends AbstractTest {
 	protected static String detectedHost;
 	
 	public static void browserSetup(){
+		long timeBeforeDriverExeExtraction = System.currentTimeMillis();
+
+		extractDriverFile(CHROMEDRIVER_EXE);
+		extractDriverFile(GECKODRIVER_EXE);
+		
 		long timeBeforeDriverLaunch = System.currentTimeMillis();
 		
+		long timeToExtract = timeBeforeDriverLaunch - timeBeforeDriverExeExtraction;
+		String formattedElapsedTime = DurationFormatUtils
+				.formatDuration(timeToExtract, "mm:ss.SSS");
+		
+		logger.debug("browserSetup - time to extract drivers: " + formattedElapsedTime);
+		
+		
 		FirefoxProfile firefoxProfile = AccountService.getFFProfile();
+		System.setProperty("webdriver.gecko.driver", GECKODRIVER_EXE);
 		driverFirefox = new FirefoxDriver(firefoxProfile);
 //		driverFirefox = new FirefoxDriver();
 		
 		long timeAfterDriverLaunch = System.currentTimeMillis();
 		
 		long elapsedTime = timeAfterDriverLaunch - timeBeforeDriverLaunch;
-		String formattedElapsedTime = DurationFormatUtils
+		formattedElapsedTime = DurationFormatUtils
 				.formatDuration(elapsedTime, "mm:ss.SSS");
 		
 		logger.debug("browserSetup - time to launch FF: " + formattedElapsedTime);
 		
 		timeBeforeDriverLaunch = System.currentTimeMillis();
-		
-
-		URL url = TestLogin.class.getClassLoader().getResource(CHROMEDRIVER_EXE);
-		
-		try {
-			FileOutputStream output = new FileOutputStream(CHROMEDRIVER_EXE);
-			InputStream input = url.openStream();
-			byte [] buffer = new byte[4096];
-			int bytesRead = input.read(buffer);
-			while (bytesRead != -1) {
-			    output.write(buffer, 0, bytesRead);
-			    bytesRead = input.read(buffer);
-			}
-			output.close();
-			input.close();
-		} catch (FileNotFoundException e) {
-			logger.error("setUp - Error while extracting chromedriver.exe: " + e.getLocalizedMessage(), e);
-		} catch (IOException e) {
-			logger.error("setUp - Error while extracting chromedriver.exe: " + e.getLocalizedMessage(), e);
-		}
 		
 		DesiredCapabilities capa = new DesiredCapabilities();
 		ChromeOptions co = new ChromeOptions();
@@ -94,15 +88,20 @@ public class AbstractDriverTest extends AbstractTest {
 		logger.debug("browserSetup - time to launch Chrome: " + formattedElapsedTime);
 		
 		try {
-			driverFirefox.get(WebConstants.TEST_HOST);
-			detectedHost = WebConstants.TEST_HOST;
+			driverFirefox.get(WebConstants.LOCAL_TOMCAT_HOST);
+			detectedHost = WebConstants.LOCAL_TOMCAT_HOST;
 			
 		} catch (TimeoutException e) {
 			try{
-				driverFirefox.get(WebConstants.HEROKUAPP_HOST);
-				detectedHost = WebConstants.HEROKUAPP_HOST;
+				driverFirefox.get(WebConstants.LOCAL_HEROKU_HOST);
+				detectedHost = WebConstants.LOCAL_HEROKU_HOST;
 			} catch(TimeoutException e2){
-				logger.warn("browserSetup - No server found, skipping tests.");
+				try{
+					driverFirefox.get(WebConstants.HEROKUAPP_HOST);
+					detectedHost = WebConstants.HEROKUAPP_HOST;
+				} catch(TimeoutException e3){
+					logger.warn("browserSetup - No server found, skipping tests.");
+				}
 			}
 		}
 		
@@ -111,12 +110,41 @@ public class AbstractDriverTest extends AbstractTest {
 		}
 	}
 	
+	private static void extractDriverFile(String pathToDriverExe) {
+
+		URL url = TestLogin.class.getClassLoader().getResource(pathToDriverExe);
+		
+		try {
+			FileOutputStream output = new FileOutputStream(pathToDriverExe);
+			InputStream input = url.openStream();
+			byte [] buffer = new byte[4096];
+			int bytesRead = input.read(buffer);
+			while (bytesRead != -1) {
+			    output.write(buffer, 0, bytesRead);
+			    bytesRead = input.read(buffer);
+			}
+			output.close();
+			input.close();
+		} catch (FileNotFoundException e) {
+			logger.error("setUp - Error while extracting " + pathToDriverExe + ": " + e.getLocalizedMessage(), e);
+		} catch (IOException e) {
+			logger.error("setUp - Error while extracting " + pathToDriverExe + ": " + e.getLocalizedMessage(), e);
+		}
+	}
+
 	protected static void browserTeardown(){
 		driverFirefox.quit();
 		driverChrome.quit();
 		
-		File chromeDriverFile = new File(CHROMEDRIVER_EXE);
-		chromeDriverFile.delete();
+		deleteDriverFile(CHROMEDRIVER_EXE);
+		deleteDriverFile(GECKODRIVER_EXE);
+		
+	}
+	
+	private static void deleteDriverFile(String pathname){
+
+		File driverFile = new File(pathname);
+		driverFile.delete();
 	}
 	
 	

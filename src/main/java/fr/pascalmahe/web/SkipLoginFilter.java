@@ -105,13 +105,20 @@ public class SkipLoginFilter implements Serializable, Filter {
 			
 			// naive implementation: CONSTANTS ! \o/ 
 			if(!logoutFlagPresent && 
-					(url.equalsIgnoreCase(WebConstants.TEST_ROOT_URL) 
-					|| url.equalsIgnoreCase(WebConstants.TEST_LOGIN_URL)
+					(url.equalsIgnoreCase(WebConstants.LOCAL_HEROKU_ROOT_URL) 
+					|| url.equalsIgnoreCase(WebConstants.LOCAL_HEROKU_LOGIN_URL)
+					|| url.equalsIgnoreCase(WebConstants.LOCAL_TOMCAT_ROOT_URL)
+					|| url.equalsIgnoreCase(WebConstants.LOCAL_TOMCAT_LOGIN_URL)
 					|| url.equalsIgnoreCase(WebConstants.HEROKUAPP_ROOT_URL)
 					|| url.equalsIgnoreCase(WebConstants.HEROKUAPP_LOGIN_URL))){
 				HttpServletResponse httpResponse = (HttpServletResponse) response;
 				logger.debug("doFilter - Wants to go to main or login page -> skip that step and go to DASHBOARD!");
-				httpResponse.sendRedirect(WebConstants.DASHBOARD_PAGE);
+				String dashboardURL = WebConstants.DASHBOARD_PAGE;
+				if(url.equalsIgnoreCase(WebConstants.LOCAL_TOMCAT_ROOT_URL)
+						|| url.equalsIgnoreCase(WebConstants.LOCAL_TOMCAT_LOGIN_URL)){
+					dashboardURL = WebConstants.WEB_SUBDOMAIN + WebConstants.DASHBOARD_PAGE;
+				}
+				httpResponse.sendRedirect(dashboardURL);
 			} else {
 				logger.debug("doFilter - Moving on...");
 				chain.doFilter(request, response);
