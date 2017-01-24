@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -48,6 +49,7 @@ public class TestAccountService extends AbstractTest {
 	}
 
 	@Test
+	@Ignore // because not implemented yet
 	public void testConnect(){
 
 		WebDriverWait wait = new WebDriverWait(driver, AccountService.waitTime);
@@ -87,6 +89,7 @@ public class TestAccountService extends AbstractTest {
 	}
 	
 	@Test
+	@Ignore // because not implemented yet
 	public void testGoToLoginPage(){
 
 		WebDriverWait wait = new WebDriverWait(driver, AccountService.waitTime);
@@ -133,6 +136,7 @@ public class TestAccountService extends AbstractTest {
 	}
 
 	@Test
+	@Ignore // because not implemented yet
 	public void testCrawlLines(){
 
 		// CA
