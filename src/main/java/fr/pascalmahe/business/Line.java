@@ -200,7 +200,7 @@ public class Line implements Serializable, Comparable<Line> {
 		Type cCardType = TypeService.fromDetailedLabel(Type.CCARD_PAYMENT);
 		Type autoType = TypeService.fromDetailedLabel(Type.AUTO_DEBIT_LONG);
 		if(type.equals(cCardType) || type.equals(autoType)){
-			this.cCardDate = extractDate(detailedLabel);
+			this.cCardDate = extractDate(detailedLabel, date);
 		}
 		
 		this.categorisationList = new ArrayList<>();
@@ -236,7 +236,7 @@ public class Line implements Serializable, Comparable<Line> {
 		categorisationList.add(new Categorisation(firstCategoAmount, cat));
 	}
 
-	protected static LocalDate extractDate(String detailedLabel) {
+	protected static LocalDate extractDate(String detailedLabel, LocalDate date) {
 		
 		LocalDate result = null;
 		int dateStartIndex, dateEndIndex;
@@ -250,10 +250,23 @@ public class Line implements Serializable, Comparable<Line> {
 			dateEndIndex = dateMatcher.end();
 			
 			String dateStr = detailedLabel.substring(dateStartIndex, dateEndIndex);
-			dateStr += "/" + LocalDate.now().getYear();
+			dateStr += "/" + date.getYear();
 			DateTimeFormatter formatter = frDTFormatter;
 			try {
 				result = LocalDate.parse(dateStr, formatter);
+				
+				// checking months to make sure that using date's year 
+				// was the right idea (it's not when the date is in december
+				// but the credit card date is in january, for example)
+				
+				// if date.month = 12 & cCardDate = 1
+				// cCardDate is next year from date
+				// cCardDate'year is date's year + 1
+				if(date.getMonthValue() == 12 && result.getMonthValue() == 1){
+					result = result.plusYears(1);
+				} else if(date.getMonthValue() == 1 && result.getMonthValue() == 12){
+					result = result.plusYears(-1);
+				}
 			} catch (DateTimeException dte) {
 				logger.debug("extractDate - Date '" + dateStr + "' could not be parsed, leaving null as cCardDate.");
 			}
@@ -299,7 +312,7 @@ public class Line implements Serializable, Comparable<Line> {
 		}
 		
 		
-		// removing references from label :
+		// removing references from label:
 		// references (IDs...) are for computers and hurt readability
 		// -> chuck'em!
 		// by breaking the string down word by word and putting it 

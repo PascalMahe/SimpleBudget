@@ -383,7 +383,7 @@ public class TestLine {
 		
 		LocalDate expectedOutput = LocalDate.of(currentYear, 03, 18);
 		
-		LocalDate actualOutput = Line.extractDate(input);
+		LocalDate actualOutput = Line.extractDate(input, LocalDate.now());
 		
 		assertThat("wrong date from auto debit", actualOutput, is(expectedOutput));
 
@@ -393,7 +393,7 @@ public class TestLine {
 		
 		expectedOutput = LocalDate.of(currentYear, 02, 26);
 		
-		actualOutput = Line.extractDate(input);
+		actualOutput = Line.extractDate(input, LocalDate.now());
 		
 		assertThat("wrong date from CCARD (date before)", actualOutput, is(expectedOutput));
 
@@ -403,7 +403,7 @@ public class TestLine {
 		
 		expectedOutput = LocalDate.of(currentYear, 07, 27);
 		
-		actualOutput = Line.extractDate(input);
+		actualOutput = Line.extractDate(input, LocalDate.now());
 		
 		assertThat("wrong date from CCARD (date after)", actualOutput, is(expectedOutput));
 
@@ -412,7 +412,7 @@ public class TestLine {
 		
 		expectedOutput = null;
 		
-		actualOutput = Line.extractDate(input);
+		actualOutput = Line.extractDate(input, LocalDate.now());
 		
 		assertThat("wrong date, should be null", actualOutput, is(expectedOutput));
 		
