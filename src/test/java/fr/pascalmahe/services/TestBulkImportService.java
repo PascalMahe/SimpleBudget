@@ -50,7 +50,6 @@ public class TestBulkImportService extends AbstractTest {
 	}
 
 	@Test
-	@Ignore
 	public void testArrayOfLineAsStrToLineList(){
 		logger.info("Starting testArrayOfLineAsStrToLineList...");
 		
@@ -133,7 +132,7 @@ public class TestBulkImportService extends AbstractTest {
 		Line list1 = new Line();
 		list1.setDetailedLabel("Monoprix 2301 Leman2045223 27/04\n" + 
 								" Paiement Par Carte");
-		list1.setShortLabel("Monoprix 2301 27/04");
+		list1.setShortLabel("Monoprix 2301");
 		list1.setDate(LocalDate.of(2016, 04, 28));
 		list1.setCCardDate(LocalDate.of(2016, 04, 27));
 		list1.setType(TypeService.fromDetailedLabel(list1.getDetailedLabel()));
@@ -144,7 +143,7 @@ public class TestBulkImportService extends AbstractTest {
 		Line list2 = new Line();
 		list2.setDetailedLabel("Le Mans St Pavin 27/04 18h20\n" + 
 								" Retrait Au Distributeur");
-		list2.setShortLabel("Le Mans St Pavin 27/04");
+		list2.setShortLabel("Le Mans St Pavin");
 		list2.setDate(LocalDate.of(2016, 04, 27));
 		list2.setType(TypeService.fromDetailedLabel(list2.getDetailedLabel()));
 		list2.setAmount(-20.00f);
@@ -154,7 +153,7 @@ public class TestBulkImportService extends AbstractTest {
 		Line list3 = new Line();
 		list3.setDetailedLabel("Du Bruit Dans La Cu Le Man 26/02\n" +
 								" Paiement Par Carte");
-		list3.setShortLabel("Du Bruit Dans La Cu Le Man 26/02");
+		list3.setShortLabel("Du Bruit Dans La Cu Le Man");
 		list3.setDate(LocalDate.of(2016, 02, 29));
 		list3.setCCardDate(LocalDate.of(2016, 02, 26));
 		list3.setType(TypeService.fromDetailedLabel(list3.getDetailedLabel()));
@@ -183,7 +182,6 @@ public class TestBulkImportService extends AbstractTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testInsertLineList(){
 		logger.info("Starting testInsertLineList...");
 		
@@ -253,7 +251,6 @@ public class TestBulkImportService extends AbstractTest {
 	}
 	
 	@Test
-	@Ignore
 	public void testConsume(){
 		logger.info("Starting testConsume...");
 		

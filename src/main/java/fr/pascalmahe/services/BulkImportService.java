@@ -60,9 +60,6 @@ public class BulkImportService {
 		
 		logger.info("Importing...");
 		
-		// 0 : number of lines correctly formed lines,
-		// 1 : number of lines successfully inserted,
-		// 2 : number of categories created
 		BulkImportResult result = new BulkImportResult();
 		
 		int startOfFirstDataLine;
@@ -207,6 +204,8 @@ public class BulkImportService {
 							cat.setFatherCategory(fatCatAlreadyInDb);
 						} else {
 							catDao.saveOrUpdate(fatCat);
+							result.addCategoryCreated(fatCat.getName());
+							
 						}
 					}
 					
