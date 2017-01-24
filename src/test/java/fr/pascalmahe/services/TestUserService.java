@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import fr.pascalmahe.business.User;
 import fr.pascalmahe.ex.LoginAlreadyExistsException;
@@ -255,6 +256,7 @@ public class TestUserService extends AbstractTest {
 	}
 	
 	@Test
+	@Ignore // because not needed atm
 	public void testCreateRealUsers(){
 		logger.info("Starting testCreateRealUsers...");
 		
@@ -275,7 +277,6 @@ public class TestUserService extends AbstractTest {
 		} catch (LoginAlreadyExistsException laee){
 			// do nothing, user already exists
 		}
-		
 		
 		logger.info("testCreateRealUsers finished.");
 	}
