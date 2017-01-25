@@ -132,6 +132,7 @@ public class CategoryService {
 		GenericDao<Line> dao = new GenericDao<>(Line.class);
 		
 		List<Line> lineList = dao.fetchLinesLast6Months();
+		logger.debug("fetchCategoryTable - fetched " + lineList.size() + " rows.");
 		List<CatRow> catRowList = lineListToCatRowList(lineList);
 		
 		String infoMsg = "Fetched " + catRowList.size() + " rows on ";

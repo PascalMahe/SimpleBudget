@@ -334,7 +334,9 @@ public class TestCategoryService extends AbstractTest {
 		
 		List<CatRow> catRowList = CategoryService.fetchCategoryTable();
 		
-		int expectedCatNb = 7; 
+		prettyPrint(catRowList);
+		
+		int expectedCatNb = 5; // only childless and father categories count 
 		assertThat("Number of Categorys in list of CatRows should be " + expectedCatNb + ": ", 
 				catRowList.size(), 
 				is(expectedCatNb));
@@ -488,10 +490,54 @@ public class TestCategoryService extends AbstractTest {
 				}
 			}
 			
-			
 		}
 		
 		logger.info("testFetchCategoryTable finished.");
+	}
+
+	private void prettyPrint(List<CatRow> catRowList) {
+		StringBuilder strBuilder = new StringBuilder("\n");
+		for(CatRow catR : catRowList){
+			// formatted on 14 chars so that they're all on the same level
+			strBuilder.append(String.format("%14s", catR.getCategory().getName()));
+			if(catR.isChildFree()){
+				
+				strBuilder.append(String.format("%14s", " "));
+				strBuilder.append(prettyPrintChildFree(catR.getMonthList()));
+			} else {
+				for(int i = 0; i < catR.getSonsCatRowList().size(); i++){
+					CatRow son = catR.getSonsCatRowList().get(i);
+					if(i == 0){
+						// the first son is on the same line as the father,
+						// so formatted on 14 chars (2/2 of childfree)
+						strBuilder.append(String.format("%14s", son.getCategory().getName()));
+					} else {
+						// the others are on their own lines, so like childfree cats 
+						strBuilder.append(String.format("%28s", son.getCategory().getName()));
+					}
+					strBuilder.append(prettyPrintChildFree(son.getMonthList()));
+				}
+			}
+		}
+		logger.warn(strBuilder.toString());
+	}
+
+	private StringBuilder prettyPrintChildFree(Map<MonthInYear, MonthCell> monthList) {
+		StringBuilder strBuilder = new StringBuilder();
+		
+		for(MonthInYear moy : monthList.keySet()){
+			MonthCell moCe = monthList.get(moy);
+			strBuilder.append(" ");
+			strBuilder.append(moy);
+			strBuilder.append(" (");
+			strBuilder.append(String.format("%6.2f", moCe.getNegAmount())); // format on 6 char, 2 digits after comma
+			strBuilder.append(" ; ");
+			strBuilder.append(String.format("%6.2f", moCe.getPosAmount()));
+			strBuilder.append(")\t");
+		}
+		strBuilder.append("\n");
+		
+		return strBuilder;
 	}
 
 }

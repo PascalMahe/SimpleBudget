@@ -80,17 +80,19 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 	}
 
 	public void addAmountToMonth(MonthInYear currentMonth, Float amount) {
-		
+		logger.trace("addAmountToMonth - adding " + amount + " to month: " + currentMonth + " in cat " + this.category.getName() + ".");
 		MonthCell currentMoce = null;
 		if(monthList == null){
 			monthList = new TreeMap<>(reverseMonthInYearComparator);
 		}
+		String debugMsg = "addAmountToMonth - ";
 		if(monthList.keySet().contains(currentMonth)){
 			
 			currentMoce = monthList.get(currentMonth);
+			debugMsg += currentMoce;
 			currentMoce.addAmount(amount);
 		} else {
-			
+			debugMsg += "created month";
 			float posAmount = 0.0f;
 			float negAmount = 0.0f;
 			if(amount > 0){
@@ -101,6 +103,8 @@ public class CatRow implements Serializable, Comparable<CatRow> {
 			currentMoce = new MonthCell(currentMonth, posAmount, negAmount);
 			monthList.put(currentMonth, currentMoce);
 		}
+		debugMsg += " -> " + currentMoce;
+		logger.trace(debugMsg);
 		
 	}
 

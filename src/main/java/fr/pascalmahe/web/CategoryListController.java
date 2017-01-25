@@ -1,6 +1,7 @@
 package fr.pascalmahe.web;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,11 @@ public class CategoryListController implements Serializable {
 		logger.debug(debugMsg);
 		
 		logger.debug("init - Filling monthList...");
-		
-		monthList = rowList.get(0).getListOfMonthNames();
-		
+		if(rowList.size() > 0){
+			monthList = rowList.get(0).getListOfMonthNames();
+		} else {
+			monthList = new ArrayList<>();
+		}
 		logger.debug("init - MonthList filled.");
 		
 		logger.debug("init - Computing sum and sumExceptInternalMovements...");

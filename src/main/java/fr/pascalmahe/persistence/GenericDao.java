@@ -403,23 +403,17 @@ public class GenericDao<T> {
 		
 		Session currSession = sessionFactory.openSession();
 		
-//		Criteria crita = currSession.createCriteria(classToUse);
-//		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-//		crita.setFetchMode("categorisationList", FetchMode.JOIN);
+		Criteria crita = currSession.createCriteria(classToUse);
+		crita.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		crita.setFetchMode("categorisationList", FetchMode.JOIN);
 		
 		LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		logger.debug("fetchLinesLast6Months - getting lines with dates as old as: " + dtf.format(sixMonthsAgo));
-//		crita.add(Restrictions.ge("date", sixMonthsAgo));
-		
-//		@SuppressWarnings("unchecked")
-//		List<Line> list = crita.list();
+		crita.add(Restrictions.ge("date", sixMonthsAgo));
 		
 		@SuppressWarnings("unchecked")
-		List<Line> list = currSession.createQuery("from Line l left join fetch l.categorisationList catego " +
-													"where l.date >= :date")
-										.setParameter("date", sixMonthsAgo)
-										.list();
+		List<Line> list = crita.list();
 		
 		return list;
 	}
