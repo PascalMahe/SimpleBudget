@@ -38,6 +38,9 @@ public class AbstractTest {
 	protected static int nbUsersBeforeTests;
 
 	protected static int nbTypesBeforeTests;
+
+	// to list Types created autmatically by TypeService.fromDetailedLabel()
+	private static List<Type> preExistingTypes;
 	
 	public static void preTestDatabaseCheckup(){
 
@@ -56,6 +59,8 @@ public class AbstractTest {
 		nbLinesBeforeTests = lineDao.count();
 		nbUsersBeforeTests = userDao.count();
 		nbTypesBeforeTests = typeDao.count();
+		
+		preExistingTypes = typeDao.fetchAll();
 		
 		logger.debug("loadUpDatabase - nbBalancesBeforeTests: " + nbBalancesBeforeTests);
 		logger.debug("loadUpDatabase - nbBudgetsBeforeTests: " + nbBudgetsBeforeTests);
@@ -95,6 +100,17 @@ public class AbstractTest {
 		logger.debug("cleanUpDatabase - nbUsersAfterTests: " + nbUsersAfterTests);
 		logger.debug("cleanUpDatabase - nbTypesAfterTests: " + nbTypesAfterTests);
 
+
+		// deleting Types that have been inserted
+		// automatically
+		List<Type> postExistingTypes = typeDao.fetchAll();
+		
+		for(Type poTy: postExistingTypes){
+			if(!preExistingTypes.contains(poTy)){
+				listToDelete.add(poTy);
+			}
+		}
+		
 		for(Object currObject : listToDelete){
 			
 			if(listAlreadyDeleted.contains(currObject)){

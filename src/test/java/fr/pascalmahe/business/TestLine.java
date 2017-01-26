@@ -7,16 +7,33 @@ import static org.hamcrest.CoreMatchers.is;
 import java.time.LocalDate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fr.pascalmahe.ex.MalformedLineException;
 import fr.pascalmahe.services.TypeService;
+import fr.pascalmahe.testUtil.AbstractTest;
 import fr.pascalmahe.testUtil.Validator;
 
-public class TestLine {
+public class TestLine extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
-	
+
+	@BeforeClass
+	public static void beforeClass(){
+		logger.info("Starting beforeClass...");
+		preTestDatabaseCheckup();
+		logger.info("beforeClass finished.");
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		logger.info("Starting afterClass...");
+		cleanUpDatabase();
+		logger.info("afterClass finished.");
+	}
+
 	@Test
 	public void testRegex(){
 		String zRegex = "Fr37z26318";

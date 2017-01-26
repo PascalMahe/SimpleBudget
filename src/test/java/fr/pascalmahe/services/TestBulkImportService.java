@@ -34,15 +34,11 @@ public class TestBulkImportService extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
 	
-	// to list Types created autmatically by the import function
-	private static List<Type> preExistingTypes;
-	
 	@BeforeClass
 	public static void beforeClass(){
 		logger.info("Starting beforeClass...");
 		preTestDatabaseCheckup();
-		
-		preExistingTypes = getTypesNotInDeletionList();
+			
 		logger.info("beforeClass finished.");
 	}
 
@@ -50,62 +46,8 @@ public class TestBulkImportService extends AbstractTest {
 	public static void afterClass() {
 		logger.info("Starting afterClass...");
 
-		// deleting Types that have been inserted
-		// automatically
-		GenericDao<Type> typeDao = new GenericDao<>(Type.class);
-		List<Type> postExistingTypes = typeDao.fetchAll();
-		
-		for(Type poTy: postExistingTypes){
-			if(!preExistingTypes.contains(poTy)){
-				listToDelete.add(poTy);
-			}
-		}
-		
 		cleanUpDatabase();
 		logger.info("afterClass finished.");
-	}
-	
-
-	private static List<Type> getTypesNotInDeletionList(){
-
-		// fetching types that arleady are in the database
-		// so that they're not deleted at the end of the test
-		GenericDao<Type> typeDao = new GenericDao<>(Type.class);
-		List<Type> preExistingTypes = typeDao.fetchAll();
-		
-		String debugMsg = "";
-		for(Type ty: preExistingTypes){
-			if(debugMsg.length() > 0){
-				debugMsg += " - ";
-			}
-			debugMsg += ty.getName();
-		}
-		logger.debug("getTypesNotInDeletionList - types in DB: [" + debugMsg + "].");
-		
-		List<Type> preExistingNotInDeletionListTypes = filterListOnListToDelete(preExistingTypes);
-		
-		debugMsg = "";
-		for(Type ty: preExistingNotInDeletionListTypes){
-			if(debugMsg.length() > 0){
-				debugMsg += " - ";
-			}
-			debugMsg += ty.getName();
-		}
-		logger.debug("getTypesNotInDeletionList - types in DB not in listToDelete: [" + debugMsg + "].");
-		
-		return preExistingNotInDeletionListTypes;
-	}
-
-	private static List<Type> filterListOnListToDelete(List<Type> preExistingTypes) {
-		List<Type> typesNotInListToDelete = new ArrayList<>(); 
-		
-		for(Type ty: typesNotInListToDelete){
-			if(!listToDelete.contains(ty)){
-				typesNotInListToDelete.add(ty);
-			}
-		}
-		
-		return typesNotInListToDelete;
 	}
 
 	@Test
