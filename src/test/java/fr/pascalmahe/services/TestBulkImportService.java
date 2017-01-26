@@ -17,7 +17,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import fr.pascalmahe.business.Account;
@@ -34,25 +33,85 @@ import fr.pascalmahe.web.beans.BulkImportResult;
 public class TestBulkImportService extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
-
+	
+	// to list Types created autmatically by the import function
+	private static List<Type> preExistingTypes;
+	
 	@BeforeClass
 	public static void beforeClass(){
 		logger.info("Starting beforeClass...");
 		preTestDatabaseCheckup();
+		
+		preExistingTypes = getTypesNotInDeletionList();
 		logger.info("beforeClass finished.");
 	}
 
 	@AfterClass
 	public static void afterClass() {
 		logger.info("Starting afterClass...");
+
+		// deleting Types that have been inserted
+		// automatically
+		GenericDao<Type> typeDao = new GenericDao<>(Type.class);
+		List<Type> postExistingTypes = typeDao.fetchAll();
+		
+		for(Type poTy: postExistingTypes){
+			if(!preExistingTypes.contains(poTy)){
+				listToDelete.add(poTy);
+			}
+		}
+		
 		cleanUpDatabase();
 		logger.info("afterClass finished.");
+	}
+	
+
+	private static List<Type> getTypesNotInDeletionList(){
+
+		// fetching types that arleady are in the database
+		// so that they're not deleted at the end of the test
+		GenericDao<Type> typeDao = new GenericDao<>(Type.class);
+		List<Type> preExistingTypes = typeDao.fetchAll();
+		
+		String debugMsg = "";
+		for(Type ty: preExistingTypes){
+			if(debugMsg.length() > 0){
+				debugMsg += " - ";
+			}
+			debugMsg += ty.getName();
+		}
+		logger.debug("getTypesNotInDeletionList - types in DB: [" + debugMsg + "].");
+		
+		List<Type> preExistingNotInDeletionListTypes = filterListOnListToDelete(preExistingTypes);
+		
+		debugMsg = "";
+		for(Type ty: preExistingNotInDeletionListTypes){
+			if(debugMsg.length() > 0){
+				debugMsg += " - ";
+			}
+			debugMsg += ty.getName();
+		}
+		logger.debug("getTypesNotInDeletionList - types in DB not in listToDelete: [" + debugMsg + "].");
+		
+		return preExistingNotInDeletionListTypes;
+	}
+
+	private static List<Type> filterListOnListToDelete(List<Type> preExistingTypes) {
+		List<Type> typesNotInListToDelete = new ArrayList<>(); 
+		
+		for(Type ty: typesNotInListToDelete){
+			if(!listToDelete.contains(ty)){
+				typesNotInListToDelete.add(ty);
+			}
+		}
+		
+		return typesNotInListToDelete;
 	}
 
 	@Test
 	public void testArrayOfLineAsStrToLineList(){
 		logger.info("Starting testArrayOfLineAsStrToLineList...");
-		
+			
 		String[] arrayOfLineAsStr = {"2016-04-28,"
 									+ "\"Mma Sa Iard Virt. Des Salaires 0 \n" + 
 										" Virement En Votre Faveur\n" +
@@ -115,69 +174,78 @@ public class TestBulkImportService extends AbstractTest {
 		result = BulkImportService.
 				arrayOfLineAsStrToLineList(arrayOfLineAsStr, result);
 		
-		Line list0 = new Line();
-		list0.setDetailedLabel("Mma Sa Iard Virt. Des Salaires 0 \n" + 
+		Line line0 = new Line();
+		line0.setDetailedLabel("Mma Sa Iard Virt. Des Salaires 0 \n" + 
 								" Virement En Votre Faveur\n" +
 								" Virement Salaire\n" +
 								" Virt. Des Salaires 0043591");
-		list0.setShortLabel("Mma Sa Iard Virt. Des Salaires 0" + 
+		line0.setShortLabel("Mma Sa Iard Virt. Des Salaires 0" + 
 								" Salaire" + 
 								" Virt. Des Salaires 0043591");
-		list0.setDate(LocalDate.of(2016, 04, 28));
-		list0.setType(TypeService.fromDetailedLabel(list0.getDetailedLabel()));
-		list0.setAmount(2347.09f);
-		list0.setNote("");
-		list0.addCategorisation(2347.09f, "Salaires");
+		line0.setDate(LocalDate.of(2016, 04, 28));
+		line0.setType(TypeService.fromDetailedLabel(line0.getDetailedLabel()));
+		line0.setAmount(2347.09f);
+		line0.setNote("");
+		line0.addCategorisation(2347.09f, "Salaires");
 		
-		Line list1 = new Line();
-		list1.setDetailedLabel("Monoprix 2301 Leman2045223 27/04\n" + 
+		Line line1 = new Line();
+		line1.setDetailedLabel("Monoprix 2301 Leman2045223 27/04\n" + 
 								" Paiement Par Carte");
-		list1.setShortLabel("Monoprix 2301");
-		list1.setDate(LocalDate.of(2016, 04, 28));
-		list1.setCCardDate(LocalDate.of(2016, 04, 27));
-		list1.setType(TypeService.fromDetailedLabel(list1.getDetailedLabel()));
-		list1.setAmount(-55.07f);
-		list1.setNote("");
-		list1.addCategorisation(-55.07f, "Courses", "Quotidiennes");
+		line1.setShortLabel("Monoprix 2301");
+		line1.setDate(LocalDate.of(2016, 04, 28));
+		line1.setCCardDate(LocalDate.of(2016, 04, 27));
+		line1.setType(TypeService.fromDetailedLabel(line1.getDetailedLabel()));
+		line1.setAmount(-55.07f);
+		line1.setNote("");
+		line1.addCategorisation(-55.07f, "Courses", "Quotidiennes");
 		
-		Line list2 = new Line();
-		list2.setDetailedLabel("Le Mans St Pavin 27/04 18h20\n" + 
+		Line line2 = new Line();
+		line2.setDetailedLabel("Le Mans St Pavin 27/04 18h20\n" + 
 								" Retrait Au Distributeur");
-		list2.setShortLabel("Le Mans St Pavin");
-		list2.setDate(LocalDate.of(2016, 04, 27));
-		list2.setType(TypeService.fromDetailedLabel(list2.getDetailedLabel()));
-		list2.setAmount(-20.00f);
-		list2.setNote("");
-		list2.addCategorisation(-20.00f, "Courses", "Retraits");
+		line2.setShortLabel("Le Mans St Pavin");
+		line2.setDate(LocalDate.of(2016, 04, 27));
+		line2.setType(TypeService.fromDetailedLabel(line2.getDetailedLabel()));
+		line2.setAmount(-20.00f);
+		line2.setNote("");
+		line2.addCategorisation(-20.00f, "Courses", "Retraits");
 
-		Line list3 = new Line();
-		list3.setDetailedLabel("Du Bruit Dans La Cu Le Man 26/02\n" +
+		Line line3 = new Line();
+		line3.setDetailedLabel("Du Bruit Dans La Cu Le Man 26/02\n" +
 								" Paiement Par Carte");
-		list3.setShortLabel("Du Bruit Dans La Cu Le Man");
-		list3.setDate(LocalDate.of(2016, 02, 29));
-		list3.setCCardDate(LocalDate.of(2016, 02, 26));
-		list3.setType(TypeService.fromDetailedLabel(list3.getDetailedLabel()));
-		list3.setAmount(-10.50f);
-		list3.setNote("");
-		list3.addCategorisation(-10.50f, "Meubles & Déco", "Cuisine");
+		line3.setShortLabel("Du Bruit Dans La Cu Le Man");
+		line3.setDate(LocalDate.of(2016, 02, 29));
+		line3.setCCardDate(LocalDate.of(2016, 02, 26));
+		line3.setType(TypeService.fromDetailedLabel(line3.getDetailedLabel()));
+		line3.setAmount(-10.50f);
+		line3.setNote("");
+		line3.addCategorisation(-10.50f, "Meubles & Déco", "Cuisine");
 
-		Line list4 = new Line();
-		list4.setDetailedLabel("Int Deb 1 Trim 16 Taeg=17,62%\n" +
+		Line line4 = new Line();
+		line4.setDetailedLabel("Int Deb 1 Trim 16 Taeg=17,62%\n" +
 								" Frais");
-		list4.setShortLabel("Int Deb 1 Trim 16");
-		list4.setDate(LocalDate.of(2016, 04, 01));
-		list4.setType(TypeService.fromDetailedLabel(list4.getDetailedLabel()));
-		list4.setAmount(-3.11f);
-		list4.setNote("");
-		list4.addCategorisation(-3.11f, "Banque", "Intérêts");
+		line4.setShortLabel("Int Deb 1 Trim 16");
+		line4.setDate(LocalDate.of(2016, 04, 01));
+		line4.setType(TypeService.fromDetailedLabel(line4.getDetailedLabel()));
+		line4.setAmount(-3.11f);
+		line4.setNote("");
+		line4.addCategorisation(-3.11f, "Banque", "Intérêts");
 
+		List<Line> expectedList = new ArrayList<>();
+		expectedList.add(line0);
+		expectedList.add(line1);
+		expectedList.add(line2);
+		expectedList.add(line3);
+		expectedList.add(line4);
+		
 		List<Line> actualList = result.getLineList();
+		
 		assertThat(actualList.size(), is(5));
-		Validator.validateLine("#0 of testArrayOfLineAsStrToLineList", list0, actualList.get(0));
-		Validator.validateLine("#1 of testArrayOfLineAsStrToLineList", list1, actualList.get(1));
-		Validator.validateLine("#2 of testArrayOfLineAsStrToLineList", list2, actualList.get(2));
-		Validator.validateLine("#3 of testArrayOfLineAsStrToLineList", list3, actualList.get(3));
-		Validator.validateLine("#4 of testArrayOfLineAsStrToLineList", list4, actualList.get(4));
+		Validator.validateLine("#0 of testArrayOfLineAsStrToLineList", expectedList.get(0), actualList.get(0));
+		Validator.validateLine("#1 of testArrayOfLineAsStrToLineList", expectedList.get(1), actualList.get(1));
+		Validator.validateLine("#2 of testArrayOfLineAsStrToLineList", expectedList.get(2), actualList.get(2));
+		Validator.validateLine("#3 of testArrayOfLineAsStrToLineList", expectedList.get(3), actualList.get(3));
+		Validator.validateLine("#4 of testArrayOfLineAsStrToLineList", expectedList.get(4), actualList.get(4));
+		
 		logger.info("testArrayOfLineAsStrToLineList finished.");
 	}
 	
@@ -413,7 +481,7 @@ public class TestBulkImportService extends AbstractTest {
 	
 	@Test
 	public void testErrorOnFatherCategoryInBulkImport(){
-		logger.info("Starting testConsume...");
+		logger.info("Starting testErrorOnFatherCategoryInBulkImport...");
 		
 		// Reproduces an error only seen from the browser:
 		// inserting two lines with the same father category
@@ -481,7 +549,6 @@ public class TestBulkImportService extends AbstractTest {
 				listToDelete.add(retCat);
 			}
 			
-			
 			// validation : will only pass when the problem is fixed!
 			assertThat("Wrong number of Lines created: ", bir.getNbLinesCreated(), is(2));
 			assertThat("Wrong number of malformed Lines: ", bir.getNbLinesMalformed(), is(0));
@@ -493,4 +560,5 @@ public class TestBulkImportService extends AbstractTest {
 		
 		logger.info("testErrorOnFatherCategoryInBulkImport finished.");
 	}
+	
 }

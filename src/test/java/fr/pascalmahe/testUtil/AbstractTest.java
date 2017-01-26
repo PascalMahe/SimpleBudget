@@ -232,6 +232,7 @@ public class AbstractTest {
 					typeDao.delete(typeToDelete);
 					nbDeletedObjects++;
 					logger.debug("Type #" + typeToDelete.getId() + " deleted.");
+					listAlreadyDeleted.add(typeToDelete);
 					
 				} else {
 					throw new IllegalArgumentException("An object had no corresponding DAO! It's a: " 
