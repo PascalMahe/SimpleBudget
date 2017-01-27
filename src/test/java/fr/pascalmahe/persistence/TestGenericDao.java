@@ -31,6 +31,7 @@ import fr.pascalmahe.business.Category;
 import fr.pascalmahe.business.Line;
 import fr.pascalmahe.business.Type;
 import fr.pascalmahe.business.User;
+import fr.pascalmahe.services.TypeService;
 import fr.pascalmahe.testUtil.AbstractTest;
 import fr.pascalmahe.testUtil.Validator;
 
@@ -1122,6 +1123,31 @@ public class TestGenericDao extends AbstractTest {
 		logger.info("Starting testFetchLinesLast6Months...");
 		
 		GenericDao<Line> lineDao = new GenericDao<>(Line.class);
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HH:mm:ss.SSS");
+		LocalDateTime dateTime = LocalDateTime.now();
+		LocalDate date = LocalDate.now();
+		String differentiator = dateTime.format(formatter);
+		Category cat = new Category("testFetchLinesLast6Months" + differentiator);
+		Categorisation catego = new Categorisation(-100.0f, cat);
+		List<Categorisation> listeCatego = new ArrayList<>();
+		listeCatego.add(catego);
+		Line l1 = new Line(date.minusMonths(2), 
+				date.minusMonths(2), 
+							"testFetchLinesLast6Months" + differentiator,
+							"testFetchLinesLast6Months" + differentiator,
+							"" + differentiator,
+							-100.0f, 
+							false,
+							TypeService.fromDetailedLabel(Type.CHECK),
+							Account.fromName(Account.NAME_LBP),
+							listeCatego);
+		lineDao.saveOrUpdate(l1);
+		
+		listToDelete.add(cat);
+		listToDelete.add(catego);
+		listToDelete.add(l1);
+		
 		List<Line> lineList = lineDao.fetchLinesLast6Months();
 		
 		assertTrue("Number of Lines should be more than 0: ", lineList.size() > 0);
