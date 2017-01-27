@@ -11,8 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fr.pascalmahe.business.Type;
+import fr.pascalmahe.testUtil.AbstractTest;
 
-public class TestTypeService extends TypeService {
+public class TestTypeService extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
 
@@ -107,15 +108,14 @@ public class TestTypeService extends TypeService {
 	@BeforeClass
 	public static void beforeClass(){
 		logger.info("Starting beforeClass...");
-		
-		
+		preTestDatabaseCheckup();
 		logger.info("beforeClass finished.");
 	}
 
 	@AfterClass
 	public static void afterClass() {
 		logger.info("Starting afterClass...");
-		
+		cleanUpDatabase();
 		logger.info("afterClass finished.");
 	}
 	

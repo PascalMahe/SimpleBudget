@@ -15,9 +15,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import fr.pascalmahe.business.Category;
+import fr.pascalmahe.testUtil.AbstractTest;
 import fr.pascalmahe.web.beans.CatChoice;
 
-public class TestLineService extends LineService {
+public class TestLineService extends AbstractTest {
 
 	private static final Logger logger = LogManager.getLogger();
 
@@ -25,7 +26,7 @@ public class TestLineService extends LineService {
 	@BeforeClass
 	public static void beforeClass(){
 		logger.info("Starting beforeClass...");
-		
+		preTestDatabaseCheckup();
 		
 		logger.info("beforeClass finished.");
 	}
@@ -33,7 +34,7 @@ public class TestLineService extends LineService {
 	@AfterClass
 	public static void afterClass() {
 		logger.info("Starting afterClass...");
-		
+		cleanUpDatabase();
 		logger.info("afterClass finished.");
 	}
 	
@@ -47,7 +48,7 @@ public class TestLineService extends LineService {
 		
 		mapCatChoice.put(0, catChoice0);
 		
-		computeCatChoiceAmounts(100.0f, mapCatChoice);
+		LineService.computeCatChoiceAmounts(100.0f, mapCatChoice);
 		
 		for(Integer categoID : mapCatChoice.keySet()){
 			CatChoice currentCatChoice = mapCatChoice.get(categoID);
@@ -64,7 +65,7 @@ public class TestLineService extends LineService {
 		mapCatChoice.put(0, catChoice0);
 		mapCatChoice.put(1, catChoice1);
 		
-		computeCatChoiceAmounts(100.0f, mapCatChoice);
+		LineService.computeCatChoiceAmounts(100.0f, mapCatChoice);
 		
 		for(Integer categoID : mapCatChoice.keySet()){
 			CatChoice currentCatChoice = mapCatChoice.get(categoID);
@@ -84,7 +85,7 @@ public class TestLineService extends LineService {
 		mapCatChoice.put(1, catChoice1);
 		mapCatChoice.put(2, catChoice2);
 		
-		computeCatChoiceAmounts(100.0f, mapCatChoice);
+		LineService.computeCatChoiceAmounts(100.0f, mapCatChoice);
 		
 		for(Integer categoID : mapCatChoice.keySet()){
 			CatChoice currentCatChoice = mapCatChoice.get(categoID);
@@ -123,7 +124,7 @@ public class TestLineService extends LineService {
 		mapCatChoice.put(1, catChoice1);
 		mapCatChoice.put(2, catChoice2);
 		
-		computeCatChoiceAmounts(100.0f, mapCatChoice);
+		LineService.computeCatChoiceAmounts(100.0f, mapCatChoice);
 		
 		for(Integer categoID : mapCatChoice.keySet()){
 			CatChoice currentCatChoice = mapCatChoice.get(categoID);
